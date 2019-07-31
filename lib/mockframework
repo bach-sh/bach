@@ -1,0 +1,168 @@
+# -*- mode: sh -*-
+
+if [[ -z "${BASH_VERSION:-}" ]]; then
+    die "This mock framework only supports bash scripts."
+    return 1
+fi
+
+shopt -s expand_aliases
+export PATH_ORIGIN="$PATH"
+
+if [[ "${BESTING_DEBUG:-}" == true ]]; then
+    eval "$(type debug | command sed -e 1d -e 's, 1\?>\&2 8> /dev/null, >\&8,' -e 's/ 1\?>\&2//')"
+    exec 8>&2
+else
+    function debug() {
+        :
+    }
+fi
+
+function besting-real-command() {
+    declare -a cmd
+    cmd=("$(PATH="$PATH_ORIGIN" command which "$1")" "${@:2}")
+    debug "[REAL-CMD]" "${cmd[@]}"
+    "${cmd[@]}"
+}
+alias @real=besting-real-command
+
+function besting-run-tests--get-all-tests() {
+    declare -F | @real grep 'declare -f test.\+'
+}
+
+function besting-run-tests() {
+    declare -i total=0 error=0
+    while read -r _ _ name; do
+        [[ "$name" == *"-assert" ]] && continue
+        debug "Running test: $name"
+        : $(( total++ ))
+        assert-execution "$name" || true : $(( error++ ))
+    done < <(besting-run-tests--get-all-tests)
+
+    printf "\n-----\nAll tests: %s, Failed tests: %d\n" "$total" "$error" >&2
+}
+
+function besting-on-exit() {
+    if [[ "$?" -eq 0 ]]; then
+        besting-run-tests
+    else
+        err "Couldn't initlize tests."
+    fi
+}
+
+trap besting-on-exit EXIT
+
+function @mock-command() {
+    debug "@mock 'command'" "$@"
+    function command() {
+        command_not_found_handle command "$@"
+    }
+}
+
+function xargs() {
+    declare param
+    declare -a xargs_opts
+    while param="${1:-}"; [[ -n "$param" ]]; do
+        shift || true
+        if [[ "$param" == "--" ]]; then
+            xargs_opts+=(/bin/echo "$@")
+            break
+        else
+            xargs_opts+=("$param")
+        fi
+    done
+    debug "@mock-xargs" "${xargs_opts[@]}"
+    @real xargs "${xargs_opts[@]}"
+}
+
+function mock-command() {
+    declare -a param name cmd func body
+    name="$1"
+    if [[ "$(type -t "$name" )" == builtin ]] && [[ "$(type -t "@mock-$name" )" == function ]]; then
+        "@mock-$name" "${@:2}"
+    fi
+    while param="${1:-}"; [[ -n "$param" ]]; do
+        shift
+        [[ "$param" == '--' ]] && break
+        cmd+=("$param")
+    done
+    declare mockfunc
+    mockfunc="mock_exec_${name}_$(builtin echo -n "${cmd[@]}" | gmd5sum | /usr/bin/cut -b1-32)"
+    #stderr name="$name"
+    if [[ "$#" -gt 0 ]]; then
+        func="$*"
+    else
+        func="$(/bin/cat)"
+    fi
+    body="function ${mockfunc}() { debug Running mock : '${cmd[*]}' :; $func; }"
+    # debug "$body"
+    eval "$body"
+}
+alias @mock="mock-command"
+
+function command_not_found_handle() {
+    declare mockfunc name="$1"
+    mockfunc="mock_exec_${name}_$(builtin echo -n "$@" | gmd5sum | /usr/bin/cut -b1-32)"
+    # debug "mockid=$mockid" >&2
+    if [[ "$(type -t "${mockfunc}")" == function ]]; then
+        "${mockfunc}" "$@"
+    elif [[ "$(type -t "${name}")" == function ]]; then
+        debug "[CNFH-builtin]" "$@"
+        builtin "$@"
+    else
+        debug "[CNFH-default]" "$@"
+        builtin echo "$@"
+    fi
+} 8>/dev/null
+export -f command_not_found_handle
+
+function mock-all-commands() {
+    declare name body
+    for name; do
+        body="function $name() { builtin echo \"$name\" \"\$@\"; }"
+        eval "$body"
+    done
+}
+alias @mockall="mock-all-commands"
+
+alias @setup='function besting_framework_setup'
+
+@mockall cd
+
+function assert-execution() (
+    PATH=path-not-exists
+    declare name="$1"
+    if /usr/bin/diff -w -C3  <(
+            set +eu
+            shopt -s restricted_shell
+            "${name}"-assert
+        ) <(
+            set +eu
+            shopt -s restricted_shell
+            [[ "$(builtin type -t besting_framework_setup)" == function ]] && besting_framework_setup
+            "${name}"
+        )
+    then
+        printf "\e[1;36m[PASS] %s\e[0;m\n" "$name"
+        return 0
+    else
+        printf "\e[1;31m[FAIL] %s\e[0;m\n" "$name"
+        return 1
+    fi
+)
+
+function ignore-command() {
+    declare name="$1"
+    eval "function $name() { :; }"
+}
+
+function stderr() {
+    printf "%s\n" "$@" >&2
+}
+
+function stdout() {
+    printf "%s\n" "$@"
+}
+
+function gmd5sum() {
+    /usr/local/bin/gmd5sum "$@"
+}
