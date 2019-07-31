@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export CFLIB_INC_PATH="$HOME/src/common-functions-lib"; source "$CFLIB_INC_PATH/cflib-import.sh"
+source <("${BASH_SOURCE%/*}"/../cflib-import.sh)
 require colorize
 require mockframework
 
