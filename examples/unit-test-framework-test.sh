@@ -140,3 +140,28 @@ test-ff-2() {
 test-ff-2-assert() {
     find . -type f -name "*file1*" -or -name "*bar*"
 }
+
+test-mock-absolute-path-of-script() {
+    @mock /tmp/cannot-mock-this 2>&1
+}
+test-mock-absolute-path-of-script-assert() {
+    printf "\e[1;31m%s\e[0;m\n" 'Cannot mock an absolute path: /tmp/cannot-mock-this'
+}
+
+test-mock-script() {
+    @mock ./script
+    ./script foo bar
+}
+test-mock-script-assert() {
+    @real ./script foo bar
+}
+
+test-mock-existed-script() {
+    @mock ./cannot-mock-existed-script 2>&1 || return 1
+    @mock ./cannot-mock-existed-script 2>&1
+    @assert-fail Should not go here
+    ./cannot-mock-existed-script foo bar    2>&1
+}
+test-mock-existed-script-assert() {
+    printf "\e[1;31m%s\e[0;m\n" 'Cannot mock an existed path: ./cannot-mock-existed-script'
+}
