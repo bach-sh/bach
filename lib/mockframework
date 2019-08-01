@@ -146,7 +146,7 @@ function @mock() {
     if [[ "$name" == */* ]]; then
         [[ -d "${name%/*}" ]] || @mkdir -p "${name%/*}"
         @cat > "$name" <<SCRIPT
-#!/bin/bash
+#!${BASH:-/bin/bash}
 ${func}
 SCRIPT
         @chmod +x "$name" >&2

@@ -169,3 +169,12 @@ test-mock-existed-script() {
 test-mock-existed-script-assert() {
     printf "\e[1;31m%s\e[0;m\n" 'Cannot mock an existed path: ./cannot-mock-existed-script'
 }
+
+test-mock-script-1() {
+    @mock ./path/to/script -- something
+    ./path/to/script
+}
+test-mock-script-1-assert() {
+    something
+}
+
