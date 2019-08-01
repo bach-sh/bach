@@ -117,6 +117,10 @@ test-must-have-an-assertion() {
     test-must-have-an-assertion-assert
 }
 
+test-SKIP-must-have-an-assertion-assert() {
+    :
+}
+
 function load-ff() {
     @load_function "${self%/*}/example-functions" ff
 }
