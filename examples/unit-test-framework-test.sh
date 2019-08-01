@@ -149,11 +149,11 @@ test-mock-absolute-path-of-script-assert() {
 }
 
 test-mock-script() {
-    @mock ./script
-    ./script foo bar
+    @mock ./path/to/script
+    ./path/to/script foo bar
 }
 test-mock-script-assert() {
-    @real ./script foo bar
+    @real ./path/to/script foo bar
 }
 
 test-mock-existed-script() {

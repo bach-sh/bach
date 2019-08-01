@@ -39,7 +39,7 @@ for name in echo pwd test; do
     declare -grx "_${name}"="$(besting-real-path "$name")"
 done
 
-for name in cat chmod cut diff find grep ls md5sum mktemp rm sed tee touch which xargs; do
+for name in cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed tee touch which xargs; do
     declare -grx "_${name}"="$(besting-real-path "$name")"
     eval "function _${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f _${name}"
 done
@@ -127,7 +127,7 @@ function @mock() {
     elif [[ "$name" == */* ]] && [[ -e "$name" ]]; then
         die "Cannot mock an existed path: $name"
     elif [[ "$name" == */* ]]; then
-        [[ -d "${name%/*}" ]] || mkdir -p "${name%/*}"
+        [[ -d "${name%/*}" ]] || _mkdir -p "${name%/*}"
         _cat > "$name" <<SCRIPT
 #!/bin/bash
 ${_echo} "$name" "\$@"
