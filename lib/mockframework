@@ -232,15 +232,19 @@ function assert-execution() (
 
     if @diff "${BESTING_ASSERT_DIFF_OPTS[@]}" <(
             set +euo pipefail
-            @pushd actual &>/dev/null
-            [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
-            ("${besting_test_name}")
+            (
+                @pushd actual &>/dev/null
+                [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
+                "${besting_test_name}"
+            )
             @echo "Exit code: $?"
         ) <(
             set +euo pipefail
-            @pushd expected &>/dev/null
-            [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
-            ("${besting_test_name}"-assert)
+            (
+                @pushd expected &>/dev/null
+                [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
+                "${besting_test_name}"-assert
+            )
             @echo "Exit code: $?"
         ) &>"$testresult" 8>&2
     then
