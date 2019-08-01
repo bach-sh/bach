@@ -14,7 +14,7 @@ testmd5sum() {
 }
 testmd5sum-assert() {
     fake-md5sum --version
-    _diff --version
+    @diff --version
 }
 
 @setup {

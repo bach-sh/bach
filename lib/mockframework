@@ -32,7 +32,7 @@ function besting-real-path() {
 export -f besting-real-path
 
 for name in cd command echo eval exec false popd pushd pwd true type; do
-    eval "function _${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f _${name}"
+    eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
 
 for name in echo pwd test; do
@@ -41,13 +41,13 @@ done
 
 for name in cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed tee touch which xargs; do
     declare -grx "_${name}"="$(besting-real-path "$name")"
-    eval "function _${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f _${name}"
+    eval "function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
 
 function besting-real-command() {
     declare name="$1"
     if [[ "$name" == */* ]]; then
-        _echo "$@"
+        @echo "$@"
         return
     fi
     declare -a cmd
@@ -59,7 +59,7 @@ export -f besting-real-command
 alias @real=besting-real-command
 
 function besting-run-tests--get-all-tests() {
-    declare -F | "$_grep" 'declare -f test.\+'
+    declare -F | "$@grep" 'declare -f test.\+'
 }
 
 function besting-run-tests() {
@@ -107,14 +107,14 @@ function xargs() {
         fi
     done
     debug "@mock-xargs" "${xargs_opts[@]}"
-    _xargs "${xargs_opts[@]}"
+    @xargs "${xargs_opts[@]}"
 }
 export -f xargs
 
 function @mock() {
     declare -a param name cmd func body
     name="$1"
-    if [[ "$(_type -t "$name" )" == builtin ]] && [[ "$(_type -t "@mock-$name" )" == function ]]; then
+    if [[ "$(@type -t "$name" )" == builtin ]] && [[ "$(@type -t "@mock-$name" )" == function ]]; then
         "@mock-$name" "${@:2}"
     fi
     while param="${1:-}"; [[ -n "$param" ]]; do
@@ -127,20 +127,20 @@ function @mock() {
     elif [[ "$name" == */* ]] && [[ -e "$name" ]]; then
         die "Cannot mock an existed path: $name"
     elif [[ "$name" == */* ]]; then
-        [[ -d "${name%/*}" ]] || _mkdir -p "${name%/*}"
-        _cat > "$name" <<SCRIPT
+        [[ -d "${name%/*}" ]] || @mkdir -p "${name%/*}"
+        @cat > "$name" <<SCRIPT
 #!/bin/bash
 ${_echo} "$name" "\$@"
 SCRIPT
-        _chmod +x "$name" >&2
+        @chmod +x "$name" >&2
     else
         declare mockfunc
-        mockfunc="mock_exec_${name}_$(_echo -n "${cmd[@]}" | _md5sum | _cut -b1-32)"
+        mockfunc="mock_exec_${name}_$(@echo -n "${cmd[@]}" | @md5sum | @cut -b1-32)"
         #stderr name="$name"
         if [[ "$#" -gt 0 ]]; then
             func="$*"
         else
-            func="$(_cat)"
+            func="$(@cat)"
         fi
         body="function ${mockfunc}() { debug Running mock : '${cmd[*]}' :; $func; }"
         # debug "$body"
@@ -150,19 +150,19 @@ SCRIPT
 export -f @mock
 
 function @mocktrue() {
-    @mock "$@" -- _true
+    @mock "$@" -- @true
 }
 export -f @mocktrue
 
 function @mockfalse() {
-    @mock "$@" -- _false
+    @mock "$@" -- @false
 }
 export -f @mockfalse
 
 function mock-all-commands() {
     declare name body
     for name; do
-        body="function $name() { _echo \"$name\" \"\$@\"; }"
+        body="function $name() { @echo \"$name\" \"\$@\"; }"
         eval "$body"
     done
 }
@@ -175,15 +175,15 @@ alias @setup='function besting_framework_setup'
 declare -xa BESTING_ASSERT_DIFF_OPTS=(-w -C3)
 function assert-execution() (
     declare name="$1" tmpdir testresult
-    tmpdir="$(_mktemp -d)"
-    testresult="$(_mktemp)"
+    tmpdir="$(@mktemp -d)"
+    testresult="$(@mktemp)"
     #trap '/bin/rm -vrf "$tmpdir" "$testresult"' RETURN
-    _pushd "$tmpdir" &>/dev/null
+    @pushd "$tmpdir" &>/dev/null
     declare retval=1
 
     function command_not_found_handle() {
         declare mockfunc name="$1"
-        mockfunc="mock_exec_${name}_$(_echo -n "$@" | _md5sum | _cut -b1-32)"
+        mockfunc="mock_exec_${name}_$(@echo -n "$@" | @md5sum | @cut -b1-32)"
         # debug "mockid=$mockid" >&2
         if [[ "$(type -t "${mockfunc}")" == function ]]; then
             debug "[CNFH-func]" "${mockfunc}" "$@"
@@ -193,13 +193,13 @@ function assert-execution() (
             builtin "$@"
         else
             debug "[CNFH-default]" "$@"
-            _echo "$@"
+            @echo "$@"
         fi
     } #8>/dev/null
     export -f command_not_found_handle
     export PATH=path-not-exists
 
-    if _diff "${BESTING_ASSERT_DIFF_OPTS[@]}" <(
+    if @diff "${BESTING_ASSERT_DIFF_OPTS[@]}" <(
             set +eu
             [[ "$(builtin type -t besting_framework_setup)" == function ]] && besting_framework_setup
             "${name}"
@@ -212,11 +212,11 @@ function assert-execution() (
         retval=0
     else
         printf "\e[1;31m[FAIL] %s\e[0;m\n" "$name"
-        _cat "$testresult" 2>/dev/null 8>/dev/null
+        @cat "$testresult" 2>/dev/null 8>/dev/null
         printf "\n"
     fi
-    if [[ "$(_type -t "${name}-assert")" != function ]]; then
-        _cat >&2 <<-EOF
+    if [[ "$(@type -t "${name}-assert")" != function ]]; then
+        : @cat >&2 <<-EOF
 # Could not find the assertion function for $name
 function ${name}-assert() {
 
@@ -224,8 +224,8 @@ function ${name}-assert() {
 
 EOF
     fi
-    _popd &>/dev/null
-    _rm -rf "$tmpdir" "$testresult"
+    @popd &>/dev/null
+    @rm -rf "$tmpdir" "$testresult"
     return "$retval"
 )
 
@@ -250,6 +250,6 @@ alias @stdout=stdout
 function @load_function() {
     local file="${1:?script filename}"
     local func="${2:?function name}"
-    source <(_sed -Ene "/^function\s+${func}\\b/,/^}\$/p" "$file")
+    source <(@sed -Ene "/^function\s+${func}\\b/,/^}\$/p" "$file")
 } 8>/dev/null
 export -f @load_function
