@@ -24,10 +24,12 @@ else
         fi
     } >&8
 fi
+export -f debug
 
 function besting-real-path() {
     PATH="$PATH_ORIGIN" command which "$1"
 }
+export -f besting-real-path
 
 for name in cd command echo eval exec popd pushd pwd type; do
     eval "function _${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f _${name}"
@@ -83,6 +85,7 @@ function @mock-command() {
         command_not_found_handle command "$@"
     }
 }
+export -f @mock-command
 
 function xargs() {
     declare param
@@ -99,6 +102,7 @@ function xargs() {
     debug "@mock-xargs" "${xargs_opts[@]}"
     _xargs "${xargs_opts[@]}"
 }
+export -f xargs
 
 function mock-command() {
     declare -a param name cmd func body
@@ -124,6 +128,7 @@ function mock-command() {
     eval "$body"
 }
 alias @mock="mock-command"
+export -f mock-command
 
 function mock-all-commands() {
     declare name body
@@ -186,22 +191,27 @@ function assert-execution() (
     return "$retval"
 )
 
-function ignore-command() {
+function @ignore() {
     declare name="$1"
     eval "function $name() { : ignore command '$name'; }"
 }
-alias @ignore=ignore-command
+export -f @ignore
 
 function stderr() {
     printf "%s\n" "$@" >&2
 }
+export -f stderr
+alias @stderr=stderr
 
 function stdout() {
     printf "%s\n" "$@"
 }
+export -f stdout
+alias @stdout=stdout
 
-function load_function() {
+function @load_function() {
     local file="${1:?script filename}"
     local func="${2:?function name}"
     source <(_sed -Ene "/^function\s+${func}\\b/,/^}\$/p" "$file")
 } 8>/dev/null
+export -f @load_function

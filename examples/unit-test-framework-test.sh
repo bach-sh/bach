@@ -58,7 +58,7 @@ test2-assert() {
 }
 
 function load-gp() {
-    load_function "${self%/*}/example-functions" gp
+    @load_function "${self%/*}/example-functions" gp
 }
 
 test-gp-1() {
