@@ -134,7 +134,7 @@ export -f @generate_mock_function_name
 function @mock() {
     declare -a param name cmd func body
     name="$1"
-    if [[ "$name" == @(builtin|eval) ]]; then
+    if [[ "$name" == @(builtin|declare|eval) ]]; then
         die "Cannot mock the builtin command: $name"
     fi
     if [[ "$(@type -t "$name" )" == builtin ]] && [[ "$(@type -t "@mock-$name" )" == function ]]; then
