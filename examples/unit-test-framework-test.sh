@@ -54,7 +54,7 @@ test2-assert() {
     sudo rm -rf /src/project
 
     printf "\e[1;31merror\e[0;m\n"
-    echo "ls /foo: No such file or directory"
+    @echo "ls /foo: No such file or directory"
 }
 
 function load-gp() {
@@ -157,7 +157,7 @@ test-mock-script() {
     ./path/to/script foo bar
 }
 test-mock-script-assert() {
-    @real ./path/to/script foo bar
+    @echo ./path/to/script foo bar
 }
 
 test-mock-existed-script() {

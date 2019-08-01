@@ -217,6 +217,7 @@ function assert-execution() (
             "${name}"
         ) <(
             set +eu
+            [[ "$(builtin type -t besting_framework_setup)" == function ]] && besting_framework_setup
             "${name}"-assert
         ) &>"$testresult" 8>&2
     then
