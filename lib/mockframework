@@ -186,21 +186,22 @@ alias @setup='function besting_framework_setup'
 
 declare -xa BESTING_ASSERT_DIFF_OPTS=(-w -C3)
 function assert-execution() (
-    declare name="$1" tmpdir testresult
-    tmpdir="$(@mktemp -d)"
+    declare besting_test_name="$1" besting_tmpdir testresult
+    besting_tmpdir="$(@mktemp -d)"
     testresult="$(@mktemp)"
-    #trap '/bin/rm -vrf "$tmpdir" "$testresult"' RETURN
-    @pushd "$tmpdir" &>/dev/null
+    #trap '/bin/rm -vrf "$besting_tmpdir" "$testresult"' RETURN
+    @pushd "${besting_tmpdir}" &>/dev/null
+    @mkdir actual expected
     declare retval=1
 
     function command_not_found_handle() {
-        declare mockfunc name="$1"
-        mockfunc="mock_exec_${name}_$(@echo -n "$@" | @md5sum | @cut -b1-32)"
+        declare mockfunc besting_cmd_name="$1"
+        mockfunc="mock_exec_${besting_cmd_name}_$(@echo -n "$@" | @md5sum | @cut -b1-32)"
         # debug "mockid=$mockid" >&2
         if [[ "$(type -t "${mockfunc}")" == function ]]; then
             debug "[CNFH-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
-        elif [[ "$(type -t "${name}")" == function ]]; then
+        elif [[ "$(type -t "${besting_cmd_name}")" == function ]]; then
             debug "[CNFH-builtin]" "$@"
             builtin "$@"
         else
@@ -212,39 +213,43 @@ function assert-execution() (
     export PATH=path-not-exists
 
     if @diff "${BESTING_ASSERT_DIFF_OPTS[@]}" <(
-            set +eu
-            [[ "$(builtin type -t besting_framework_setup)" == function ]] && besting_framework_setup
-            "${name}"
+            set +euo pipefail
+            @pushd actual &>/dev/null
+            [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
+            ("${besting_test_name}")
+            @echo "Exit code: $?"
         ) <(
-            set +eu
-            [[ "$(builtin type -t besting_framework_setup)" == function ]] && besting_framework_setup
-            "${name}"-assert
+            set +euo pipefail
+            @pushd expected &>/dev/null
+            [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
+            ("${besting_test_name}"-assert)
+            @echo "Exit code: $?"
         ) &>"$testresult" 8>&2
     then
-        printf "\e[1;36m[PASS] %s\e[0;m\n" "$name"
+        printf "\e[1;36m[PASS] %s\e[0;m\n" "$besting_test_name"
         retval=0
     else
-        printf "\e[1;31m[FAIL] %s\e[0;m\n" "$name"
+        printf "\e[1;31m[FAIL] %s\e[0;m\n" "$besting_test_name"
         @cat "$testresult" 2>/dev/null 8>/dev/null
         printf "\n"
     fi
-    if [[ "$(@type -t "${name}-assert")" != function ]]; then
+    if [[ "$(@type -t "${besting_test_name}-assert")" != function ]]; then
         : @cat >&2 <<-EOF
-# Could not find the assertion function for $name
-function ${name}-assert() {
+# Could not find the assertion function for $besting_test_name
+function ${besting_test_name}-assert() {
 
 }
 
 EOF
     fi
     @popd &>/dev/null
-    @rm -rf "$tmpdir" "$testresult"
+    @rm -rf "$besting_tmpdir" "$testresult"
     return "$retval"
 )
 
 function @ignore() {
-    declare name="$1"
-    eval "function $name() { : ignore command '$name'; }"
+    declare besting_test_name="$1"
+    eval "function $besting_test_name() { : ignore command '$besting_test_name'; }"
 }
 export -f @ignore
 

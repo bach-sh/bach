@@ -150,6 +150,7 @@ test-mock-absolute-path-of-script() {
 }
 test-mock-absolute-path-of-script-assert() {
     printf "\e[1;31m%s\e[0;m\n" 'Cannot mock an absolute path: /tmp/cannot-mock-this'
+    return 1
 }
 
 test-mock-script() {
@@ -168,6 +169,7 @@ test-mock-existed-script() {
 }
 test-mock-existed-script-assert() {
     printf "\e[1;31m%s\e[0;m\n" 'Cannot mock an existed path: ./cannot-mock-existed-script'
+    return 1
 }
 
 test-mock-script-1() {
