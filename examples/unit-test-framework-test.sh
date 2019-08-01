@@ -66,9 +66,13 @@ test-gp-1() {
 
     @mocktrue git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
     gp
+    gp another-remote
+    gp another-remote another-branch
 }
 test-gp-1-assert() {
     git push remote-master branch-name
+    git push another-remote branch-name
+    git push another-remote another-branch
 }
 
 test-gp-2() {
@@ -76,9 +80,13 @@ test-gp-2() {
 
     @mockfalse git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
     gp
+    gp another-remote
+    gp another-remote another-branch
 }
 test-gp-2-assert() {
     git push -u remote-master branch-name
+    git push -u another-remote branch-name
+    git push -u another-remote another-branch
 }
 
 test-besting-real-command-mock-builtin() {
@@ -107,4 +115,28 @@ test-besting-simple-command-assert() {
 
 test-must-have-an-assertion() {
     test-must-have-an-assertion-assert
+}
+
+function load-ff() {
+    @load_function "${self%/*}/example-functions" ff
+}
+
+test-ff-1() {
+    load-ff
+
+    ff
+    ff file1
+}
+test-ff-1-assert() {
+    find . -type f -name "*"
+    find . -type f -name "*file1*"
+}
+
+test-ff-2() {
+    load-ff
+
+    ff file1 bar
+}
+test-ff-2-assert() {
+    find . -type f -name "*file1*" -or -name "*bar*"
 }

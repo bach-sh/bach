@@ -195,6 +195,15 @@ function assert-execution() (
         _cat "$testresult" 2>/dev/null 8>/dev/null
         printf "\n"
     fi
+    if [[ "$(_type -t "${name}-assert")" != function ]]; then
+        _cat >&2 <<-EOF
+# Could not find the assertion function for $name
+function ${name}-assert() {
+
+}
+
+EOF
+    fi
     _popd &>/dev/null
     _rm -rf "$tmpdir" "$testresult"
     return "$retval"
