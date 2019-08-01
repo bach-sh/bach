@@ -184,7 +184,7 @@ alias @setup='function besting_framework_setup'
 
 @mockall cd
 
-declare -xa BESTING_ASSERT_DIFF_OPTS=(-w -C3)
+declare -xa BESTING_ASSERT_DIFF_OPTS=(-C3)
 function assert-execution() (
     declare besting_test_name="$1" besting_tmpdir testresult
     besting_tmpdir="$(@mktemp -d)"
