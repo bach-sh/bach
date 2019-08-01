@@ -93,6 +93,36 @@ test-gp-2-assert() {
     git push -f -u remote-master branch-name
 }
 
+function init-current-working-dir-is-not-a-repo() {
+    @mockfalse git config --get branch.master.remote
+    @mockfalse git rev-parse --abbrev-ref HEAD
+    @mockfalse git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
+
+}
+
+test-gp-not-a-repo() {
+    load-gp
+    init-current-working-dir-is-not-a-repo
+
+    set -eu
+    gp
+}
+test-gp-not-a-repo-assert() {
+    @false
+}
+
+
+test-gp-not-a-repo1() {
+    load-gp
+    init-current-working-dir-is-not-a-repo
+    
+    set -eu
+    gp origin
+}
+test-gp-not-a-repo1-assert() {
+    false
+}
+
 test-besting-real-command-mock-builtin() {
     @mock command which grep -- @stdout fake-grep
     besting-real-command grep --version

@@ -14,8 +14,8 @@ function gp() {
         shift
         gp_opts+=("$param")
     done
-    origin="${1:-$(git config --get branch.master.remote)}"
-    branch="${2:-$(git rev-parse --abbrev-ref HEAD)}"
+    origin="${1:-$(git config --get branch.master.remote)}" || return 1
+    branch="${2:-$(git rev-parse --abbrev-ref HEAD)}" || return 1
     if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' &>/dev/null; then
         gp_opts+=(-u)
     fi
