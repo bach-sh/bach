@@ -68,11 +68,13 @@ test-gp-1() {
     gp
     gp another-remote
     gp another-remote another-branch
+    gp -f
 }
 test-gp-1-assert() {
     git push remote-master branch-name
     git push another-remote branch-name
     git push another-remote another-branch
+    git push -f remote-master branch-name
 }
 
 test-gp-2() {
@@ -82,11 +84,13 @@ test-gp-2() {
     gp
     gp another-remote
     gp another-remote another-branch
+    gp -f
 }
 test-gp-2-assert() {
     git push -u remote-master branch-name
     git push -u another-remote branch-name
     git push -u another-remote another-branch
+    git push -f -u remote-master branch-name
 }
 
 test-besting-real-command-mock-builtin() {

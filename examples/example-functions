@@ -7,10 +7,15 @@ function gcmsg() {
 
 unalias gp &>/dev/null || true
 function gp() {
-    declare branch origin
+    declare branch origin param
+    declare -a gp_opts=()
+    while param="${1:-}"; [[ -n "$param" ]]; do
+        [[ "$param" == -* ]] || break
+        shift
+        gp_opts+=("$param")
+    done
     origin="${1:-$(git config --get branch.master.remote)}"
     branch="${2:-$(git rev-parse --abbrev-ref HEAD)}"
-    declare -a gp_opts=()
     if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' &>/dev/null; then
         gp_opts+=(-u)
     fi
