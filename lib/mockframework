@@ -104,7 +104,7 @@ function xargs() {
 }
 export -f xargs
 
-function mock-command() {
+function @mock() {
     declare -a param name cmd func body
     name="$1"
     if [[ "$(_type -t "$name" )" == builtin ]] && [[ "$(_type -t "@mock-$name" )" == function ]]; then
@@ -127,8 +127,17 @@ function mock-command() {
     # debug "$body"
     eval "$body"
 }
-alias @mock="mock-command"
-export -f mock-command
+export -f @mock
+
+function @mocktrue() {
+    @mock "$@" -- return 0
+}
+export -f @mocktrue
+
+function @mockfalse() {
+    @mock "$@" -- return 1
+}
+export -f @mockfalse
 
 function mock-all-commands() {
     declare name body

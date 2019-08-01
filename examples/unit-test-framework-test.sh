@@ -20,14 +20,14 @@ testmd5sum-assert() {
 @setup {
     @ignore echo
 
-    @mock git config --get branch.master.remote -- stdout "remote-master"
+    @mock git config --get branch.master.remote -- @stdout "remote-master"
     @mock git rev-parse --abbrev-ref HEAD <<-MOCK
-			stdout branch-name
+			@stdout branch-name
 		MOCK
 }
 
 test1() {
-    @mock find . -name fn -- file1 file2
+    @mock find . -name fn -- @stdout file1 file2
 
     ls $(find . -name fn)
 
@@ -47,14 +47,14 @@ test2() {
     sudo rm -rf $project_path
 
     err error 2>&1
-    /bin/ls /foo &>/dev/null || @real echo "ls /foo: No such file or directory"
+    /bin/ls /foo &>/dev/null || @stdout "ls /foo: No such file or directory"
 }
 test2-assert() {
     cd /src
     sudo rm -rf /src/project
 
     printf "\e[1;31merror\e[0;m\n"
-    out "ls /foo: No such file or directory"
+    echo "ls /foo: No such file or directory"
 }
 
 function load-gp() {
@@ -64,7 +64,7 @@ function load-gp() {
 test-gp-1() {
     load-gp
 
-    @mock git rev-parse --abbrev-ref --symbolic-full-name '@{u}' -- return 0
+    @mocktrue git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
     gp
 }
 test-gp-1-assert() {
@@ -74,7 +74,7 @@ test-gp-1-assert() {
 test-gp-2() {
     load-gp
 
-    @mock git rev-parse --abbrev-ref --symbolic-full-name '@{u}' -- return 1
+    @mockfalse git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
     gp
 }
 test-gp-2-assert() {
@@ -82,7 +82,7 @@ test-gp-2-assert() {
 }
 
 test-besting-real-command-mock-builtin() {
-    @mock command which grep -- stdout fake-grep
+    @mock command which grep -- @stdout fake-grep
     besting-real-command grep --version
     command id
 }
