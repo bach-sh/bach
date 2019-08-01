@@ -18,7 +18,7 @@ testmd5sum-assert() {
 }
 
 @setup {
-    ignore-command echo
+    @ignore echo
 
     @mock git config --get branch.master.remote -- stdout "remote-master"
     @mock git rev-parse --abbrev-ref HEAD <<-MOCK
@@ -47,14 +47,14 @@ test2() {
     sudo rm -rf $project_path
 
     err error 2>&1
-    /bin/ls /foo 2>&1
+    /bin/ls /foo &>/dev/null || @real echo "ls /foo: No such file or directory"
 }
 test2-assert() {
     cd /src
     sudo rm -rf /src/project
 
     printf "\e[1;31merror\e[0;m\n"
-    out "ls: /foo: No such file or directory"
+    out "ls /foo: No such file or directory"
 }
 
 function load-gp() {

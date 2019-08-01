@@ -188,8 +188,9 @@ function assert-execution() (
 
 function ignore-command() {
     declare name="$1"
-    eval "function $name() { :; }"
+    eval "function $name() { : ignore command '$name'; }"
 }
+alias @ignore=ignore-command
 
 function stderr() {
     printf "%s\n" "$@" >&2
