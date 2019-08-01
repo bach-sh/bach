@@ -198,3 +198,9 @@ function stderr() {
 function stdout() {
     printf "%s\n" "$@"
 }
+
+function load_function() {
+    local file="${1:?script filename}"
+    local func="${2:?function name}"
+    source <(_sed -Ene "/^function\s+${func}\\b/,/^}\$/p" "$file")
+} 8>/dev/null

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-source <("${BASH_SOURCE%/*}"/../cflib-import.sh)
+declare -grx self="$(realpath "${BASH_SOURCE}")"
+source <("${self%/*/*}"/cflib-import.sh)
 require colorize
 require mockframework
 
@@ -57,11 +57,14 @@ test2-assert() {
     out "ls: /foo: No such file or directory"
 }
 
-load_function ~/.profile.d/90-aliases.sh gp
+function load-gp() {
+    load_function "${self%/*}/example-functions" gp
+}
 
 test-gp-1() {
-    @mock git rev-parse --abbrev-ref --symbolic-full-name '@{u}' -- return 0
+    load-gp
 
+    @mock git rev-parse --abbrev-ref --symbolic-full-name '@{u}' -- return 0
     gp
 }
 test-gp-1-assert() {
@@ -69,6 +72,8 @@ test-gp-1-assert() {
 }
 
 test-gp-2() {
+    load-gp
+
     @mock git rev-parse --abbrev-ref --symbolic-full-name '@{u}' -- return 1
     gp
 }

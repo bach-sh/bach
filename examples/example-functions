@@ -1,0 +1,29 @@
+#!/bin/bash
+
+unalias gcmsg &>/dev/null || true
+function gcmsg() {
+  git commit -m "$*"
+}
+
+unalias gp &>/dev/null || true
+function gp() {
+    declare branch origin
+    origin="${1:-$(git config --get branch.master.remote)}"
+    branch="${2:-$(git rev-parse --abbrev-ref HEAD)}"
+    declare -a gp_opts=()
+    if ! git rev-parse --abbrev-ref --symbolic-full-name '@{u}' &>/dev/null; then
+        gp_opts+=(-u)
+    fi
+    gp_opts+=("$origin" "$branch")
+    echo git push "${gp_opts[@]}"
+    git push "${gp_opts[@]}"
+}
+
+function ff() {
+    declare -a ff_opts=(-name "${1:+*$1}*");
+    [[ "$#" -ge 1 ]] && shift
+    for name; do
+        ff_opts+=(-or -name "*${name}*")
+    done
+    find . -type f "${ff_opts[@]}"
+}
