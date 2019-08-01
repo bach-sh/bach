@@ -178,3 +178,19 @@ test-mock-script-1-assert() {
     something
 }
 
+test-mock-script-2() {
+    @mock ./path/to/script <<\SCRIPT
+if [[ "$1" == foo ]]; then
+  @echo bar
+else
+  @echo anything
+fi
+SCRIPT
+    ./path/to/script foo
+    ./path/to/script something
+}
+test-mock-script-2-assert() {
+    bar
+    anything
+}
+
