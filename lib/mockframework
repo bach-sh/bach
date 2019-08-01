@@ -67,6 +67,7 @@ function besting-run-tests() {
     done < <(besting-run-tests--get-all-tests)
 
     printf -- "-----\nAll tests: %s, failed: %d\n" "$total" "$error" >&2
+    [[ "$error" == 0 ]]
 }
 
 function besting-on-exit() {
