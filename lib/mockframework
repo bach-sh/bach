@@ -58,8 +58,13 @@ function besting-real-command() {
 export -f besting-real-command
 alias @real=besting-real-command
 
+function besting-get-all-functions() {
+    declare -F
+}
+export -f besting-get-all-functions
+
 function besting-run-tests--get-all-tests() {
-    declare -F | while read -r _ _ name; do
+    besting-get-all-functions | while read -r _ _ name; do
         [[ "$name" == test?* ]] || continue
         [[ "$name" == *-assert ]] && continue
         printf "%s\n" "$name"
@@ -117,13 +122,21 @@ function xargs() {
 export -f xargs
 
 function @generate_mock_function_name() {
-    @echo "mock_exec_${1}_$(@echo -n "${@}" | @md5sum | @cut -b1-32)"
+    declare name="$1"
+    if [[ "$(@type -t "$name")" == function && "$name" == !(command) ]]; then
+        @echo "$name"
+    else
+        @echo "mock_exec_${name}_$(@echo -n "${@}" | @md5sum | @cut -b1-32)"
+    fi
 }
 export -f @generate_mock_function_name
 
 function @mock() {
     declare -a param name cmd func body
     name="$1"
+    if [[ "$name" == @(builtin|eval) ]]; then
+        die "Cannot mock the builtin command: $name"
+    fi
     if [[ "$(@type -t "$name" )" == builtin ]] && [[ "$(@type -t "@mock-$name" )" == function ]]; then
         "@mock-$name" "${@:2}"
     fi

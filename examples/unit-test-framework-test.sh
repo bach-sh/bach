@@ -115,7 +115,7 @@ test-gp-not-a-repo-assert() {
 test-gp-not-a-repo1() {
     load-gp
     init-current-working-dir-is-not-a-repo
-    
+
     set -eu
     gp origin
 }
@@ -230,3 +230,17 @@ test-mock-script-2-assert() {
     anything
 }
 
+test-besting-run-tests--get-all-tests() {
+#    set -x
+    @mock besting-get-all-functions <<EOF
+@echo declare -f test-besting-run-tests--get-all-tests-foo
+@echo declare -f test-besting-run-tests--get-all-tests-bar
+@echo declare -f test-besting-run-tests--get-all-tests-bar-assert
+EOF
+
+    besting-run-tests--get-all-tests
+}
+test-besting-run-tests--get-all-tests-assert() {
+    test-besting-run-tests--get-all-tests-foo
+    test-besting-run-tests--get-all-tests-bar
+}
