@@ -6,6 +6,16 @@ require colorize
 require mockframework
 
 #declare -a BESTING_ASSERT_DIFF_OPTS=(-w -y)
+export BESTING_DEBUG=true
+testmd5sum() {
+    @mock command which md5sum -- fake-md5sum
+    @real md5sum --version
+    @real diff --version
+}
+testmd5sum-assert() {
+    fake-md5sum --version
+    _diff --version
+}
 
 @setup {
     ignore-command echo
@@ -23,7 +33,6 @@ test1() {
 
     @mock ls file1 file2 -- file2 file1
     ls $(find . -name fn) | xargs -n1 -- do-something
-
 }
 test1-assert() {
     ls file1 file2

@@ -25,16 +25,34 @@ else
     } >&8
 fi
 
+function besting-real-path() {
+    PATH="$PATH_ORIGIN" command which "$1"
+}
+
+for name in cd command echo eval exec popd pushd pwd type; do
+    eval "function _${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f _${name}"
+done
+
+for name in echo test; do
+    declare -grx "_${name}"="$(besting-real-path "$name")"
+done
+
+for name in cat cut diff grep md5sum mktemp rm sed which xargs; do
+    declare -grx "_${name}"="$(besting-real-path "$name")"
+    eval "function _${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f _${name}"
+done
+
 function besting-real-command() {
     declare -a cmd
-    cmd=("$(PATH="$PATH_ORIGIN" command which "$1")" "${@:2}")
+    cmd=("$(besting-real-path "$1")" "${@:2}")
     debug "[REAL-CMD]" "${cmd[@]}"
     "${cmd[@]}"
 }
+export -f besting-real-command
 alias @real=besting-real-command
 
 function besting-run-tests--get-all-tests() {
-    declare -F | @real grep 'declare -f test.\+'
+    declare -F | "$_grep" 'declare -f test.\+'
 }
 
 function besting-run-tests() {
@@ -72,20 +90,20 @@ function xargs() {
     while param="${1:-}"; [[ -n "$param" ]]; do
         shift || true
         if [[ "$param" == "--" ]]; then
-            xargs_opts+=(/bin/echo "$@")
+            xargs_opts+=("$_echo" "$@")
             break
         else
             xargs_opts+=("$param")
         fi
     done
     debug "@mock-xargs" "${xargs_opts[@]}"
-    @real xargs "${xargs_opts[@]}"
+    _xargs "${xargs_opts[@]}"
 }
 
 function mock-command() {
     declare -a param name cmd func body
     name="$1"
-    if [[ "$(type -t "$name" )" == builtin ]] && [[ "$(type -t "@mock-$name" )" == function ]]; then
+    if [[ "$(_type -t "$name" )" == builtin ]] && [[ "$(_type -t "@mock-$name" )" == function ]]; then
         "@mock-$name" "${@:2}"
     fi
     while param="${1:-}"; [[ -n "$param" ]]; do
@@ -94,12 +112,12 @@ function mock-command() {
         cmd+=("$param")
     done
     declare mockfunc
-    mockfunc="mock_exec_${name}_$(builtin echo -n "${cmd[@]}" | gmd5sum | /usr/bin/cut -b1-32)"
+    mockfunc="mock_exec_${name}_$(_echo -n "${cmd[@]}" | _md5sum | _cut -b1-32)"
     #stderr name="$name"
     if [[ "$#" -gt 0 ]]; then
         func="$*"
     else
-        func="$(/bin/cat)"
+        func="$(_cat)"
     fi
     body="function ${mockfunc}() { debug Running mock : '${cmd[*]}' :; $func; }"
     # debug "$body"
@@ -110,7 +128,7 @@ alias @mock="mock-command"
 function mock-all-commands() {
     declare name body
     for name; do
-        body="function $name() { builtin echo \"$name\" \"\$@\"; }"
+        body="function $name() { _echo \"$name\" \"\$@\"; }"
         eval "$body"
     done
 }
@@ -123,15 +141,15 @@ alias @setup='function besting_framework_setup'
 declare -xa BESTING_ASSERT_DIFF_OPTS=(-w -C3)
 function assert-execution() (
     declare name="$1" tmpdir testresult
-    tmpdir="$(@real mktemp -d)"
-    testresult="$(@real mktemp)"
+    tmpdir="$(_mktemp -d)"
+    testresult="$(_mktemp)"
     #trap '/bin/rm -vrf "$tmpdir" "$testresult"' RETURN
-    pushd "$tmpdir" &>/dev/null
+    _pushd "$tmpdir" &>/dev/null
     declare retval=1
 
     function command_not_found_handle() {
         declare mockfunc name="$1"
-        mockfunc="mock_exec_${name}_$(builtin echo -n "$@" | gmd5sum | /usr/bin/cut -b1-32)"
+        mockfunc="mock_exec_${name}_$(_echo -n "$@" | _md5sum | _cut -b1-32)"
         # debug "mockid=$mockid" >&2
         if [[ "$(type -t "${mockfunc}")" == function ]]; then
             debug "[CNFH-func]" "${mockfunc}" "$@"
@@ -141,30 +159,30 @@ function assert-execution() (
             builtin "$@"
         else
             debug "[CNFH-default]" "$@"
-            builtin echo "$@"
+            _echo "$@"
         fi
     } #8>/dev/null
     export -f command_not_found_handle
     export PATH=path-not-exists
 
-    if @real diff "${BESTING_ASSERT_DIFF_OPTS[@]}" <(
-            set +eu
-            "${name}"-assert
-        ) <(
+    if _diff "${BESTING_ASSERT_DIFF_OPTS[@]}" <(
             set +eu
             [[ "$(builtin type -t besting_framework_setup)" == function ]] && besting_framework_setup
             "${name}"
+        ) <(
+            set +eu
+            "${name}"-assert
         ) &>"$testresult" 8>&2
     then
         printf "\e[1;36m[PASS] %s\e[0;m\n" "$name"
         retval=0
     else
         printf "\e[1;31m[FAIL] %s\e[0;m\n" "$name"
-        @real cat "$testresult" 2>/dev/null 8>/dev/null
+        _cat "$testresult" 2>/dev/null 8>/dev/null
         printf "\n"
     fi
-    pushd &>/dev/null
-    @real rm -rf "$tmpdir" "$testresult"
+    _popd &>/dev/null
+    _rm -rf "$tmpdir" "$testresult"
     return "$retval"
 )
 
@@ -179,8 +197,4 @@ function stderr() {
 
 function stdout() {
     printf "%s\n" "$@"
-}
-
-function gmd5sum() {
-    /usr/local/bin/gmd5sum "$@"
 }
