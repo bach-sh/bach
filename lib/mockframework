@@ -116,6 +116,11 @@ function xargs() {
 }
 export -f xargs
 
+function @generate_mock_function_name() {
+    @echo "mock_exec_${1}_$(@echo -n "${@}" | @md5sum | @cut -b1-32)"
+}
+export -f @generate_mock_function_name
+
 function @mock() {
     declare -a param name cmd func body
     name="$1"
@@ -152,7 +157,7 @@ SCRIPT
         @chmod +x "$name" >&2
     else
         declare mockfunc
-        mockfunc="mock_exec_${name}_$(@echo -n "${cmd[@]}" | @md5sum | @cut -b1-32)"
+        mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
         #stderr name="$name"
         body="function ${mockfunc}() { debug Running mock : '${cmd[*]}' :; $func; }"
         # debug "$body"
@@ -196,7 +201,7 @@ function assert-execution() (
 
     function command_not_found_handle() {
         declare mockfunc besting_cmd_name="$1"
-        mockfunc="mock_exec_${besting_cmd_name}_$(@echo -n "$@" | @md5sum | @cut -b1-32)"
+        mockfunc="$(@generate_mock_function_name "$@")"
         # debug "mockid=$mockid" >&2
         if [[ "$(type -t "${mockfunc}")" == function ]]; then
             debug "[CNFH-func]" "${mockfunc}" "$@"
