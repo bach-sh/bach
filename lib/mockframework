@@ -5,6 +5,8 @@ if [[ -z "${BASH_VERSION:-}" ]]; then
     return 1
 fi
 
+declare -a besting_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs)
+
 shopt -s expand_aliases
 export PATH_ORIGIN="$PATH"
 
@@ -39,10 +41,11 @@ for name in echo pwd test; do
     declare -grx "_${name}"="$(besting-real-path "$name")"
 done
 
-for name in cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs; do
+for name in "${besting_core_utils[@]}"; do
     declare -grx "_${name}"="$(besting-real-path "$name")"
-    eval "function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
+    eval "[[ -n \"\$_${name}\" ]] || die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
+unset name
 
 function besting-real-command() {
     declare name="$1"
