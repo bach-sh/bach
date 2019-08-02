@@ -202,7 +202,22 @@ function mock-all-commands() {
 }
 alias @mockall="mock-all-commands"
 
-alias @setup='function bach_framework_setup'
+BACH_FRAMEWORK__SETUP_FUNCNAME="_bach_framework_setup_"
+alias @setup="function $BACH_FRAMEWORK__SETUP_FUNCNAME"
+
+BACH_FRAMEWORK__PRE_TEST_FUNCNAME='_bach_framework_pre_test_'
+alias @setup-test="function $BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
+
+BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME='_bach_framework_pre_assert_'
+alias @setup-assert="function $BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
+
+function _bach_framework__run_function() {
+    declare name="$1"
+    if [[ "$(@type -t "$name")" == function ]]; then
+        "$name"
+    fi
+}
+export -f _bach_framework__run_function
 
 @mockall cd
 
@@ -238,7 +253,8 @@ function assert-execution() (
             set +euo pipefail
             (
                 @pushd actual &>/dev/null
-                [[ "$(@type -t bach_framework_setup)" == function ]] && bach_framework_setup
+                _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
+                _bach_framework__run_function "$BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
                 "${bach_test_name}"
             )
             @echo "Exit code: $?"
@@ -246,7 +262,8 @@ function assert-execution() (
             set +euo pipefail
             (
                 @pushd expected &>/dev/null
-                [[ "$(@type -t bach_framework_setup)" == function ]] && bach_framework_setup
+                _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
+                _bach_framework__run_function "$BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
                 "${bach_test_name}"-assert
             )
             @echo "Exit code: $?"

@@ -25,6 +25,9 @@ testmd5sum-assert() {
     @diff --version
 }
 
+this_variable_exists=""
+this_variable_exists_in_test=""
+this_variable_exists_in_assert=""
 @setup {
     @ignore echo
 
@@ -32,6 +35,28 @@ testmd5sum-assert() {
     @mock git rev-parse --abbrev-ref HEAD <<-MOCK
 			@stdout branch-name
 		MOCK
+    declare -g this_variable_exists=in_test_and_assert
+    declare -g this_variable_exists_in_test=""
+    declare -g this_variable_exists_in_assert=""
+}
+
+@setup-test {
+    declare -g this_variable_exists_in_test=in_test
+}
+
+@setup-assert {
+    declare -g this_variable_exists_in_assert=in_assert
+}
+
+test-bach-setup() {
+    if [[ -n "$this_variable_exists" ]]; then @echo "$this_variable_exists"; else @echo TEST setup fail; fi
+    if [[ -n "$this_variable_exists_in_test" ]]; then @echo setup-test; else @echo TEST setup setup-test fail; fi
+    if [[ -z "$this_variable_exists_in_assert" ]]; then @echo setup-assert; else @echo TEST should NOT setup setup-assert; fi
+}
+test-bach-setup-assert() {
+    if [[ -n "$this_variable_exists" ]]; then @echo "$this_variable_exists"; else @echo ASSERT setup fail; fi
+    if [[ -z "$this_variable_exists_in_test" ]]; then @echo setup-test; else @echo ASSERT should NOT setup setup-assert; fi
+    if [[ -n "$this_variable_exists_in_assert" ]]; then @echo setup-assert; else @echo ASSERT setup pre-assert fail; fi
 }
 
 test1() {
