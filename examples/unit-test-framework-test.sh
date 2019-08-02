@@ -231,10 +231,13 @@ test-mock-script-2-assert() {
 }
 
 test-besting-run-tests--get-all-tests() {
-#    set -x
+    @mock @shuf -- @cat
     @mock besting-get-all-functions <<EOF
+@echo declare -f gp
 @echo declare -f test-besting-run-tests--get-all-tests-foo
 @echo declare -f test-besting-run-tests--get-all-tests-bar
+@echo declare -f test-besting-run-tests--get-all-tests-bar1
+@echo declare -f test-besting-run-tests--get-all-tests-bar2
 @echo declare -f test-besting-run-tests--get-all-tests-bar-assert
 EOF
 
@@ -243,4 +246,6 @@ EOF
 test-besting-run-tests--get-all-tests-assert() {
     test-besting-run-tests--get-all-tests-foo
     test-besting-run-tests--get-all-tests-bar
+    test-besting-run-tests--get-all-tests-bar1
+    test-besting-run-tests--get-all-tests-bar2
 }

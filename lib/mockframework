@@ -39,7 +39,7 @@ for name in echo pwd test; do
     declare -grx "_${name}"="$(besting-real-path "$name")"
 done
 
-for name in cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed tee touch which xargs; do
+for name in cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs; do
     declare -grx "_${name}"="$(besting-real-path "$name")"
     eval "function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
@@ -64,7 +64,7 @@ function besting-get-all-functions() {
 export -f besting-get-all-functions
 
 function besting-run-tests--get-all-tests() {
-    besting-get-all-functions | while read -r _ _ name; do
+    besting-get-all-functions | @shuf | while read -r _ _ name; do
         [[ "$name" == test?* ]] || continue
         [[ "$name" == *-assert ]] && continue
         printf "%s\n" "$name"
@@ -202,7 +202,7 @@ alias @setup='function besting_framework_setup'
 
 @mockall cd
 
-declare -xa BESTING_ASSERT_DIFF_OPTS=(-C3)
+declare -xa BESTING_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -y)
 function assert-execution() (
     declare besting_test_name="$1" besting_tmpdir testresult
     besting_tmpdir="$(@mktemp -d)"
