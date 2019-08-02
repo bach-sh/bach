@@ -3,10 +3,10 @@ set -euo pipefail
 declare -grx self="$(realpath "${BASH_SOURCE}")"
 source <("${self%/*/*}"/cflib-import.sh)
 require colorize
-require mockframework
+require bach
 
-#declare -a BESTING_ASSERT_DIFF_OPTS=(-w -y)
-export BESTING_DEBUG=true
+#declare -a BACH_ASSERT_DIFF_OPTS=(-w -y)
+export BACH_DEBUG=true
 
 test-rm-rf() {
     project_log_path=/tmp/project/logs
@@ -132,27 +132,27 @@ test-gp-not-a-repo1-assert() {
     false
 }
 
-test-besting-real-command-mock-builtin() {
+test-bach-real-command-mock-builtin() {
     @mock command which grep -- @stdout fake-grep
-    besting-real-command grep --version
+    bach-real-command grep --version
     command id
 }
-test-besting-real-command-mock-builtin-assert() {
+test-bach-real-command-mock-builtin-assert() {
     fake-grep --version
     id
 }
 
-test-besting-real-command-slash-bin() {
-    besting-real-command hostname -f
+test-bach-real-command-slash-bin() {
+    bach-real-command hostname -f
 }
-test-besting-real-command-slash-bin-assert() {
+test-bach-real-command-slash-bin-assert() {
     /bin/hostname -f
 }
 
-test-besting-simple-command() {
+test-bach-simple-command() {
     hostname -f
 }
-test-besting-simple-command-assert() {
+test-bach-simple-command-assert() {
     hostname -f
 }
 
@@ -239,22 +239,22 @@ test-mock-script-2-assert() {
     anything
 }
 
-test-besting-run-tests--get-all-tests() {
+test-bach-run-tests--get-all-tests() {
     @mock @shuf -- @cat
-    @mock besting-get-all-functions <<EOF
+    @mock bach-get-all-functions <<EOF
 @echo declare -f gp
-@echo declare -f test-besting-run-tests--get-all-tests-foo
-@echo declare -f test-besting-run-tests--get-all-tests-bar
-@echo declare -f test-besting-run-tests--get-all-tests-bar1
-@echo declare -f test-besting-run-tests--get-all-tests-bar2
-@echo declare -f test-besting-run-tests--get-all-tests-bar-assert
+@echo declare -f test-bach-run-tests--get-all-tests-foo
+@echo declare -f test-bach-run-tests--get-all-tests-bar
+@echo declare -f test-bach-run-tests--get-all-tests-bar1
+@echo declare -f test-bach-run-tests--get-all-tests-bar2
+@echo declare -f test-bach-run-tests--get-all-tests-bar-assert
 EOF
 
-    besting-run-tests--get-all-tests
+    bach-run-tests--get-all-tests
 }
-test-besting-run-tests--get-all-tests-assert() {
-    test-besting-run-tests--get-all-tests-foo
-    test-besting-run-tests--get-all-tests-bar
-    test-besting-run-tests--get-all-tests-bar1
-    test-besting-run-tests--get-all-tests-bar2
+test-bach-run-tests--get-all-tests-assert() {
+    test-bach-run-tests--get-all-tests-foo
+    test-bach-run-tests--get-all-tests-bar
+    test-bach-run-tests--get-all-tests-bar1
+    test-bach-run-tests--get-all-tests-bar2
 }

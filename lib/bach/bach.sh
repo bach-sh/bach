@@ -5,12 +5,12 @@ if [[ -z "${BASH_VERSION:-}" ]]; then
     return 1
 fi
 
-declare -a besting_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs)
+declare -a bach_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs)
 
 shopt -s expand_aliases
 export PATH_ORIGIN="$PATH"
 
-if [[ "${BESTING_DEBUG:-}" != true ]]; then
+if [[ "${BACH_DEBUG:-}" != true ]]; then
     function debug() {
         :
     }
@@ -28,57 +28,57 @@ else
 fi
 export -f debug
 
-function besting-real-path() {
+function bach-real-path() {
     PATH="$PATH_ORIGIN" command which "$1"
 }
-export -f besting-real-path
+export -f bach-real-path
 
 for name in cd command echo eval exec false popd pushd pwd true type; do
     eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
 
 for name in echo pwd test; do
-    declare -grx "_${name}"="$(besting-real-path "$name")"
+    declare -grx "_${name}"="$(bach-real-path "$name")"
 done
 
-for name in "${besting_core_utils[@]}"; do
-    declare -grx "_${name}"="$(besting-real-path "$name")"
+for name in "${bach_core_utils[@]}"; do
+    declare -grx "_${name}"="$(bach-real-path "$name")"
     eval "[[ -n \"\$_${name}\" ]] || die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
 unset name
 
-function besting-real-command() {
+function bach-real-command() {
     declare name="$1"
     if [[ "$name" == */* ]]; then
         @echo "$@"
         return
     fi
     declare -a cmd
-    cmd=("$(besting-real-path "$1")" "${@:2}")
+    cmd=("$(bach-real-path "$1")" "${@:2}")
     debug "[REAL-CMD]" "${cmd[@]}"
     "${cmd[@]}"
 }
-export -f besting-real-command
-alias @real=besting-real-command
+export -f bach-real-command
+alias @real=bach-real-command
 
-function besting-get-all-functions() {
+function bach-get-all-functions() {
     declare -F
 }
-export -f besting-get-all-functions
+export -f bach-get-all-functions
 
-function besting-run-tests--get-all-tests() {
-    besting-get-all-functions | @shuf | while read -r _ _ name; do
+function bach-run-tests--get-all-tests() {
+    bach-get-all-functions | @shuf | while read -r _ _ name; do
         [[ "$name" == test?* ]] || continue
         [[ "$name" == *-assert ]] && continue
         printf "%s\n" "$name"
     done
 }
 
-function besting-run-tests() {
+function bach-run-tests() {
     set -euo pipefail
     declare -i total=0 error=0
     declare -a all_tests
-    mapfile -t all_tests < <(besting-run-tests--get-all-tests)
+    mapfile -t all_tests < <(bach-run-tests--get-all-tests)
     for name in "${all_tests[@]}"; do
         # debug "Running test: $name"
         : $(( total++ ))
@@ -89,15 +89,15 @@ function besting-run-tests() {
     [[ "$error" == 0 ]] && [[ "${#all_tests[@]}" -eq "$total" ]]
 }
 
-function besting-on-exit() {
+function bach-on-exit() {
     if [[ "$?" -eq 0 ]]; then
-        besting-run-tests
+        bach-run-tests
     else
         err "Couldn't initlize tests."
     fi
 }
 
-trap besting-on-exit EXIT
+trap bach-on-exit EXIT
 
 function @mock-command() {
     debug "@mock 'command'" "$@"
@@ -201,28 +201,28 @@ function mock-all-commands() {
 }
 alias @mockall="mock-all-commands"
 
-alias @setup='function besting_framework_setup'
+alias @setup='function bach_framework_setup'
 
 @mockall cd
 
-declare -gxa BESTING_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -y)
+declare -gxa BACH_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -y)
 function assert-execution() (
-    declare besting_test_name="$1" besting_tmpdir testresult
-    besting_tmpdir="$(@mktemp -d)"
+    declare bach_test_name="$1" bach_tmpdir testresult
+    bach_tmpdir="$(@mktemp -d)"
     testresult="$(@mktemp)"
-    #trap '/bin/rm -vrf "$besting_tmpdir" "$testresult"' RETURN
-    @pushd "${besting_tmpdir}" &>/dev/null
+    #trap '/bin/rm -vrf "$bach_tmpdir" "$testresult"' RETURN
+    @pushd "${bach_tmpdir}" &>/dev/null
     @mkdir actual expected
     declare retval=1
 
     function command_not_found_handle() {
-        declare mockfunc besting_cmd_name="$1"
+        declare mockfunc bach_cmd_name="$1"
         mockfunc="$(@generate_mock_function_name "$@")"
         # debug "mockid=$mockid" >&2
         if [[ "$(type -t "${mockfunc}")" == function ]]; then
             debug "[CNFH-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
-        elif [[ "$(type -t "${besting_cmd_name}")" == function ]]; then
+        elif [[ "$(type -t "${bach_cmd_name}")" == function ]]; then
             debug "[CNFH-builtin]" "$@"
             builtin "$@"
         else
@@ -233,48 +233,48 @@ function assert-execution() (
     export -f command_not_found_handle
     export PATH=path-not-exists
 
-    if @diff "${BESTING_ASSERT_DIFF_OPTS[@]}" <(
+    if @diff "${BACH_ASSERT_DIFF_OPTS[@]}" <(
             set +euo pipefail
             (
                 @pushd actual &>/dev/null
-                [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
-                "${besting_test_name}"
+                [[ "$(@type -t bach_framework_setup)" == function ]] && bach_framework_setup
+                "${bach_test_name}"
             )
             @echo "Exit code: $?"
         ) <(
             set +euo pipefail
             (
                 @pushd expected &>/dev/null
-                [[ "$(@type -t besting_framework_setup)" == function ]] && besting_framework_setup
-                "${besting_test_name}"-assert
+                [[ "$(@type -t bach_framework_setup)" == function ]] && bach_framework_setup
+                "${bach_test_name}"-assert
             )
             @echo "Exit code: $?"
         ) &>"$testresult" 8>&2
     then
-        printf "\e[1;36m[PASS] %s\e[0;m\n" "$besting_test_name"
+        printf "\e[1;36m[PASS] %s\e[0;m\n" "$bach_test_name"
         retval=0
     else
-        printf "\e[1;31m[FAIL] %s\e[0;m\n" "$besting_test_name"
+        printf "\e[1;31m[FAIL] %s\e[0;m\n" "$bach_test_name"
         @cat "$testresult" 2>/dev/null 8>/dev/null
         printf "\n"
     fi
-    if [[ "$(@type -t "${besting_test_name}-assert")" != function ]]; then
+    if [[ "$(@type -t "${bach_test_name}-assert")" != function ]]; then
         : @cat >&2 <<-EOF
-# Could not find the assertion function for $besting_test_name
-function ${besting_test_name}-assert() {
+# Could not find the assertion function for $bach_test_name
+function ${bach_test_name}-assert() {
 
 }
 
 EOF
     fi
     @popd &>/dev/null
-    @rm -rf "$besting_tmpdir" "$testresult"
+    @rm -rf "$bach_tmpdir" "$testresult"
     return "$retval"
 )
 
 function @ignore() {
-    declare besting_test_name="$1"
-    eval "function $besting_test_name() { : ignore command '$besting_test_name'; }"
+    declare bach_test_name="$1"
+    eval "function $bach_test_name() { : ignore command '$bach_test_name'; }"
 }
 export -f @ignore
 
