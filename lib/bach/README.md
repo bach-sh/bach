@@ -2,7 +2,7 @@
 
 ## Bach
 
-Bach is a unit testing frramework used for testing Bash scripts.
+Bach is a unit testing framework used for testing Bash scripts.
 
 It's part of Shell Common Functions Library
 
@@ -21,5 +21,6 @@ It's part of Shell Common Functions Library
     }
     test-rm-rf-assert() {
         # Verify your test case
-        sudo rm -rf /  # This is the actual command to be running on your host!
+        sudo rm -rf /   # This is the actual command to run on your host!
+                        # DO NOT worry! By using Bach Testing Framework it won't actually run.
     }
