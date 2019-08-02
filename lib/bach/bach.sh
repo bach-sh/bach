@@ -1,4 +1,5 @@
 # -*- mode: sh -*-
+set -euo pipefail
 
 if [[ -z "${BASH_VERSION:-}" ]]; then
     die "This mock framework only supports bash scripts."

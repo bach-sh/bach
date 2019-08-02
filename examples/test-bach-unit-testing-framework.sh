@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
 declare -grx self="$(realpath "${BASH_SOURCE}")"
 source <("${self%/*/*}"/cflib-import.sh)
 require colorize
