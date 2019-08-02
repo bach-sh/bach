@@ -7,6 +7,15 @@ require mockframework
 
 #declare -a BESTING_ASSERT_DIFF_OPTS=(-w -y)
 export BESTING_DEBUG=true
+
+test-rm-rf() {
+    project_log_path=/tmp/project/logs
+    sudo rm -rf "$project_log_ptah/" # Typo here!
+}
+test-rm-rf-assert() {
+    sudo rm -rf /  # This is the actual command to be running on your host!
+}
+
 testmd5sum() {
     @mock command which md5sum -- fake-md5sum
     @real md5sum --version
