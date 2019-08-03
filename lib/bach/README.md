@@ -22,7 +22,7 @@ It's part of Shell Common Functions Library
     test-rm-rf-assert() {
         # Verify your test case
         sudo rm -rf /   # This is the actual command to run on your host!
-                        # DO NOT worry! By using Bach Testing Framework it won't actually run.
+                        # DO NOT PANIC! By using Bach Testing Framework it won't actually run.
     }
 
     test-rm-your-dot-git() {
