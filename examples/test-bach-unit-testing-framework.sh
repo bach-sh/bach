@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 declare -grx self="$(realpath "${BASH_SOURCE}")"
 source <("${self%/*/*}"/cflib-import.sh)
-require colorize
 require bach
 
 #declare -a BACH_ASSERT_DIFF_OPTS=(-w -y)
@@ -29,6 +28,25 @@ test-rm-your-dot-git-assert() {
     # Verify the actual command
 
     rm -rf ~/src/your-awesome-project/.git ~/src/code/.git
+}
+
+test-output() {
+    @out out1
+    @echo out2 | @out
+    @out "out3 " <<EOF
+one
+two
+three
+EOF
+}
+test-output-assert() {
+    @cat <<EOF
+out1
+out2
+out3 one
+out3 two
+out3 three
+EOF
 }
 
 testmd5sum() {
@@ -96,14 +114,17 @@ test2() {
     cd "${project_path%/*}"
     sudo rm -rf $project_path
 
-    err error 2>&1
-    /bin/ls /foo &>/dev/null || @stdout "ls /foo: No such file or directory"
+    @err no error 2>/dev/null
+    @err error 2>&1 1>/dev/null
+
+    @mockfalse ls /bin
+    ls /bin &>/dev/null || @stdout "ls /foo: No such file or directory"
 }
 test2-assert() {
     cd /src
     sudo rm -rf /src/project
 
-    printf "\e[1;31merror\e[0;m\n"
+    @echo error
     @echo "ls /foo: No such file or directory"
 }
 
@@ -233,7 +254,8 @@ test-mock-absolute-path-of-script() {
     @mock /tmp/cannot-mock-this 2>&1
 }
 test-mock-absolute-path-of-script-assert() {
-    printf "\e[1;31m%s\e[0;m\n" 'Cannot mock an absolute path: /tmp/cannot-mock-this'
+    #printf "\e[1;31m%s\e[0;m\n"
+    @echo 'Cannot mock an absolute path: /tmp/cannot-mock-this'
     return 1
 }
 
@@ -252,7 +274,7 @@ test-mock-existed-script() {
     ./cannot-mock-existed-script foo bar    2>&1
 }
 test-mock-existed-script-assert() {
-    printf "\e[1;31m%s\e[0;m\n" 'Cannot mock an existed path: ./cannot-mock-existed-script'
+    @echo 'Cannot mock an existed path: ./cannot-mock-existed-script'
     return 1
 }
 

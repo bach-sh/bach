@@ -1,8 +1,32 @@
 # -*- mode: sh -*-
 set -euo pipefail
 
+function @out() {
+    if [[ ! -t 0 ]]; then
+        while IFS=$'\n' read -r line; do
+            printf "%s\n" "${*}$line"
+        done
+    elif [[ "$#" -gt 0 ]]; then
+        printf "%s\n" "$*"
+    else
+        printf "\n"
+    fi
+} 8>/dev/null
+export -f @out
+
+function @err() {
+    @out "$@"
+} >&2
+export -f @err
+
+function @die() {
+    @out "$@"
+    exit 1
+} >&2
+export -f @die
+
 if [[ -z "${BASH_VERSION:-}" ]]; then
-    die "This mock framework only supports bash scripts."
+    @die "This mock framework only supports bash scripts."
     return 1
 fi
 
@@ -12,22 +36,16 @@ shopt -s expand_aliases
 export PATH_ORIGIN="$PATH"
 
 if [[ "${BACH_DEBUG:-}" != true ]]; then
-    function debug() {
+    function @debug() {
         :
     }
 else
     exec 8>&2
-    function debug() {
-        if [[ "$#" -gt 0 ]]; then
-            out "[DEBUG]" "$@"
-        else
-            while IFS='\n' read -r line; do
-                printf "[DEBUG] %s\n" "$line"
-            done
-        fi
+    function @debug() {
+        @printf '[DEBUG] %s\n' "$*"
     } >&8
 fi
-export -f debug
+export -f @debug
 
 function bach-real-path() {
     PATH="$PATH_ORIGIN" command which "$1"
@@ -44,7 +62,7 @@ done
 
 for name in "${bach_core_utils[@]}"; do
     declare -grx "_${name}"="$(bach-real-path "$name")"
-    eval "[[ -n \"\$_${name}\" ]] || die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
+    eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
 unset name
 
@@ -56,7 +74,7 @@ function bach-real-command() {
     fi
     declare -a cmd
     cmd=("$(bach-real-path "$1")" "${@:2}")
-    debug "[REAL-CMD]" "${cmd[@]}"
+    @debug "[REAL-CMD]" "${cmd[@]}"
     "${cmd[@]}"
 }
 export -f bach-real-command
@@ -83,7 +101,7 @@ function bach-run-tests() {
     mapfile -t all_tests < <(bach-run-tests--get-all-tests)
     @echo "1..${#all_tests[@]}"
     for name in "${all_tests[@]}"; do
-        # debug "Running test: $name"
+        # @debug "Running test: $name"
         : $(( total++ ))
         testresult="$(@mktemp)"
         if assert-execution "$name" &>"$testresult"; then
@@ -115,7 +133,7 @@ function bach-on-exit() {
 trap bach-on-exit EXIT
 
 function @mock-command() {
-    debug "@mock 'command'" "$@"
+    @debug "@mock 'command'" "$@"
     function command() {
         command_not_found_handle command "$@"
     }
@@ -134,7 +152,7 @@ function xargs() {
             xargs_opts+=("$param")
         fi
     done
-    debug "@mock-xargs" "${xargs_opts[@]}"
+    @debug "@mock-xargs" "${xargs_opts[@]}"
     @xargs "${xargs_opts[@]}"
 }
 export -f xargs
@@ -152,8 +170,8 @@ export -f @generate_mock_function_name
 function @mock() {
     declare -a param name cmd func body
     name="$1"
-    if [[ "$name" == @(builtin|declare|eval) ]]; then
-        die "Cannot mock the builtin command: $name"
+    if [[ "$name" == @(builtin|declare|eval|printf) ]]; then
+        @die "Cannot mock the builtin command: $name"
     fi
     if [[ "$(@type -t "$name" )" == builtin ]] && [[ "$(@type -t "@mock-$name" )" == function ]]; then
         "@mock-$name" "${@:2}"
@@ -164,19 +182,19 @@ function @mock() {
         cmd+=("$param")
     done
     if [[ "$name" == /* ]]; then
-        die "Cannot mock an absolute path: $name"
+        @die "Cannot mock an absolute path: $name"
     elif [[ "$name" == */* ]] && [[ -e "$name" ]]; then
-        die "Cannot mock an existed path: $name"
+        @die "Cannot mock an existed path: $name"
     fi
-    debug "@mock $name"
+    @debug "@mock $name"
     if [[ "$#" -gt 0 ]]; then
-        debug "@mock $name $*"
+        @debug "@mock $name $*"
         func="$*"
     elif [[ ! -t 0 ]]; then
-        debug "@mock $name @cat"
+        @debug "@mock $name @cat"
         func="$(@cat)"
     else
-        debug "@mock $name $_echo"
+        @debug "@mock $name $_echo"
         func="${_echo} \"${name}\" \"\$@\""
     fi
     if [[ "$name" == */* ]]; then
@@ -190,8 +208,8 @@ SCRIPT
         declare mockfunc
         mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
         #stderr name="$name"
-        body="function ${mockfunc}() { debug Running mock : '${cmd[*]}' :; $func; }"
-        # debug "$body"
+        body="function ${mockfunc}() { @debug Running mock : '${cmd[*]}' :; $func; }"
+        # @debug "$body"
         eval "$body"
     fi
 }
@@ -247,15 +265,15 @@ function assert-execution() (
     function command_not_found_handle() {
         declare mockfunc bach_cmd_name="$1"
         mockfunc="$(@generate_mock_function_name "$@")"
-        # debug "mockid=$mockid" >&2
+        # @debug "mockid=$mockid" >&2
         if [[ "$(type -t "${mockfunc}")" == function ]]; then
-            debug "[CNFH-func]" "${mockfunc}" "$@"
+            @debug "[CNFH-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
         elif [[ "$(type -t "${bach_cmd_name}")" == function ]]; then
-            debug "[CNFH-builtin]" "$@"
+            @debug "[CNFH-builtin]" "$@"
             builtin "$@"
         else
-            debug "[CNFH-default]" "$@"
+            @debug "[CNFH-default]" "$@"
             @echo "$@"
         fi
     } #8>/dev/null
