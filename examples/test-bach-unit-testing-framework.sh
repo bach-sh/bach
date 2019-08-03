@@ -13,7 +13,22 @@ test-rm-rf() {
 }
 test-rm-rf-assert() {
     sudo rm -rf /   # This is the actual command to run on your host!
-                    # DO NOT worry! By using Bach Testing Framework it won't actually run.
+                    # DO NOT PANIC! By using Bach Testing Framework it won't actually run.
+}
+
+test-rm-your-dot-git() {
+    # Mock `find` command with certain parameters, will output two directories
+
+    @mock find ~ -type d -name .git === @stdout ~/src/your-awesome-project/.git \
+                                                ~/src/code/.git
+
+    # Do it, remove all .git directories
+    find ~ -type d -name .git | xargs -- rm -rf
+}
+test-rm-your-dot-git-assert() {
+    # Verify the actual command
+
+    rm -rf ~/src/your-awesome-project/.git ~/src/code/.git
 }
 
 testmd5sum() {
