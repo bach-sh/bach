@@ -351,3 +351,23 @@ test-forbidden-running-@mock-assert() {
     @mock anything === anything
     @ignore foobar
 }
+
+test-mock-cd() {
+    exec 2>&1
+    cd /path
+}
+test-mock-cd-assert() {
+    exec 2>&1
+    @echo cd /path
+}
+
+test-mock-echo() {
+    unset -f echo
+    @mock echo
+    @type -t echo
+    echo done
+}
+test-mock-echo-assert() {
+    @echo function
+    @echo echo done
+}

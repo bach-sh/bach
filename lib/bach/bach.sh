@@ -3,6 +3,11 @@ set -euo pipefail
 
 export BACH_COLOR="${BACH_COLOR:-auto}"
 
+declare -a bach_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs)
+
+shopt -s expand_aliases
+export PATH_ORIGIN="$PATH"
+
 function @out() {
     if [[ ! -t 0 ]]; then
         while IFS=$'\n' read -r line; do
@@ -31,11 +36,6 @@ if [[ -z "${BASH_VERSION:-}" ]]; then
     @die "This mock framework only supports bash scripts."
     return 1
 fi
-
-declare -a bach_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs)
-
-shopt -s expand_aliases
-export PATH_ORIGIN="$PATH"
 
 if [[ "${BACH_DEBUG:-}" != true ]]; then
     function @debug() {
@@ -136,6 +136,8 @@ function bach-run-tests() {
 
 function bach-on-exit() {
     if [[ "$?" -eq 0 ]]; then
+        @mockall cd echo
+
         bach-run-tests
     else
         printf "Bail out! %s\n" "Couldn't initlize tests."
@@ -180,12 +182,13 @@ function @generate_mock_function_name() {
 export -f @generate_mock_function_name
 
 function @mock() {
-    declare -a param name cmd func body
+    declare -a param name cmd func body desttype
     name="$1"
     if [[ "$name" == @(builtin|declare|eval|printf) ]]; then
         @die "Cannot mock the builtin command: $name"
     fi
-    if [[ "$(@type -t "$name" )" == builtin ]] && [[ "$(@type -t "@mock-$name" )" == function ]]; then
+    desttype="$(@type -t "$name" )"
+    if [[ "$desttype" == builtin ]] && [[ "$(@type -t "@mock-$name" )" == function ]]; then
         "@mock-$name" "${@:2}"
     fi
     while param="${1:-}"; [[ -n "$param" ]]; do
@@ -218,7 +221,11 @@ SCRIPT
         @chmod +x "$name" >&2
     else
         declare mockfunc
-        mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
+        if [[ "$desttype" == builtin && "${#cmd[@]}" -eq 1 ]]; then
+            mockfunc="$name"
+        else
+            mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
+        fi
         #stderr name="$name"
         body="function ${mockfunc}() { @debug Running mock : '${cmd[*]}' :; $func; }"
         # @debug "$body"
@@ -237,16 +244,14 @@ function @mockfalse() {
 }
 export -f @mockfalse
 
-function mock-all-commands() {
+function @mockall() {
     declare name body
     for name; do
-        body="function $name() { @echo \"$name\" \"\$@\"; }"
-        eval "$body"
+        @mock "$name"
     done
 }
-alias @mockall="mock-all-commands"
+export -f @mockall
 
-@mockall cd echo
 
 BACH_FRAMEWORK__SETUP_FUNCNAME="_bach_framework_setup_"
 alias @setup="function $BACH_FRAMEWORK__SETUP_FUNCNAME"
