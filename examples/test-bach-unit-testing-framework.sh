@@ -50,16 +50,22 @@ EOF
 }
 
 test-run() {
-    @cat > script.sh <<EOF
-for param; do "${_echo}" "script.sh - \$param"; done
-EOF
-    @run script.sh foo bar
+    @mock load-script === @echo "'for param; do \"${_echo}\" \"script.sh - \$param\"; done'"
+
+    @run <(load-script) foo bar
 }
 test-run-assert() {
     @cat <<EOF
 script.sh - foo
 script.sh - bar
 EOF
+}
+
+test-run-no-filename() {
+    @run
+}
+test-run-no-filename-assert() {
+    @false
 }
 
 testmd5sum() {

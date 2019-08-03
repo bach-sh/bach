@@ -335,17 +335,15 @@ function @ignore() {
 }
 export -f @ignore
 
-function stderr() {
+function @stderr() {
     printf "%s\n" "$@" >&2
 }
-export -f stderr
-alias @stderr=stderr
+export -f @stderr
 
-function stdout() {
+function @stdout() {
     printf "%s\n" "$@"
 }
-export -f stdout
-alias @stdout=stdout
+export -f @stdout
 
 function @load_function() {
     local file="${1:?script filename}"
