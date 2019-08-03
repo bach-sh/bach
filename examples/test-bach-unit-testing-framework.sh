@@ -284,3 +284,14 @@ test-bach-run-tests--get-all-tests-assert() {
     test-bach-run-tests--get-all-tests-bar1
     test-bach-run-tests--get-all-tests-bar2
 }
+
+
+test-forbidden-running-@mock() {
+    @echo @mock anything === anything
+    @echo @ignore foobar
+}
+test-forbidden-running-@mock-assert() {
+    @type -t @mock 2>&1
+    @mock anything === anything
+    @ignore foobar
+}
