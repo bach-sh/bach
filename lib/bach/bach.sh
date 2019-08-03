@@ -146,7 +146,7 @@ function @mock() {
     fi
     while param="${1:-}"; [[ -n "$param" ]]; do
         shift
-        [[ "$param" == '--' ]] && break
+        [[ "$param" == '===' ]] && break
         cmd+=("$param")
     done
     if [[ "$name" == /* ]]; then
@@ -184,12 +184,12 @@ SCRIPT
 export -f @mock
 
 function @mocktrue() {
-    @mock "$@" -- @true
+    @mock "$@" === @true
 }
 export -f @mocktrue
 
 function @mockfalse() {
-    @mock "$@" -- @false
+    @mock "$@" === @false
 }
 export -f @mockfalse
 

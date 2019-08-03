@@ -16,7 +16,7 @@ test-rm-rf-assert() {
 }
 
 testmd5sum() {
-    @mock command which md5sum -- fake-md5sum
+    @mock command which md5sum === fake-md5sum
     @real md5sum --version
     @real diff --version
 }
@@ -31,7 +31,7 @@ this_variable_exists_in_assert=""
 @setup {
     @ignore echo
 
-    @mock git config --get branch.master.remote -- @stdout "remote-master"
+    @mock git config --get branch.master.remote === @stdout "remote-master"
     @mock git rev-parse --abbrev-ref HEAD <<-MOCK
 			@stdout branch-name
 		MOCK
@@ -60,11 +60,11 @@ test-bach-setup-assert() {
 }
 
 test1() {
-    @mock find . -name fn -- @stdout file1 file2
+    @mock find . -name fn === @stdout file1 file2
 
     ls $(find . -name fn)
 
-    @mock ls file1 file2 -- file2 file1
+    @mock ls file1 file2 === file2 file1
     ls $(find . -name fn) | xargs -n1 -- do-something
 }
 test1-assert() {
@@ -157,7 +157,7 @@ test-gp-not-a-repo1-assert() {
 }
 
 test-bach-real-command-mock-builtin() {
-    @mock command which grep -- @stdout fake-grep
+    @mock command which grep === @stdout fake-grep
     bach-real-command grep --version
     command id
 }
@@ -240,7 +240,7 @@ test-mock-existed-script-assert() {
 }
 
 test-mock-script-1() {
-    @mock ./path/to/script -- something
+    @mock ./path/to/script === something
     ./path/to/script
 }
 test-mock-script-1-assert() {
@@ -264,7 +264,7 @@ test-mock-script-2-assert() {
 }
 
 test-bach-run-tests--get-all-tests() {
-    @mock @shuf -- @cat
+    @mock @shuf === @cat
     @mock bach-get-all-functions <<EOF
 @echo declare -f gp
 @echo declare -f test-bach-run-tests--get-all-tests-foo
