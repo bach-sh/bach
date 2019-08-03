@@ -1,6 +1,8 @@
 # -*- mode: sh -*-
 set -euo pipefail
 
+export BACH_COLOR="${BACH_COLOR:-auto}"
+
 function @out() {
     if [[ ! -t 0 ]]; then
         while IFS=$'\n' read -r line; do
@@ -95,6 +97,16 @@ function bach-run-tests--get-all-tests() {
 
 function bach-run-tests() {
     set -euo pipefail
+    declare color_ok color_err color_end
+    if [[ "$BACH_COLOR" == "always" ]] || [[ "$BACH_COLOR" != "no" && -t 1 && -t 2 ]]; then
+        color_ok="\e[1;32m"
+        color_err="\e[1;31m"
+        color_end="\e[0;m"
+    else
+        color_ok=""
+        color_err=""
+        color_end=""
+    fi
     declare testresult
     declare -i total=0 error=0
     declare -a all_tests
@@ -105,10 +117,10 @@ function bach-run-tests() {
         : $(( total++ ))
         testresult="$(@mktemp)"
         if assert-execution "$name" &>"$testresult"; then
-            printf "ok %d - %s\n" "$total" "$name"
+            printf "${color_ok}ok %d - %s${color_end}\n" "$total" "$name"
         else
             : $(( error++ ))
-            printf "not ok %d - %s\n" "$total" "$name"
+            printf "${color_err}not ok %d - %s${color_end}\n" "$total" "$name"
             {
                 printf "\n"
                 @cat "$testresult" >&2
