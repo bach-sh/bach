@@ -246,7 +246,9 @@ export -f @mockfalse
 function @mockall() {
     declare name body
     for name; do
-        @mock "$name"
+        body="function ${name}() { @echo \"$name\" \"\$@\"; }; export -f \"$name\";"
+        @debug "Mock $name: $body"
+        eval "$body"
     done
 }
 export -f @mockall
