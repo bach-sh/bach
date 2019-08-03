@@ -3,8 +3,6 @@ set -euo pipefail
 
 export BACH_COLOR="${BACH_COLOR:-auto}"
 
-declare -a bach_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs)
-
 shopt -s expand_aliases
 export PATH_ORIGIN="$PATH"
 
@@ -32,9 +30,8 @@ function @die() {
 } >&2
 export -f @die
 
-if [[ -z "${BASH_VERSION:-}" ]]; then
-    @die "This mock framework only supports bash scripts."
-    return 1
+if [[ -z "${BASH_VERSION:-}" ]] || [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+    @die "Bach Testing Framework only support Bash v4+!"
 fi
 
 if [[ "${BACH_DEBUG:-}" != true ]]; then
@@ -61,6 +58,8 @@ done
 for name in echo pwd test; do
     declare -grx "_${name}"="$(bach-real-path "$name")"
 done
+
+declare -a bach_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf tee touch which xargs)
 
 for name in "${bach_core_utils[@]}"; do
     declare -grx "_${name}"="$(bach-real-path "$name")"
