@@ -54,7 +54,7 @@ function bach-real-path() {
 }
 export -f bach-real-path
 
-for name in cd command echo eval exec false popd pushd pwd true type; do
+for name in cd command echo eval exec false popd pushd pwd source true type; do
     eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
 
@@ -350,6 +350,13 @@ alias @stdout=stdout
 function @load_function() {
     local file="${1:?script filename}"
     local func="${2:?function name}"
-    source <(@sed -Ene "/^function\s+${func}\\b/,/^}\$/p" "$file")
+    @source <(@sed -Ene "/^function\s+${func}\\b/,/^}\$/p" "$file")
 } 8>/dev/null
 export -f @load_function
+
+function @run() {
+    declare script="${1:?missing script name}"
+    shift
+    @source "$script" "$@"
+}
+export -f @run

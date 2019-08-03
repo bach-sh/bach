@@ -49,6 +49,19 @@ out3 three
 EOF
 }
 
+test-run() {
+    @cat > script.sh <<EOF
+for param; do "${_echo}" "script.sh - \$param"; done
+EOF
+    @run script.sh foo bar
+}
+test-run-assert() {
+    @cat <<EOF
+script.sh - foo
+script.sh - bar
+EOF
+}
+
 testmd5sum() {
     @mock command which md5sum === fake-md5sum
     @real md5sum --version
