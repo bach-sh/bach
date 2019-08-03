@@ -77,16 +77,30 @@ function bach-run-tests--get-all-tests() {
 
 function bach-run-tests() {
     set -euo pipefail
+    declare testresult
     declare -i total=0 error=0
     declare -a all_tests
     mapfile -t all_tests < <(bach-run-tests--get-all-tests)
+    @echo "1..${#all_tests[@]}"
     for name in "${all_tests[@]}"; do
         # debug "Running test: $name"
         : $(( total++ ))
-        assert-execution "$name" || true : $(( error++ ))
+        testresult="$(@mktemp)"
+        if assert-execution "$name" &>"$testresult"; then
+            printf "ok %d - %s\n" "$total" "$name"
+        else
+            : $(( error++ ))
+            printf "not ok %d - %s\n" "$total" "$name"
+            {
+                printf "\n"
+                @cat "$testresult" >&2
+                printf "\n"
+            } >&2
+        fi
+        @rm "$testresult" &>/dev/null
     done
 
-    printf -- "-----\nAll tests: %s, failed: %d, skipped: %d\n" "$total" "$error" "$(( ${#all_tests[@]} - $total ))">&2
+    printf -- "# -----\n# All tests: %s, failed: %d, skipped: %d\n" "$total" "$error" "$(( ${#all_tests[@]} - $total ))">&2
     [[ "$error" == 0 ]] && [[ "${#all_tests[@]}" -eq "$total" ]]
 }
 
@@ -223,10 +237,9 @@ export -f _bach_framework__run_function
 
 declare -gxa BACH_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -y)
 function assert-execution() (
-    declare bach_test_name="$1" bach_tmpdir testresult
+    declare bach_test_name="$1" bach_tmpdir
     bach_tmpdir="$(@mktemp -d)"
-    testresult="$(@mktemp)"
-    #trap '/bin/rm -vrf "$bach_tmpdir" "$testresult"' RETURN
+    #trap '/bin/rm -vrf "$bach_tmpdir"' RETURN
     @pushd "${bach_tmpdir}" &>/dev/null
     @mkdir actual expected
     declare retval=1
@@ -268,14 +281,9 @@ function assert-execution() (
                 "${bach_test_name}"-assert
             )
             @echo "Exit code: $?"
-        ) &>"$testresult" 8>&2
+        )
     then
-        printf "\e[1;36m[PASS] %s\e[0;m\n" "$bach_test_name"
         retval=0
-    else
-        printf "\e[1;31m[FAIL] %s\e[0;m\n" "$bach_test_name"
-        @cat "$testresult" 2>/dev/null 8>/dev/null
-        printf "\n"
     fi
     if [[ "$(@type -t "${bach_test_name}-assert")" != function ]]; then
         : @cat >&2 <<-EOF
@@ -287,7 +295,7 @@ function ${bach_test_name}-assert() {
 EOF
     fi
     @popd &>/dev/null
-    @rm -rf "$bach_tmpdir" "$testresult"
+    @rm -rf "$bach_tmpdir"
     return "$retval"
 )
 
