@@ -108,7 +108,7 @@ function bach-on-exit() {
     if [[ "$?" -eq 0 ]]; then
         bach-run-tests
     else
-        err "Couldn't initlize tests."
+        printf "Bail out! %s\n" "Couldn't initlize tests."
     fi
 }
 
