@@ -12,7 +12,8 @@ test-rm-rf() {
     sudo rm -rf "$project_log_ptah/" # Typo here!
 }
 test-rm-rf-assert() {
-    sudo rm -rf /  # This is the actual command to be running on your host!
+    sudo rm -rf /   # This is the actual command to run on your host!
+                    # DO NOT worry! By using Bach Testing Framework it won't actually run.
 }
 
 testmd5sum() {
@@ -29,18 +30,19 @@ this_variable_exists=""
 this_variable_exists_in_test=""
 this_variable_exists_in_assert=""
 @setup {
-    @ignore echo
-
-    @mock git config --get branch.master.remote === @stdout "remote-master"
-    @mock git rev-parse --abbrev-ref HEAD <<-MOCK
-			@stdout branch-name
-		MOCK
     declare -g this_variable_exists=in_test_and_assert
     declare -g this_variable_exists_in_test=""
     declare -g this_variable_exists_in_assert=""
 }
 
 @setup-test {
+    @ignore echo
+
+    @mock git config --get branch.master.remote === @stdout "remote-master"
+    @mock git rev-parse --abbrev-ref HEAD <<-MOCK
+			@stdout branch-name
+		MOCK
+
     declare -g this_variable_exists_in_test=in_test
 }
 

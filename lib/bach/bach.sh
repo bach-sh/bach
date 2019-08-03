@@ -202,6 +202,8 @@ function mock-all-commands() {
 }
 alias @mockall="mock-all-commands"
 
+@mockall cd echo
+
 BACH_FRAMEWORK__SETUP_FUNCNAME="_bach_framework_setup_"
 alias @setup="function $BACH_FRAMEWORK__SETUP_FUNCNAME"
 
@@ -218,8 +220,6 @@ function _bach_framework__run_function() {
     fi
 }
 export -f _bach_framework__run_function
-
-@mockall cd
 
 declare -gxa BACH_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -y)
 function assert-execution() (
@@ -259,6 +259,7 @@ function assert-execution() (
             )
             @echo "Exit code: $?"
         ) <(
+            unset -f @mock @mockall @ignore @setup-test
             set +euo pipefail
             (
                 @pushd expected &>/dev/null
