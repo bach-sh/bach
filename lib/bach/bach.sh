@@ -175,7 +175,7 @@ function @generate_mock_function_name() {
     if [[ "$(@type -t "$name")" == function && "$name" == !(command) ]]; then
         @echo "$name"
     else
-        @echo "mock_exec_${name}_$(@echo -n "${@}" | @md5sum | @cut -b1-32)"
+        @echo "mock_exec_${name}_$(@dryrun "${@}" | @md5sum | @cut -b1-32)"
     fi
 }
 export -f @generate_mock_function_name
