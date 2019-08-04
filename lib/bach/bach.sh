@@ -308,7 +308,6 @@ function assert-execution() (
     if @diff "${BACH_ASSERT_DIFF_OPTS[@]}" <(
             set +euo pipefail
             (
-                @pushd actual &>/dev/null
                 _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
                 _bach_framework__run_function "$BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
                 "${bach_test_name}"
@@ -318,7 +317,6 @@ function assert-execution() (
             unset -f @mock @mockall @ignore @setup-test
             set +euo pipefail
             (
-                @pushd expected &>/dev/null
                 _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
                 _bach_framework__run_function "$BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
                 "${bach_test_name}"-assert
