@@ -43,3 +43,39 @@ It's part of Shell Common Functions Library
 ### More Examples
 
 [examples/test-bach-unit-testing-framework.sh](../../examples/test-bach-unit-testing-framework.sh)
+
+## Learn Bash Programming with Bach
+
+    test-learn-bash-no-double-quote-star() {
+        @touch bar1 bar2 bar3 "bar*"
+
+        function cleanup() {
+            rm -rf $1
+        }
+
+        # We want to remove the file "bar*", not the others
+        cleanup "bar*"
+    }
+    test-learn-bash-no-double-quote-star-assert() {
+        @touch bar1 bar2 bar3 "bar*"
+
+        # Without double quotes, all bar files are removed!
+        rm -rf "bar*" bar1 bar2 bar3
+    }
+
+    test-learn-bash-double-quote-star() {
+        @touch bar1 bar2 bar3 "bar*"
+
+        function cleanup() {
+            rm -rf "$1"
+        }
+
+        # We want to remove the file "bar*", not the others
+        cleanup "bar*"
+    }
+    test-learn-bash-double-quote-star-assert() {
+        @touch bar1 bar2 bar3 "bar*"
+
+        # Yes, with double quotes, only the file "bar*" is removed
+        rm -rf "bar*"
+    }

@@ -30,6 +30,64 @@ test-rm-your-dot-git-assert() {
     rm -rf ~/src/your-awesome-project/.git ~/src/code/.git
 }
 
+test-learn-bash-no-double-quote() {
+    function foo() {
+        no-double-quote $@
+    }
+    # We passed TWO parameters to this function
+    foo "a b" "c d"
+}
+test-learn-bash-no-double-quote-assert() {
+    # But the command 'no-double-quote' received FOUR parameters!
+    no-double-quote a b c d
+}
+
+test-learn-bash-double-quotes() {
+    function foo() {
+        double-quotes "$@"
+    }
+    # We passed TWO parameters to this function
+    foo "a b" "c d"
+}
+test-learn-bash-double-quotes-assert() {
+    # Yes, the command 'double-quotes' received TWO correct parameters
+    double-quotes "a b" "c d"
+}
+
+test-learn-bash-no-double-quote-star() {
+    @touch bar1 bar2 bar3 "bar*"
+
+    function cleanup() {
+        rm -rf $1
+    }
+
+    # We want to remove the file "bar*", not the others
+    cleanup "bar*"
+}
+test-learn-bash-no-double-quote-star-assert() {
+    @touch bar1 bar2 bar3 "bar*"
+
+    # Without double quotes, all bar files are removed!
+    rm -rf "bar*" bar1 bar2 bar3
+}
+
+test-learn-bash-double-quote-star() {
+    @touch bar1 bar2 bar3 "bar*"
+
+    function cleanup() {
+        rm -rf "$1"
+    }
+
+    # We want to remove the file "bar*", not the others
+    cleanup "bar*"
+}
+test-learn-bash-double-quote-star-assert() {
+    @touch bar1 bar2 bar3 "bar*"
+
+    # Yes, with double quotes, only the file "bar*" is removed
+    rm -rf "bar*"
+}
+
 test-output() {
     @out out1
     @echo out2 | @out
