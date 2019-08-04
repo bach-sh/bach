@@ -322,7 +322,7 @@ test-mock-script-2-assert() {
 }
 
 test-bach-run-tests--get-all-tests() {
-    @mock @shuf === @cat
+    @mock @shuf === @sort
     @mock bach-get-all-functions <<EOF
 @echo declare -f gp
 @echo declare -f test-bach-run-tests--get-all-tests-foo
@@ -335,10 +335,10 @@ EOF
     bach-run-tests--get-all-tests
 }
 test-bach-run-tests--get-all-tests-assert() {
-    test-bach-run-tests--get-all-tests-foo
     test-bach-run-tests--get-all-tests-bar
     test-bach-run-tests--get-all-tests-bar1
     test-bach-run-tests--get-all-tests-bar2
+    test-bach-run-tests--get-all-tests-foo
 }
 
 test-dryrun-should-split-parameters-by-two-spaces() {
