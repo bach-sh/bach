@@ -6,11 +6,11 @@ require bach
 #declare -a BACH_ASSERT_DIFF_OPTS=(-w -y)
 export BACH_DEBUG=true
 
-test-rm-rf() {
+test-rm--rf() {
     project_log_path=/tmp/project/logs
     sudo rm -rf "$project_log_ptah/" # Typo here!
 }
-test-rm-rf-assert() {
+test-rm--rf-assert() {
     sudo rm -rf /   # This is the actual command to run on your host!
                     # DO NOT PANIC! By using Bach Testing Framework it won't actually run.
 }
@@ -30,31 +30,31 @@ test-rm-your-dot-git-assert() {
     rm -rf ~/src/your-awesome-project/.git ~/src/code/.git
 }
 
-test-learn-bash-no-double-quote() {
+test-learn-bash:-no-double-quote() {
     function foo() {
         no-double-quote $@
     }
     # We passed TWO parameters to this function
     foo "a b" "c d"
 }
-test-learn-bash-no-double-quote-assert() {
+test-learn-bash:-no-double-quote-assert() {
     # But the command 'no-double-quote' received FOUR parameters!
     no-double-quote a b c d
 }
 
-test-learn-bash-double-quotes() {
+test-learn-bash:-double-quotes() {
     function foo() {
         double-quotes "$@"
     }
     # We passed TWO parameters to this function
     foo "a b" "c d"
 }
-test-learn-bash-double-quotes-assert() {
+test-learn-bash:-double-quotes-assert() {
     # Yes, the command 'double-quotes' received TWO correct parameters
     double-quotes "a b" "c d"
 }
 
-test-learn-bash-no-double-quote-star() {
+test-learn-bash:-no-double-quote-star() {
     @touch bar1 bar2 bar3 "bar*"
 
     function cleanup() {
@@ -64,12 +64,12 @@ test-learn-bash-no-double-quote-star() {
     # We want to remove the file "bar*", not the others
     cleanup "bar*"
 }
-test-learn-bash-no-double-quote-star-assert() {
+test-learn-bash:-no-double-quote-star-assert() {
     # Without double quotes, all bar files are removed!
     rm -rf "bar*" bar1 bar2 bar3
 }
 
-test-learn-bash-double-quote-star() {
+test-learn-bash:-double-quote-star() {
     @touch bar1 bar2 bar3 "bar*"
 
     function cleanup() {
@@ -79,12 +79,12 @@ test-learn-bash-double-quote-star() {
     # We want to remove the file "bar*", not the others
     cleanup "bar*"
 }
-test-learn-bash-double-quote-star-assert() {
+test-learn-bash:-double-quote-star-assert() {
     # Yes, with double quotes, only the file "bar*" is removed
     rm -rf "bar*"
 }
 
-test-output() {
+test-output-function-@out() {
     @out out1
     @echo out2 | @out
     @out "out3 " <<EOF
@@ -93,7 +93,7 @@ two
 three
 EOF
 }
-test-output-assert() {
+test-output-function-@out-assert() {
     @cat <<EOF
 out1
 out2
@@ -103,31 +103,31 @@ out3 three
 EOF
 }
 
-test-run() {
+test-run-a-script() {
     @mock load-script === @echo "'for param; do \"${_echo}\" \"script.sh - \$param\"; done'"
 
     @run <(load-script) foo bar
 }
-test-run-assert() {
+test-run-a-script-assert() {
     @cat <<EOF
 script.sh - foo
 script.sh - bar
 EOF
 }
 
-test-run-no-filename() {
+test-run-with-no-filename() {
     @run
 }
-test-run-no-filename-assert() {
+test-run-with-no-filename-assert() {
     @false
 }
 
-testmd5sum() {
+test-@real-function() {
     @mock command which md5sum === fake-md5sum
     @real md5sum --version
     @real diff --version
 }
-testmd5sum-assert() {
+test-@real-function-assert() {
     fake-md5sum --version
     @diff --version
 }
@@ -156,18 +156,18 @@ this_variable_exists_in_assert=""
     declare -g this_variable_exists_in_assert=in_assert
 }
 
-test-bach-setup() {
+test-bach-framework-setup-functions() {
     if [[ -n "$this_variable_exists" ]]; then @echo "$this_variable_exists"; else @echo TEST setup fail; fi
     if [[ -n "$this_variable_exists_in_test" ]]; then @echo setup-test; else @echo TEST setup setup-test fail; fi
     if [[ -z "$this_variable_exists_in_assert" ]]; then @echo setup-assert; else @echo TEST should NOT setup setup-assert; fi
 }
-test-bach-setup-assert() {
+test-bach-framework-setup-functions-assert() {
     if [[ -n "$this_variable_exists" ]]; then @echo "$this_variable_exists"; else @echo ASSERT setup fail; fi
     if [[ -z "$this_variable_exists_in_test" ]]; then @echo setup-test; else @echo ASSERT should NOT setup setup-assert; fi
     if [[ -n "$this_variable_exists_in_assert" ]]; then @echo setup-assert; else @echo ASSERT setup pre-assert fail; fi
 }
 
-test1() {
+test-bach-framework-mock-commands() {
     @mock find . -name fn === @stdout file1 file2
 
     ls $(find . -name fn)
@@ -175,14 +175,14 @@ test1() {
     @mock ls file1 file2 === file2 file1
     ls $(find . -name fn) | xargs -n1 -- do-something
 }
-test1-assert() {
+test-bach-framework-mock-commands-assert() {
     ls file1 file2
 
     do-something file2
     do-something file1
 }
 
-test2() {
+test-bach-framework-error-output() {
     project_path=/src/project
     cd "${project_path%/*}"
     sudo rm -rf $project_path
@@ -193,7 +193,7 @@ test2() {
     @mockfalse ls /bin
     ls /bin &>/dev/null || @stdout "ls /foo: No such file or directory"
 }
-test2-assert() {
+test-bach-framework-error-output-assert() {
     cd /src
     sudo rm -rf /src/project
 
@@ -205,7 +205,7 @@ function load-gp() {
     @load_function "${self%/*}/example-functions" gp
 }
 
-test-gp-1() {
+test-gp-running-inside-a-git-repo-and-the-branch-has-upstream() {
     load-gp
 
     @mocktrue git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
@@ -214,14 +214,14 @@ test-gp-1() {
     gp another-remote another-branch
     gp -f
 }
-test-gp-1-assert() {
+test-gp-running-inside-a-git-repo-and-the-branch-has-upstream-assert() {
     git push remote-master branch-name
     git push another-remote branch-name
     git push another-remote another-branch
     git push -f remote-master branch-name
 }
 
-test-gp-2() {
+test-gp-running-inside-a-git-repo-and-the-branch-does-not-have-upstream() {
     load-gp
 
     @mockfalse git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
@@ -230,7 +230,7 @@ test-gp-2() {
     gp another-remote another-branch
     gp -f
 }
-test-gp-2-assert() {
+test-gp-running-inside-a-git-repo-and-the-branch-does-not-have-upstream-assert() {
     git push -u remote-master branch-name
     git push -u another-remote branch-name
     git push -u another-remote another-branch
@@ -244,26 +244,26 @@ function init-current-working-dir-is-not-a-repo() {
 
 }
 
-test-gp-not-a-repo() {
+test-gp-running-not-inside-a-valid-git-repo() {
     load-gp
     init-current-working-dir-is-not-a-repo
 
     set -eu
     gp
 }
-test-gp-not-a-repo-assert() {
+test-gp-running-not-inside-a-valid-git-repo-assert() {
     @false
 }
 
 
-test-gp-not-a-repo1() {
+test-gp-running-not-inside-a-valid-git-repo-again() {
     load-gp
     init-current-working-dir-is-not-a-repo
 
     set -eu
     gp origin
 }
-test-gp-not-a-repo1-assert() {
+test-gp-running-not-inside-a-valid-git-repo-again-assert() {
     false
 }
 
@@ -303,30 +303,30 @@ function load-ff() {
     @load_function "${self%/*}/example-functions" ff
 }
 
-test-ff-1() {
+test-load-and-test-ff-function() {
     load-ff
 
     ff
     ff file1
 }
-test-ff-1-assert() {
+test-load-and-test-ff-function-assert() {
     find . -type f -name "*"
     find . -type f -name "*file1*"
 }
 
-test-ff-2() {
+test-load-and-test-ff-function-with-multi-filenames() {
     load-ff
 
-    ff file1 bar
+    ff file1 bar "file name"
 }
-test-ff-2-assert() {
-    find . -type f -name "*file1*" -or -name "*bar*"
+test-load-and-test-ff-function-with-multi-filenames-assert() {
+    find . -type f -name "*file1*" -or -name "*bar*" -or -name "*file name*"
 }
 
-test-mock-absolute-path-of-script() {
+test-cannot-mock-absolute-path-of-script() {
     @mock /tmp/cannot-mock-this 2>&1
 }
-test-mock-absolute-path-of-script-assert() {
+test-cannot-mock-absolute-path-of-script-assert() {
     #printf "\e[1;31m%s\e[0;m\n"
     @echo 'Cannot mock an absolute path: /tmp/cannot-mock-this'
     return 1
@@ -340,26 +340,26 @@ test-mock-script-assert() {
     @dryrun ./path/to/script foo bar
 }
 
-test-mock-existed-script() {
+test-cannot-mock-existed-script() {
     @mock ./cannot-mock-existed-script 2>&1 || return 1
     @mock ./cannot-mock-existed-script 2>&1
     @assert-fail Should not go here
     ./cannot-mock-existed-script foo bar    2>&1
 }
-test-mock-existed-script-assert() {
+test-cannot-mock-existed-script-assert() {
     @echo 'Cannot mock an existed path: ./cannot-mock-existed-script'
     return 1
 }
 
-test-mock-script-1() {
+test-mock-script-with-custom-action() {
     @mock ./path/to/script === something
     ./path/to/script
 }
-test-mock-script-1-assert() {
+test-mock-script-with-custom-action-assert() {
     something
 }
 
-test-mock-script-2() {
+test-mock-script-with-custom-complex-action() {
     @mock ./path/to/script <<\SCRIPT
 if [[ "$1" == foo ]]; then
   @echo bar
@@ -370,12 +370,12 @@ SCRIPT
     ./path/to/script foo
     ./path/to/script something
 }
-test-mock-script-2-assert() {
+test-mock-script-with-custom-complex-action-assert() {
     bar
     anything
 }
 
-test-bach-run-tests--get-all-tests() {
+test-bach-framework-can-get-all-tests() {
     @mock @shuf === @sort
     @mock bach-get-all-functions <<EOF
 @echo declare -f gp
@@ -388,7 +388,7 @@ EOF
 
     bach-run-tests--get-all-tests
 }
-test-bach-run-tests--get-all-tests-assert() {
+test-bach-framework-can-get-all-tests-assert() {
     test-bach-run-tests--get-all-tests-bar
     test-bach-run-tests--get-all-tests-bar1
     test-bach-run-tests--get-all-tests-bar2
@@ -418,22 +418,22 @@ test-forbidden-running-mock-inside-assertion-assert() {
     @ignore foobar
 }
 
-test-mock-cd() {
+test-mock-cd-builtin-command() {
     exec 2>&1
     cd /path
 }
-test-mock-cd-assert() {
+test-mock-cd-builtin-command-assert() {
     exec 2>&1
     @echo cd /path
 }
 
-test-mock-echo() {
+test-mock-echo-builtin-command() {
     unset -f echo
     @mock echo
     @type -t echo
     echo done
 }
-test-mock-echo-assert() {
+test-mock-echo-builtin-command-assert() {
     @echo function
     @dryrun echo done
 }

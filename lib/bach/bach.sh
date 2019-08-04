@@ -106,20 +106,23 @@ function bach-run-tests() {
         color_err=""
         color_end=""
     fi
-    declare testresult
+    declare name friendly_name testresult
     declare -i total=0 error=0
     declare -a all_tests
     mapfile -t all_tests < <(bach-run-tests--get-all-tests)
     @echo "1..${#all_tests[@]}"
     for name in "${all_tests[@]}"; do
         # @debug "Running test: $name"
+        friendly_name="${name/#test-/}"
+        friendly_name="${friendly_name//-/ }"
+        friendly_name="${friendly_name//  / -}"
         : $(( total++ ))
         testresult="$(@mktemp)"
         if assert-execution "$name" &>"$testresult"; then
-            printf "${color_ok}ok %d - %s${color_end}\n" "$total" "$name"
+            printf "${color_ok}ok %d - %s${color_end}\n" "$total" "$friendly_name"
         else
             : $(( error++ ))
-            printf "${color_err}not ok %d - %s${color_end}\n" "$total" "$name"
+            printf "${color_err}not ok %d - %s${color_end}\n" "$total" "$friendly_name"
             {
                 printf "\n"
                 @cat "$testresult" >&2
