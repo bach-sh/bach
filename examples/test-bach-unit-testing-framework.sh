@@ -65,8 +65,6 @@ test-learn-bash-no-double-quote-star() {
     cleanup "bar*"
 }
 test-learn-bash-no-double-quote-star-assert() {
-    @touch bar1 bar2 bar3 "bar*"
-
     # Without double quotes, all bar files are removed!
     rm -rf "bar*" bar1 bar2 bar3
 }
@@ -82,8 +80,6 @@ test-learn-bash-double-quote-star() {
     cleanup "bar*"
 }
 test-learn-bash-double-quote-star-assert() {
-    @touch bar1 bar2 bar3 "bar*"
-
     # Yes, with double quotes, only the file "bar*" is removed
     rm -rf "bar*"
 }
