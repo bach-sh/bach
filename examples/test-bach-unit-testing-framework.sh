@@ -34,8 +34,8 @@ test-learn-bash:-no-double-quote() {
     function foo() {
         no-double-quote $@
     }
-    # We passed TWO parameters to this function
-    foo "a b" "c d"
+    # We passed ONE parameter to this function
+    foo "a b c d"
 }
 test-learn-bash:-no-double-quote-assert() {
     # But the command 'no-double-quote' received FOUR parameters!
@@ -46,12 +46,12 @@ test-learn-bash:-double-quotes() {
     function foo() {
         double-quotes "$@"
     }
-    # We passed TWO parameters to this function
-    foo "a b" "c d"
+    # We passed ONE parameter to this function
+    foo "a b c d"
 }
 test-learn-bash:-double-quotes-assert() {
-    # Yes, the command 'double-quotes' received TWO correct parameters
-    double-quotes "a b" "c d"
+    # Yes, the command 'double-quotes' received the correct parameter
+    double-quotes "a b c d"
 }
 
 test-learn-bash:-no-double-quote-star() {
