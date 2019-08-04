@@ -283,7 +283,7 @@ test-mock-script() {
     ./path/to/script foo bar
 }
 test-mock-script-assert() {
-    @echo ./path/to/script foo bar
+    @dryrun ./path/to/script foo bar
 }
 
 test-mock-existed-script() {
@@ -341,12 +341,24 @@ test-bach-run-tests--get-all-tests-assert() {
     test-bach-run-tests--get-all-tests-bar2
 }
 
-
-test-forbidden-running-@mock() {
-    @echo @mock anything === anything
-    @echo @ignore foobar
+test-dryrun-should-split-parameters-by-two-spaces() {
+    no-parameter
+    @dryrun one-parameter '{ "foo": 1, "bar": 2 }'
+    multi-parameters "{ 'foo': 1, 'bar': 2 }" '{ "foo": 1, "bar": 2 }'
 }
-test-forbidden-running-@mock-assert() {
+test-dryrun-should-split-parameters-by-two-spaces-assert() {
+    @cat <<EOF
+no-parameter
+one-parameter  { "foo": 1, "bar": 2 }
+multi-parameters  { 'foo': 1, 'bar': 2 }  { "foo": 1, "bar": 2 }
+EOF
+}
+
+test-forbidden-running-mock-inside-assertion() {
+    @dryrun @mock anything === anything
+    @dryrun @ignore foobar
+}
+test-forbidden-running-mock-inside-assertion-assert() {
     @type -t @mock 2>&1
     @mock anything === anything
     @ignore foobar
@@ -369,5 +381,5 @@ test-mock-echo() {
 }
 test-mock-echo-assert() {
     @echo function
-    @echo echo done
+    @dryrun echo done
 }

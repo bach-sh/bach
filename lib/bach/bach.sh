@@ -159,7 +159,7 @@ function xargs() {
     while param="${1:-}"; [[ -n "$param" ]]; do
         shift || true
         if [[ "$param" == "--" ]]; then
-            xargs_opts+=("$_echo" "$@")
+            xargs_opts+=("${BASH:-bash}" "-c" "$* \$@" "-s")
             break
         else
             xargs_opts+=("$param")
@@ -209,7 +209,7 @@ function @mock() {
         func="$(@cat)"
     else
         @debug "@mock $name $_echo"
-        func="${_echo} \"${name}\" \"\$@\""
+        func="@dryrun \"${name}\" \"\$@\""
     fi
     if [[ "$name" == */* ]]; then
         [[ -d "${name%/*}" ]] || @mkdir -p "${name%/*}"
@@ -271,6 +271,13 @@ function _bach_framework__run_function() {
 }
 export -f _bach_framework__run_function
 
+function @dryrun() {
+    printf '%s' "$1"
+    [[ "$#" -gt 1 ]] && printf '  %s' "${@:2}"
+    printf '\n'
+}
+export -f @dryrun
+
 declare -gxa BACH_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -y)
 function assert-execution() (
     declare bach_test_name="$1" bach_tmpdir
@@ -292,7 +299,7 @@ function assert-execution() (
             builtin "$@"
         else
             @debug "[CNFH-default]" "$@"
-            @echo "$@"
+            @dryrun "$@"
         fi
     } #8>/dev/null
     export -f command_not_found_handle
