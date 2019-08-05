@@ -470,3 +470,11 @@ num 3
 num 3
 EOF
 }
+
+test-bach-should-ignore-comment() {
+    only-you
+    @comment hi
+}
+test-bach-should-ignore-comment-assert() {
+    only-you
+}

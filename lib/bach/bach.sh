@@ -339,7 +339,7 @@ function assert-execution() (
     export -f command_not_found_handle
     export PATH=path-not-exists
 
-    if @diff "${BACH_ASSERT_DIFF_OPTS[@]}" <(
+    if @diff "${BACH_ASSERT_DIFF_OPTS[@]}" -I "^##BACH: " <(
             set +euo pipefail
             (
                 _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
@@ -373,6 +373,11 @@ EOF
     @rm -rf "$bach_tmpdir"
     return "$retval"
 )
+
+function @comment() {
+    @out "##BACH:" "$@"
+}
+export -f @comment
 
 function @ignore() {
     declare bach_test_name="$1"
