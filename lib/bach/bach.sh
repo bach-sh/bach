@@ -5,6 +5,7 @@ export BACH_COLOR="${BACH_COLOR:-auto}"
 
 shopt -s expand_aliases
 export PATH_ORIGIN="$PATH"
+export PS4='+ ${FUNCNAME:-}:${LINENO} '
 
 function @out() {
     if [[ ! -t 0 ]]; then
@@ -175,11 +176,8 @@ export -f xargs
 
 function @generate_mock_function_name() {
     declare name="$1"
-    if [[ "$(@type -t "$name")" == function && "$name" == !(command) ]]; then
-        @echo "$name"
-    else
-        @echo "mock_exec_${name}_$(@dryrun "${@}" | @md5sum | @cut -b1-32)"
-    fi
+    @echo "mock_exec_${name}_$(@dryrun "${@}" | @md5sum | @cut -b1-32)"
+
 }
 export -f @generate_mock_function_name
 
@@ -228,13 +226,46 @@ SCRIPT
         else
             mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
         fi
+        if [[ -z "$desttype" ]]; then
+            eval "function ${name}() {
+                      declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\"
+                      if [[ \"\$(@type -t \"\$mockfunc\")\" == function ]]; then
+                           \"\${mockfunc}\" \"$@\"
+                      else
+                           @dryrun ${name} \"\$@\"
+                      fi
+                  }; export -f ${name}"
+        fi
         #stderr name="$name"
-        body="function ${mockfunc}() { @debug Running mock : '${cmd[*]}' :; $func; }"
-        # @debug "$body"
+        #body="function ${mockfunc}() { @debug Running mock : '${cmd[*]}' :; $func; }"
+        declare mockfunc_seq="${mockfunc//@/__}_SEQ"
+        mockfunc_seq="${mockfunc_seq//-/__}"
+        body="function ${mockfunc}() {
+            declare -gxi ${mockfunc_seq}=\"\${${mockfunc_seq}:-0}\";
+            if [[ \"\$(@type -t \"${mockfunc}_\$(( ${mockfunc_seq} + 1))\")\" == function ]]; then
+                let ${mockfunc_seq}++;
+            fi;
+            \"${mockfunc}_\${${mockfunc_seq}}\" \"\$@\";
+        }; export -f ${mockfunc}"
+        @debug "$body"
+        eval "$body"
+        for (( mockfunc__SEQ=1; mockfunc__SEQ <= ${BACH_MOCK_FUNCTION_MAX_COUNT:-0}; mockfunc__SEQ++ )); do
+            [[ "$(@type -t "${mockfunc}_${mockfunc__SEQ}")" == function ]] || break
+        done
+        body="${mockfunc}_${mockfunc__SEQ}() {
+            @debug : ${name} ${cmd[@]} :
+            $func
+        }; export -f ${mockfunc}_${mockfunc__SEQ}"
+        @debug "$body"
         eval "$body"
     fi
 }
 export -f @mock
+
+function @@mock() {
+    BACH_MOCK_FUNCTION_MAX_COUNT=15 @mock "$@"
+}
+export -f @@mock
 
 function @mocktrue() {
     @mock "$@" === @true
@@ -297,7 +328,7 @@ function assert-execution() (
         if [[ "$(type -t "${mockfunc}")" == function ]]; then
             @debug "[CNFH-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
-        elif [[ "$(type -t "${bach_cmd_name}")" == function ]]; then
+        elif [[ "${bach_cmd_name}" == @(cd|command|echo|eval|exec|false|popd|pushd|pwd|source|true|type) ]]; then
             @debug "[CNFH-builtin]" "$@"
             builtin "$@"
         else

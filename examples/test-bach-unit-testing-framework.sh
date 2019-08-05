@@ -122,6 +122,16 @@ test-run-with-no-filename-assert() {
     @false
 }
 
+test-mock-command-which-something() {
+    @mock command which something === fake-something
+    command which something
+    PATH=/bin:/usr/bin command which hostname
+}
+test-mock-command-which-something-assert() {
+    fake-something
+    @echo /bin/hostname
+}
+
 test-@real-function() {
     @mock command which md5sum === fake-md5sum
     @real md5sum --version
@@ -241,7 +251,6 @@ function init-current-working-dir-is-not-a-repo() {
     @mockfalse git config --get branch.master.remote
     @mockfalse git rev-parse --abbrev-ref HEAD
     @mockfalse git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
-
 }
 
 test-gp-running-not-inside-a-valid-git-repo() {
@@ -376,6 +385,7 @@ test-mock-script-with-custom-complex-action-assert() {
 }
 
 test-bach-framework-can-get-all-tests() {
+    unset -f bach-get-all-functions @shuf
     @mock @shuf === @sort
     @mock bach-get-all-functions <<EOF
 @echo declare -f gp
@@ -436,4 +446,27 @@ test-mock-echo-builtin-command() {
 test-mock-echo-builtin-command-assert() {
     @echo function
     @dryrun echo done
+}
+
+test-mock-function-multiple-times() {
+    @@mock random numbers === @echo num 1
+    @@mock random numbers === @echo num 2
+    @@mock random numbers === @echo num 3
+
+    random
+    random hello
+    random numbers
+    random numbers
+    random numbers
+    random numbers
+}
+test-mock-function-multiple-times-assert() {
+    @dryrun random
+    @dryrun random hello
+    @cat << EOF
+num 1
+num 2
+num 3
+num 3
+EOF
 }
