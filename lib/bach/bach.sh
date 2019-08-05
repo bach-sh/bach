@@ -253,7 +253,7 @@ SCRIPT
             [[ "$(@type -t "${mockfunc}_${mockfunc__SEQ}")" == function ]] || break
         done
         body="${mockfunc}_${mockfunc__SEQ}() {
-            @debug : ${name} ${cmd[@]} :
+            # @mock ${name} ${cmd[@]} ===
             $func
         }; export -f ${mockfunc}_${mockfunc__SEQ}"
         @debug "$body"
