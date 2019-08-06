@@ -136,6 +136,10 @@ function bach-run-tests() {
 
     bach_initialize
 
+    function @do-not-panic() {
+        builtin true;
+    }
+
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
         BACH_ASSERT_DIFF_OPTS+=(-I "^##BACH: ")
     fi
@@ -444,3 +448,9 @@ function @run() {
     @source "$script" "$@"
 }
 export -f @run
+
+function @do-not-panic() {
+    builtin printf "\n%s\n  line number: %s\n  script stack: %s\n\n" "DO NOT PANIC!" "${LINENO}" "${BASH_SOURCE[*]}"
+    builtin exit 1
+}
+export -f @do-not-panic
