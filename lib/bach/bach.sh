@@ -107,6 +107,12 @@ function bach-run-tests--get-all-tests() {
 
 function bach-run-tests() {
     set -euo pipefail
+
+    if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
+        BACH_ASSERT_DIFF_OPTS+=(-I "^##BACH: ")
+    fi
+    @mockall cd echo
+
     declare color_ok color_err color_end
     if [[ "$BACH_COLOR" == "always" ]] || [[ "$BACH_COLOR" != "no" && -t 1 && -t 2 ]]; then
         color_ok="\e[1;32m"
@@ -149,10 +155,6 @@ function bach-run-tests() {
 
 function bach-on-exit() {
     if [[ "$?" -eq 0 ]]; then
-        [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]] &&
-            BACH_ASSERT_DIFF_OPTS+=(-I "^##BACH: ")
-        @mockall cd echo
-
         bach-run-tests
     else
         printf "Bail out! %s\n" "Couldn't initlize tests."
@@ -328,7 +330,7 @@ function @dryrun() {
 }
 export -f @dryrun
 
-declare -gxa BACH_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -u)
+declare -gxa BACH_ASSERT_DIFF_OPTS=(-u)
 declare -gx BACH_ASSERT_IGNORE_COMMENT="${BACH_ASSERT_IGNORE_COMMENT:-true}"
 declare -gx BACH_ASSERT_DIFF="${BACH_ASSERT_DIFF:-diff}"
 
