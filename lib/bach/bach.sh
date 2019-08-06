@@ -4,7 +4,7 @@ set -euo pipefail
 export BACH_COLOR="${BACH_COLOR:-auto}"
 
 shopt -s expand_aliases
-export PATH_ORIGIN="$PATH"
+export BACH_OS_ORIGIN_PATH="$PATH"
 export PS4='+ ${FUNCNAME:-}:${LINENO} '
 
 function @out() {
@@ -48,7 +48,7 @@ fi
 export -f @debug
 
 function bach-real-path() {
-    PATH="$PATH_ORIGIN" command which "$1"
+    PATH="$BACH_OS_ORIGIN_PATH" command which "$1"
 }
 export -f bach-real-path
 
