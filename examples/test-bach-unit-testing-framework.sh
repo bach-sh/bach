@@ -584,3 +584,30 @@ test-bach-framework-set--u-should-work-in-tests() {
 test-bach-framework-set--u-should-work-in-tests-assert() {
     @false
 }
+
+function mock-bach-get-all-functions() {
+    @mock bach-get-all-functions <<EOF
+@echo declare -f gp
+@echo declare -f test-bach-run-tests--get-all-tests-foo
+@echo declare -f test-bach-run-tests--get-all-tests-bar
+@echo declare -f test-bach-run-this
+@echo declare -f test-bach-run-this-assert
+@echo declare -f test-bach-run-this-too
+@echo declare -f test-bach-run-tests--get-all-tests-bar2
+@echo declare -f test-bach-run-tests--get-all-tests-bar-assert
+EOF
+}
+
+test-bach-framework-only-run-a-certain-test() {
+    export BACH_TESTS=bach-run-this
+
+    unset -f bach-get-all-functions @shuf
+    @mock @shuf === @sort
+    mock-bach-get-all-functions
+    bach-run-tests--get-all-tests
+}
+test-bach-framework-only-run-a-certain-test-assert() {
+    @cat <<TESTS
+test-bach-run-this
+TESTS
+}

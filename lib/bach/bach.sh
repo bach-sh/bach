@@ -87,10 +87,20 @@ function bach-get-all-functions() {
 }
 export -f bach-get-all-functions
 
+function bach--skip-the-test() {
+    declare test="$1"
+    if [[ -n "${BACH_TESTS:-}" ]]; then
+        [[ "$test" == "$BACH_TESTS" ]] ||
+            [[ "$test" == test-"$BACH_TESTS" ]]
+    fi
+}
+export -f bach--skip-the-test
+
 function bach-run-tests--get-all-tests() {
     bach-get-all-functions | @shuf | while read -r _ _ name; do
         [[ "$name" == test?* ]] || continue
         [[ "$name" == *-assert ]] && continue
+        bach--skip-the-test "$name" || continue
         printf "%s\n" "$name"
     done
 }
