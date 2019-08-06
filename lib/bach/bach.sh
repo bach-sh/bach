@@ -149,7 +149,12 @@ function bach-run-tests() {
         @rm "$testresult" &>/dev/null
     done
 
-    printf -- "# -----\n# All tests: %s, failed: %d, skipped: %d\n" "${#all_tests[@]}" "$error" "$(( ${#all_tests[@]} - total ))">&2
+    declare color_result=""
+    if (( error > 0 )); then
+        color_result="$color_err"
+    fi
+    printf -- "# -----\n#${color_result} All tests: %s, failed: %d, skipped: %d${color_end}\n" \
+           "${#all_tests[@]}" "$error" "$(( ${#all_tests[@]} - total ))">&2
     [[ "$error" == 0 ]] && [[ "${#all_tests[@]}" -eq "$total" ]]
 }
 
