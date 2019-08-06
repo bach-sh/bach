@@ -536,6 +536,18 @@ test-bach-framework-set--e-does-not-work-due-to-a-known-limitation-assert() {
     #     the false command causes the subshell to exit without executing echo one; however, echo two is executed because the exit status of the pipeline (false; echo one) | cat is zero.
 }
 
+test-bach-framework-set--o-pipefail-does-not-work-due-to-a-known-limitation() {
+    set -o pipefail
+
+    @false | due-to-a-known-limitation set -o pipefail does not work in tests
+
+    fix it
+}
+test-bach-framework-set--o-pipefail-does-not-work-due-to-a-known-limitation-assert() {
+    due-to-a-known-limitation set -o pipefail does not work in tests
+    fix it
+}
+
 test-bach-framework-mock-builtin-trap-function() {
     @mock trap
 
