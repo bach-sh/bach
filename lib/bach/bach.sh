@@ -155,7 +155,7 @@ function bach-run-tests() {
 
 function bach-on-exit() {
     if [[ "$?" -eq 0 ]]; then
-        bach-run-tests
+        [[ "${BACH_DISABLED:-false}" == true ]] || bach-run-tests
     else
         printf "Bail out! %s\n" "Couldn't initlize tests."
     fi
