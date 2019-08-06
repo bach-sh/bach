@@ -90,8 +90,8 @@ export -f bach-get-all-functions
 function bach--skip-the-test() {
     declare test="$1"
     if [[ -n "${BACH_TESTS:-}" ]]; then
-        [[ "$test" == "$BACH_TESTS" ]] ||
-            [[ "$test" == test-"$BACH_TESTS" ]]
+        [[ "$test" == $BACH_TESTS ]] ||
+            [[ "$test" == test-$BACH_TESTS ]]
     fi
 }
 export -f bach--skip-the-test

@@ -611,3 +611,45 @@ test-bach-framework-only-run-a-certain-test-assert() {
 test-bach-run-this
 TESTS
 }
+
+test-bach-framework-filter-tests-no-matches() {
+    export BACH_TESTS="you-can-not-find-me"
+
+    unset -f bach-get-all-functions @shuf
+    @mock @shuf === @sort
+    mock-bach-get-all-functions
+    bach-run-tests--get-all-tests
+}
+test-bach-framework-filter-tests-no-matches-assert() {
+    @comment nothing here
+}
+
+test-bach-framework-filter-tests-by-glob() {
+    export BACH_TESTS="bach-run-this*"
+
+    unset -f bach-get-all-functions @shuf
+    @mock @shuf === @sort
+    mock-bach-get-all-functions
+    bach-run-tests--get-all-tests
+}
+test-bach-framework-filter-tests-by-glob-assert() {
+    @cat <<TESTS
+test-bach-run-this
+test-bach-run-this-too
+TESTS
+}
+
+test-bach-framework-filter-tests-by-glob-two-stars() {
+    export BACH_TESTS="*run-this*"
+
+    unset -f bach-get-all-functions @shuf
+    @mock @shuf === @sort
+    mock-bach-get-all-functions
+    bach-run-tests--get-all-tests
+}
+test-bach-framework-filter-tests-by-glob-two-stars-assert() {
+    @cat <<TESTS
+test-bach-run-this
+test-bach-run-this-too
+TESTS
+}
