@@ -60,7 +60,7 @@ for name in echo pwd test; do
     declare -grx "_${name}"="$(bach-real-path "$name")"
 done
 
-declare -a bach_core_utils=(cat chmod cut diff find grep ls md5sum mkdir mktemp rm rmdir sed shuf sort tee touch which xargs)
+declare -a bach_core_utils=(cat chmod cut diff find env grep ls md5sum mkdir mktemp rm rmdir sed shuf sort tee touch which xargs)
 
 for name in "${bach_core_utils[@]}"; do
     declare -grx "_${name}"="$(bach-real-path "$name")"
