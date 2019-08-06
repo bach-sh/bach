@@ -234,7 +234,7 @@ SCRIPT
             eval "function ${name}() {
                       declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\"
                       if [[ \"\$(@type -t \"\$mockfunc\")\" == function ]]; then
-                           \"\${mockfunc}\" \"$@\"
+                           \"\${mockfunc}\" \"\$@\"
                       else
                            @dryrun ${name} \"\$@\"
                       fi
