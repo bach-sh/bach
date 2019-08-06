@@ -52,21 +52,47 @@ function bach-real-path() {
 }
 export -f bach-real-path
 
-for name in cd command echo eval exec false popd pushd pwd source trap true type; do
-    eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
-done
+function bach_initialize(){
+    declare name
 
-for name in echo pwd test; do
-    declare -grx "_${name}"="$(bach-real-path "$name")"
-done
+    for name in cd command echo eval exec false popd pushd pwd source trap true type; do
+        eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
+    done
 
-declare -a bach_core_utils=(cat chmod cut diff find env grep ls md5sum mkdir mktemp rm rmdir sed shuf sort tee touch which xargs)
+    for name in echo pwd test; do
+        declare -grx "_${name}"="$(bach-real-path "$name")"
+    done
 
-for name in "${bach_core_utils[@]}"; do
-    declare -grx "_${name}"="$(bach-real-path "$name")"
-    eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
-done
-unset name
+    declare -a bach_core_utils=(cat chmod cut diff find env grep ls md5sum mkdir mktemp rm rmdir sed shuf sort tee touch which xargs)
+
+    for name in "${bach_core_utils[@]}"; do
+        declare -grx "_${name}"="$(bach-real-path "$name")"
+        eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
+    done
+    unset name
+
+    function xargs() {
+        declare param
+        declare -a xargs_opts
+        while param="${1:-}"; [[ -n "$param" ]]; do
+            shift || true
+            if [[ "$param" == "--" ]]; then
+                xargs_opts+=("${BASH:-bash}" "-c" "$* \$@" "-s")
+                break
+            else
+                xargs_opts+=("$param")
+            fi
+        done
+        @debug "@mock-xargs" "${xargs_opts[@]}"
+        if [[ "$#" -gt 0 ]]; then
+            @xargs "${xargs_opts[@]}"
+        else
+            @dryrun xargs "${xargs_opts[@]}"
+        fi
+    }
+    export -f xargs
+
+}
 
 function bach-real-command() {
     declare name="$1"
@@ -107,6 +133,8 @@ function bach-run-tests--get-all-tests() {
 
 function bach-run-tests() {
     set -euo pipefail
+
+    bach_initialize
 
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
         BACH_ASSERT_DIFF_OPTS+=(-I "^##BACH: ")
@@ -173,29 +201,9 @@ function @mock-command() {
     function command() {
         command_not_found_handle command "$@"
     }
+    export -f command
 }
 export -f @mock-command
-
-function xargs() {
-    declare param
-    declare -a xargs_opts
-    while param="${1:-}"; [[ -n "$param" ]]; do
-        shift || true
-        if [[ "$param" == "--" ]]; then
-            xargs_opts+=("${BASH:-bash}" "-c" "$* \$@" "-s")
-            break
-        else
-            xargs_opts+=("$param")
-        fi
-    done
-    @debug "@mock-xargs" "${xargs_opts[@]}"
-    if [[ "$#" -gt 0 ]]; then
-        @xargs "${xargs_opts[@]}"
-    else
-        @dryrun xargs "${xargs_opts[@]}"
-    fi
-}
-export -f xargs
 
 function @generate_mock_function_name() {
     declare name="$1"
