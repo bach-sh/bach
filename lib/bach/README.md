@@ -79,3 +79,8 @@ It's part of Shell Common Functions Library
         # Yes, with double quotes, only the file "bar*" is removed
         rm -rf "bar*"
     }
+
+## Roadmap
+
+- a command line tool
+- run inside docker containers
