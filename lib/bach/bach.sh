@@ -170,7 +170,11 @@ function xargs() {
         fi
     done
     @debug "@mock-xargs" "${xargs_opts[@]}"
-    @xargs "${xargs_opts[@]}"
+    if [[ "$#" -gt 0 ]]; then
+        @xargs "${xargs_opts[@]}"
+    else
+        @dryrun xargs "${xargs_opts[@]}"
+    fi
 }
 export -f xargs
 

@@ -478,3 +478,26 @@ test-bach-should-ignore-comment() {
 test-bach-should-ignore-comment-assert() {
     only-you
 }
+
+test-xargs-withoug-double-dashes() {
+    @mock ls === @stdout foo bar
+    ls | xargs -n1 do-something
+}
+test-xargs-withoug-double-dashes-assert() {
+    @dryrun xargs -n1 do-something
+}
+
+
+test-xargs-with-double-dashes() {
+    @mock ls === @stdout foo bar
+    ls | xargs -- do-something
+    ls | xargs -n1 -- do-something
+    ls | xargs -I file -- do-something file with other parameters
+}
+test-xargs-with-double-dashes-assert() {
+    do-something foo bar
+    do-something foo
+    do-something bar
+    do-something foo with other parameters
+    do-something bar with other parameters
+}
