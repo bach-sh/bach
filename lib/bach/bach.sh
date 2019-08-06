@@ -149,6 +149,8 @@ function bach-run-tests() {
 
 function bach-on-exit() {
     if [[ "$?" -eq 0 ]]; then
+        [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]] &&
+            BACH_ASSERT_DIFF_OPTS+=(-I "^##BACH: ")
         @mockall cd echo
 
         bach-run-tests
@@ -326,7 +328,10 @@ function @dryrun() {
 }
 export -f @dryrun
 
-declare -gxa BACH_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -y)
+declare -gxa BACH_ASSERT_DIFF_OPTS=(-W "${COLUMNS:-130}" -u)
+declare -gx BACH_ASSERT_IGNORE_COMMENT="${BACH_ASSERT_IGNORE_COMMENT:-true}"
+declare -gx BACH_ASSERT_DIFF="${BACH_ASSERT_DIFF:-diff}"
+
 function assert-execution() (
     declare bach_test_name="$1" bach_tmpdir
     bach_tmpdir="$(@mktemp -d)"
@@ -353,7 +358,7 @@ function assert-execution() (
     export -f command_not_found_handle
     export PATH=path-not-exists
 
-    if @diff "${BACH_ASSERT_DIFF_OPTS[@]}" -I "^##BACH: " <(
+    if @real "${BACH_ASSERT_DIFF}" "${BACH_ASSERT_DIFF_OPTS[@]}" <(
             @trap - EXIT
             set +euo pipefail
             (
