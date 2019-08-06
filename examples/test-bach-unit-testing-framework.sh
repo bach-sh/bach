@@ -535,3 +535,28 @@ test-bach-framework-set--e-does-not-work-due-to-a-known-limitation-assert() {
     #
     #     the false command causes the subshell to exit without executing echo one; however, echo two is executed because the exit status of the pipeline (false; echo one) | cat is zero.
 }
+
+test-bach-framework-mock-builtin-trap-function() {
+    @mock trap
+
+    @type -t trap
+    trap - ERR
+}
+test-bach-framework-mock-builtin-trap-function-assert() {
+    @echo function
+    @dryrun trap - ERR
+}
+
+test-bach-framework-should-clear-the-exit-trap-in-tests() {
+    builtin trap -p EXIT
+}
+test-bach-framework-should-clear-the-exit-trap-in-tests-assert() {
+    : do nothing here :
+}
+
+test-bach-framework-should-clear-the-exit-trap-in-assertion() {
+    : do nothing here :
+}
+test-bach-framework-should-clear-the-exit-trap-in-assertion-assert() {
+    builtin trap -p EXIT
+}

@@ -52,7 +52,7 @@ function bach-real-path() {
 }
 export -f bach-real-path
 
-for name in cd command echo eval exec false popd pushd pwd source true type; do
+for name in cd command echo eval exec false popd pushd pwd source trap true type; do
     eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
 done
 
@@ -344,6 +344,7 @@ function assert-execution() (
     export PATH=path-not-exists
 
     if @diff "${BACH_ASSERT_DIFF_OPTS[@]}" -I "^##BACH: " <(
+            @trap - EXIT
             set +euo pipefail
             (
                 _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
@@ -352,6 +353,7 @@ function assert-execution() (
             )
             @echo "Exit code: $?"
         ) <(
+            @trap - EXIT
             unset -f @mock @mockall @ignore @setup-test
             set +euo pipefail
             (
