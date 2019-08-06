@@ -133,7 +133,7 @@ function bach-run-tests() {
         @rm "$testresult" &>/dev/null
     done
 
-    printf -- "# -----\n# All tests: %s, failed: %d, skipped: %d\n" "$total" "$error" "$(( ${#all_tests[@]} - $total ))">&2
+    printf -- "# -----\n# All tests: %s, failed: %d, skipped: %d\n" "${#all_tests[@]}" "$error" "$(( ${#all_tests[@]} - total ))">&2
     [[ "$error" == 0 ]] && [[ "${#all_tests[@]}" -eq "$total" ]]
 }
 
