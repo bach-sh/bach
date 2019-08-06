@@ -560,3 +560,15 @@ test-bach-framework-should-clear-the-exit-trap-in-assertion() {
 test-bach-framework-should-clear-the-exit-trap-in-assertion-assert() {
     builtin trap -p EXIT
 }
+
+test-bach-framework-set--u-should-work-in-tests() {
+    set -u
+    unset foobar
+
+    do-something "$foobar"
+
+    should-not-show-this
+}
+test-bach-framework-set--u-should-work-in-tests-assert() {
+    @false
+}
