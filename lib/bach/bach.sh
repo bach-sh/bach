@@ -167,7 +167,10 @@ function bach-run-tests() {
         friendly_name="${friendly_name//  / -}"
         : $(( total++ ))
         testresult="$(@mktemp)"
-        if assert-execution "$name" &>"$testresult"; then
+        set +e
+        assert-execution "$name" &>"$testresult"; test_retval="$?"
+        set -e
+        if [[ "$test_retval" -eq 0 ]]; then
             printf "${color_ok}ok %d - %s${color_end}\n" "$total" "$friendly_name"
         else
             : $(( error++ ))
@@ -352,11 +355,11 @@ declare -gx BACH_ASSERT_IGNORE_COMMENT="${BACH_ASSERT_IGNORE_COMMENT:-true}"
 declare -gx BACH_ASSERT_DIFF="${BACH_ASSERT_DIFF:-diff}"
 
 function assert-execution() (
-    declare bach_test_name="$1" bach_tmpdir
+    declare bach_test_name="$1" bach_tmpdir bach_actual_output bach_expected_output
     bach_tmpdir="$(@mktemp -d)"
     #trap '/bin/rm -vrf "$bach_tmpdir"' RETURN
-    @pushd "${bach_tmpdir}" &>/dev/null
-    @mkdir actual expected
+    @mkdir "${bach_tmpdir}/test_root"
+    @pushd "${bach_tmpdir}/test_root" &>/dev/null
     declare retval=1
 
     function command_not_found_handle() {
@@ -376,27 +379,32 @@ function assert-execution() (
     } #8>/dev/null
     export -f command_not_found_handle
     export PATH=path-not-exists
-
-    if @real "${BACH_ASSERT_DIFF}" "${BACH_ASSERT_DIFF_OPTS[@]}" <(
-            @trap - EXIT
+    bach_actual_stdout="${bach_tmpdir}/actual-stdout.txt"
+    bach_expected_stdout="${bach_tmpdir}/expected-stdout.txt"
+    @cat <(
+        (
+            @trap - EXIT RETURN
             set +euo pipefail
-            (
-                _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
-                _bach_framework__run_function "$BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
-                "${bach_test_name}"
-            )
-            @echo "Exit code: $?"
-        ) <(
-            @trap - EXIT
+            _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
+            _bach_framework__run_function "$BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
+            "${bach_test_name}"
+        )
+        @echo "# Exit code: $?"
+    ) > "${bach_actual_stdout}"
+    @cat <(
+        (
+            @trap - EXIT RETURN
             unset -f @mock @mockall @ignore @setup-test
             set +euo pipefail
-            (
-                _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
-                _bach_framework__run_function "$BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
-                "${bach_test_name}"-assert
-            )
-            @echo "Exit code: $?"
+            _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
+            _bach_framework__run_function "$BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
+            "${bach_test_name}"-assert
         )
+        @echo "# Exit code: $?"
+    ) > "${bach_expected_stdout}"
+    @cd ..
+    if @real "${BACH_ASSERT_DIFF}" "${BACH_ASSERT_DIFF_OPTS[@]}" -- \
+        "${bach_actual_stdout##*/}" "${bach_expected_stdout##*/}"
     then
         retval=0
     fi

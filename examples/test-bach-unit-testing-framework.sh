@@ -507,50 +507,28 @@ test-xargs-with-double-dashes-assert() {
     do-something bar with other parameters
 }
 
-test-bach-framework-set--e-does-not-work-due-to-a-known-limitation() {
+test-bach-framework-set--e-should-work() {
     set -e
 
     do-this
     builtin false
 
-    due-to-a-known-limitation set -e does not work in tests
+    should-not-do-this
 
 }
-test-bach-framework-set--e-does-not-work-due-to-a-known-limitation-assert() {
+test-bach-framework-set--e-should-work-assert() {
     do-this
-
-    due-to-a-known-limitation set -e does not work in tests
-    #
-    # See:
-    #   - http://austingroupbugs.net/view.php?id=537
-    #   - https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_25
-    #
-    # set
-    #     -e
-    #     When this option is on, when any command fails (for any of the reasons listed in Consequences of Shell Errors or by returning an exit status greater than zero), the shell immediately shall exit, as if by executing the exit special built-in utility with no arguments, with the following exceptions:
-    #     The failure of any individual command in a multi-command pipeline shall not cause the shell to exit. Only the failure of the pipeline itself shall be considered.
-    #
-    #     The -e setting shall be ignored when executing the compound list following the while, until, if, or elif reserved word, a pipeline beginning with the ! reserved word, or any command of an AND-OR list other than the last.
-    #
-    #     If the exit status of a compound command other than a subshell command was the result of a failure while -e was being ignored, then -e shall not apply to this command.
-    #
-    #     This requirement applies to the shell environment and each subshell environment separately. For example, in:
-    #
-    #     set -e; (false; echo one) | cat; echo two
-    #
-    #     the false command causes the subshell to exit without executing echo one; however, echo two is executed because the exit status of the pipeline (false; echo one) | cat is zero.
+    @false
 }
 
-test-bach-framework-set--o-pipefail-does-not-work-due-to-a-known-limitation() {
+test-bach-framework-set--o-pipefail-should-work() {
     set -o pipefail
 
-    @false | due-to-a-known-limitation set -o pipefail does not work in tests
-
-    fix it
+    @false | do-this
 }
-test-bach-framework-set--o-pipefail-does-not-work-due-to-a-known-limitation-assert() {
-    due-to-a-known-limitation set -o pipefail does not work in tests
-    fix it
+test-bach-framework-set--o-pipefail-should-work-assert() {
+    do-this
+    @false
 }
 
 test-bach-framework-mock-builtin-trap-function() {
@@ -579,10 +557,10 @@ test-bach-framework-should-clear-the-exit-trap-in-assertion-assert() {
 }
 
 test-bach-framework-set--u-should-work-in-tests() {
-    set -u
+    set -ue
     unset foobar
 
-    do-something "$foobar"
+    visit-an-undefined-variable "$foobar"
 
     should-not-show-this
 }
