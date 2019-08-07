@@ -471,6 +471,6 @@ function @do-not-panic() {
 export -f @do-not-panic
 
 function @assert-fail() {
-    builtin false
+    builtin exit 1
 }
 export -f @assert-fail

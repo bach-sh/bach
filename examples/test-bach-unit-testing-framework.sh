@@ -651,3 +651,13 @@ test-bach-run-this
 test-bach-run-this-too
 TESTS
 }
+
+test-ASSERT-FAIL-bach-framework-api-assert-fail() {
+    do-something
+}
+test-ASSERT-FAIL-bach-framework-api-assert-fail-assert() {
+    do-something
+    @assert-fail
+
+    should-not-do-this
+}
