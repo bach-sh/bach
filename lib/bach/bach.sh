@@ -457,9 +457,11 @@ function @load_function() {
 } 8>/dev/null
 export -f @load_function
 
+export BACH_STARTUP_PWD="${PWD:-$(pwd)}"
 function @run() {
     declare script="${1:?missing script name}"
     shift
+    [[ "$script" == /* ]] || script="${BACH_STARTUP_PWD}/${script}"
     @source "$script" "$@"
 }
 export -f @run

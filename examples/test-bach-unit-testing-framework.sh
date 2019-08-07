@@ -661,3 +661,27 @@ test-ASSERT-FAIL-bach-framework-api-assert-fail-assert() {
 
     should-not-do-this
 }
+
+test-bach-framework-run-script-with-relative-path() {
+    unset -f @source
+    @mock @source
+
+    BACH_STARTUP_PWD=/foo/bar/bach
+
+    @run ../script.sh
+}
+test-bach-framework-run-script-with-relative-path-assert() {
+    @dryrun @source /foo/bar/bach/../script.sh
+}
+
+test-bach-framework-run-script-with-absolute-path() {
+    unset -f @source
+    @mock @source
+
+    BACH_STARTUP_PWD=/foo/bar/bach
+
+    @run /awesome-bach/script.sh
+}
+test-bach-framework-run-script-with-absolute-path-assert() {
+    @dryrun @source /awesome-bach/script.sh
+}
