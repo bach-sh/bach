@@ -3,8 +3,12 @@ declare -grx self="$(realpath "${BASH_SOURCE}")"
 source <("${self%/*/*}"/cflib-import.sh)
 require bach
 
-#declare -a BACH_ASSERT_DIFF_OPTS=(-w -y)
-export BACH_DEBUG=true
+# export BACH_DISABLED=false
+# export BACH_COLOR=auto
+# export BACH_DEBUG=true
+# export BACH_ASSERT_DIFF=diff
+# export BACH_ASSERT_IGNORE_COMMENT=true
+# declare -a BACH_ASSERT_DIFF_OPTS=(-u)
 
 test-rm--rf() {
     @do-not-panic
