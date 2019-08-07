@@ -473,3 +473,4 @@ export -f @do-not-panic
 function @assert-fail() {
     builtin false
 }
+export -f @assert-fail
