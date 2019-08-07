@@ -1,9 +1,8 @@
 # -*- mode: sh -*-
 set -euo pipefail
+shopt -s expand_aliases
 
 export BACH_COLOR="${BACH_COLOR:-auto}"
-
-shopt -s expand_aliases
 export BACH_OS_ORIGIN_PATH="$PATH"
 export PS4='+ ${FUNCNAME:-}:${LINENO} '
 
@@ -42,12 +41,13 @@ if [[ "${BACH_DEBUG:-}" != true ]]; then
 else
     exec 8>&2
     function @debug() {
-        @printf '[DEBUG] %s\n' "$*"
+        builtin printf '[DEBUG] %s\n' "$*"
     } >&8
 fi
 export -f @debug
 
 function bach-real-path() {
+    @debug PATH="$BACH_OS_ORIGIN_PATH" command which "$1"
     PATH="$BACH_OS_ORIGIN_PATH" command which "$1"
 }
 export -f bach-real-path
