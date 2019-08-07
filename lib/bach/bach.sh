@@ -170,6 +170,9 @@ function bach-run-tests() {
         set +e
         assert-execution "$name" &>"$testresult"; test_retval="$?"
         set -e
+        if [[ "$name" == test-ASSERT-FAIL-* ]]; then
+            test_retval="$(( test_retval == 0?1:0 ))"
+        fi
         if [[ "$test_retval" -eq 0 ]]; then
             printf "${color_ok}ok %d - %s${color_end}\n" "$total" "$friendly_name"
         else

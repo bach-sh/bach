@@ -568,6 +568,20 @@ test-bach-framework-set--u-should-work-in-tests-assert() {
     @false
 }
 
+test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-test() {
+    @false
+}
+test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-test-assert() {
+    @true
+}
+
+test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion() {
+    @true
+}
+test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion-assert() {
+    @false
+}
+
 function mock-bach-get-all-functions() {
     @mock bach-get-all-functions <<EOF
 @echo declare -f gp
