@@ -155,7 +155,7 @@ function bach-run-tests() {
         color_err=""
         color_end=""
     fi
-    declare name friendly_name testresult
+    declare name friendly_name testresult test_name_assert_fail
     declare -i total=0 error=0
     declare -a all_tests
     mapfile -t all_tests < <(bach-run-tests--get-all-tests)
@@ -172,12 +172,16 @@ function bach-run-tests() {
         set -e
         if [[ "$name" == test-ASSERT-FAIL-* ]]; then
             test_retval="$(( test_retval == 0?1:0 ))"
+            test_name_assert_fail="${color_err}ASSERT FAIL${color_end}"
+            friendly_name="${friendly_name/#ASSERT FAIL/}"
+        else
+            test_name_assert_fail=""
         fi
         if [[ "$test_retval" -eq 0 ]]; then
-            printf "${color_ok}ok %d - %s${color_end}\n" "$total" "$friendly_name"
+            printf "${color_ok}ok %d - ${test_name_assert_fail}${color_ok}%s${color_end}\n" "$total" "$friendly_name"
         else
             : $(( error++ ))
-            printf "${color_err}not ok %d - %s${color_end}\n" "$total" "$friendly_name"
+            printf "${color_err}not ok %d - ${test_name_assert_fail}${color_err}%s${color_end}\n" "$total" "$friendly_name"
             {
                 printf "\n"
                 @cat "$testresult" >&2
