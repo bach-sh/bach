@@ -124,7 +124,7 @@ test-run-with-no-filename() {
     @run
 }
 test-run-with-no-filename-assert() {
-    @false
+    @assert-fail
 }
 
 test-mock-command-which-something() {
@@ -266,7 +266,7 @@ test-gp-running-not-inside-a-valid-git-repo() {
     gp
 }
 test-gp-running-not-inside-a-valid-git-repo-assert() {
-    @false
+    @assert-fail
 }
 
 
@@ -278,7 +278,7 @@ test-gp-running-not-inside-a-valid-git-repo-again() {
     gp origin
 }
 test-gp-running-not-inside-a-valid-git-repo-again-assert() {
-    false
+    @assert-fail
 }
 
 test-bach-real-command-mock-builtin() {
@@ -343,7 +343,7 @@ test-cannot-mock-absolute-path-of-script() {
 test-cannot-mock-absolute-path-of-script-assert() {
     #printf "\e[1;31m%s\e[0;m\n"
     @echo 'Cannot mock an absolute path: /tmp/cannot-mock-this'
-    return 1
+    @assert-fail
 }
 
 test-mock-script() {
@@ -362,7 +362,7 @@ test-cannot-mock-existed-script() {
 }
 test-cannot-mock-existed-script-assert() {
     @echo 'Cannot mock an existed path: ./cannot-mock-existed-script'
-    return 1
+    @assert-fail
 }
 
 test-mock-script-with-custom-action() {
@@ -518,7 +518,7 @@ test-bach-framework-set--e-should-work() {
 }
 test-bach-framework-set--e-should-work-assert() {
     do-this
-    @false
+    @assert-fail
 }
 
 test-bach-framework-set--o-pipefail-should-work() {
@@ -528,7 +528,8 @@ test-bach-framework-set--o-pipefail-should-work() {
 }
 test-bach-framework-set--o-pipefail-should-work-assert() {
     do-this
-    @false
+
+    @assert-fail
 }
 
 test-bach-framework-mock-builtin-trap-function() {
@@ -565,7 +566,7 @@ test-bach-framework-set--u-should-work-in-tests() {
     should-not-show-this
 }
 test-bach-framework-set--u-should-work-in-tests-assert() {
-    @false
+    @assert-fail
 }
 
 test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-test() {
@@ -579,7 +580,7 @@ test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion() {
     @true
 }
 test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion-assert() {
-    @false
+    @assert-fail
 }
 
 function mock-bach-get-all-functions() {
