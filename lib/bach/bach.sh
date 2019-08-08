@@ -480,7 +480,7 @@ export -f @run
 function @do-not-panic() {
     builtin printf "\n%s\n  line number: %s\n  script stack: %s\n\n" "DO NOT PANIC!" "${LINENO}" "${BASH_SOURCE[*]}"
     builtin exit 1
-}
+} >&2
 export -f @do-not-panic
 
 function @assert-fail() {
