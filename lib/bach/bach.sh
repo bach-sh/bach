@@ -3,8 +3,12 @@ set -euo pipefail
 shopt -s expand_aliases
 
 export BACH_COLOR="${BACH_COLOR:-auto}"
-export BACH_OS_ORIGIN_PATH="$PATH"
 export PS4='+ ${FUNCNAME:-}:${LINENO} '
+
+declare -gxa bach_origin_paths=()
+while builtin read -r -d: folder; do
+    bach_origin_paths+=("$folder")
+done <<< "${PATH}"
 
 function @out() {
     if [[ ! -t 0 ]]; then
@@ -47,8 +51,13 @@ fi
 export -f @debug
 
 function bach-real-path() {
-    @debug PATH="$BACH_OS_ORIGIN_PATH" command which "$1"
-    PATH="$BACH_OS_ORIGIN_PATH" command which "$1"
+    declare folder name="$1"
+    for folder in "${bach_origin_paths[@]}"; do
+        [[ -x "$folder/$name" ]] || continue
+        builtin echo "$folder/$name"
+        return 0
+    done
+    return 1
 }
 export -f bach-real-path
 
@@ -362,6 +371,7 @@ declare -gx BACH_ASSERT_IGNORE_COMMENT="${BACH_ASSERT_IGNORE_COMMENT:-true}"
 declare -gx BACH_ASSERT_DIFF="${BACH_ASSERT_DIFF:-diff}"
 
 function assert-execution() (
+    unset BACH_TESTS
     declare bach_test_name="$1" bach_tmpdir bach_actual_output bach_expected_output
     bach_tmpdir="$(@mktemp -d)"
     #trap '/bin/rm -vrf "$bach_tmpdir"' RETURN
@@ -385,13 +395,13 @@ function assert-execution() (
         fi
     } #8>/dev/null
     export -f command_not_found_handle
-    export PATH=path-not-exists
     bach_actual_stdout="${bach_tmpdir}/actual-stdout.txt"
     bach_expected_stdout="${bach_tmpdir}/expected-stdout.txt"
     @cat <(
         (
             @trap - EXIT RETURN
             set +euo pipefail
+            declare -gxr PATH=bach-fake-path
             _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
             _bach_framework__run_function "$BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
             "${bach_test_name}"
@@ -403,6 +413,7 @@ function assert-execution() (
             @trap - EXIT RETURN
             unset -f @mock @mockall @ignore @setup-test
             set +euo pipefail
+            declare -gxr PATH=bach-fake-path
             _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
             _bach_framework__run_function "$BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
             "${bach_test_name}"-assert
@@ -473,6 +484,6 @@ function @do-not-panic() {
 export -f @do-not-panic
 
 function @assert-fail() {
-    builtin exit 1
+    builtin exit "${1:-1}"
 }
 export -f @assert-fail

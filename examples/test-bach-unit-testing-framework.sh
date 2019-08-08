@@ -130,21 +130,21 @@ test-run-with-no-filename-assert() {
 test-mock-command-which-something() {
     @mock command which something === fake-something
     command which something
-    PATH=/bin:/usr/bin command which hostname
 }
 test-mock-command-which-something-assert() {
     fake-something
-    @echo /bin/hostname
 }
 
 test-@real-function() {
-    @mock command which md5sum === fake-md5sum
+    unset -f bach-real-path
+    @mock bach-real-path md5sum === fake-md5sum
+
+    @real md5sum
     @real md5sum --version
-    @real diff --version
 }
 test-@real-function-assert() {
+    fake-md5sum
     fake-md5sum --version
-    @diff --version
 }
 
 this_variable_exists=""
@@ -281,14 +281,14 @@ test-gp-running-not-inside-a-valid-git-repo-again-assert() {
     @assert-fail
 }
 
+
 test-bach-real-command-mock-builtin() {
-    @mock command which grep === @stdout fake-grep
-    bach-real-command grep --version
-    command id
+    command hostname
+    command id -u
 }
 test-bach-real-command-mock-builtin-assert() {
-    fake-grep --version
-    id
+    @dryrun hostname
+    @dryrun id -u
 }
 
 test-bach-real-command-slash-bin() {
@@ -685,3 +685,68 @@ test-bach-framework-run-script-with-absolute-path() {
 test-bach-framework-run-script-with-absolute-path-assert() {
     @dryrun @source /awesome-bach/script.sh
 }
+
+test-bach-framework-could-not-set-PATH-during-testing() {
+    @real hostname
+    PATH=/bin:/usr/bin
+
+    ls -al -- should not show this command 2>&1
+}
+test-bach-framework-could-not-set-PATH-during-testing-assert() {
+    /bin/hostname
+    @assert-fail
+}
+
+
+test-bach-framework-could-not-export-PATH() {
+    export new_path=/bin:/usr/bin
+    export PATH="$new_path"
+    export FOOBAR=foobar
+    ls -al "$FOOBAR"
+
+    [[ "$PATH" == "$new_path" ]]
+}
+test-bach-framework-could-not-export-PATH-assert() {
+    @dryrun ls -al foobar
+    @assert-fail
+}
+
+
+test-bach-framework-could-not-declare-PATH() {
+    declare new_path=/bin:/usr/bin
+    declare FOOBAR=foobar
+    declare PATH="$new_path"
+
+    ls -al "$FOOBAR"
+    [[ "$PATH" == "$new_path" ]]
+}
+test-bach-framework-could-not-declare-PATH-assert() {
+    @dryrun ls -al foobar
+
+    @assert-fail
+}
+
+
+test-bach-framework-could-not-set-PATH-for-a-command() {
+    PATH=/bin:/usr/bin ls -al
+}
+test-bach-framework-could-not-set-PATH-for-a-command-assert() {
+    @dryrun ls -al
+}
+
+
+test-bach-framework-could-not-set-PATH-by-full-path-of-env-command() {
+    PATH=/bin:/usr/bin @env hostname
+}
+test-bach-framework-could-not-set-PATH-by-full-path-of-env-command-assert() {
+    @assert-fail 127
+}
+
+
+test-bach-framework-COULD-set-PATH-by-full-path-of-env-command() {
+    @env PATH=/bin:/usr/bin hostname
+}
+test-bach-framework-COULD-set-PATH-by-full-path-of-env-command-assert() {
+    /bin/hostname
+}
+
