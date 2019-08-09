@@ -187,7 +187,7 @@ test-bach-framework-mock-commands() {
 
     ls $(find . -name fn)
 
-    @mock ls file1 file2 === file2 file1
+    @mock ls file1 file2 === @stdout file2 file1
     ls $(find . -name fn) | xargs -n1 -- do-something
 }
 test-bach-framework-mock-commands-assert() {
@@ -749,4 +749,3 @@ test-bach-framework-COULD-set-PATH-by-full-path-of-env-command() {
 test-bach-framework-COULD-set-PATH-by-full-path-of-env-command-assert() {
     /bin/hostname
 }
-

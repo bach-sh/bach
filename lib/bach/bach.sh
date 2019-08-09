@@ -110,7 +110,7 @@ function bach-real-command() {
         return
     fi
     declare -a cmd
-    cmd=("$(bach-real-path "$1")" "${@:2}")
+    cmd=("$(bach-real-path "$1" 7>&1)" "${@:2}")
     @debug "[REAL-CMD]" "${cmd[@]}"
     "${cmd[@]}"
 }
@@ -231,7 +231,6 @@ export -f @mock-command
 function @generate_mock_function_name() {
     declare name="$1"
     @echo "mock_exec_${name}_$(@dryrun "${@}" | @md5sum | @cut -b1-32)"
-
 }
 export -f @generate_mock_function_name
 
@@ -360,9 +359,9 @@ function _bach_framework__run_function() {
 export -f _bach_framework__run_function
 
 function @dryrun() {
-    printf '%s' "$1"
-    [[ "$#" -gt 1 ]] && printf '  %s' "${@:2}"
-    printf '\n'
+    builtin declare param
+    [[ "$#" -le 1 ]] || builtin printf -v param '  %s' "${@:2}"
+    builtin echo "${1}${param}"
 }
 export -f @dryrun
 
@@ -379,6 +378,8 @@ function assert-execution() (
     @pushd "${bach_tmpdir}/test_root" &>/dev/null
     declare retval=1
 
+    exec 7>&2
+
     function command_not_found_handle() {
         declare mockfunc bach_cmd_name="$1"
         mockfunc="$(@generate_mock_function_name "$@")"
@@ -393,7 +394,7 @@ function assert-execution() (
             @debug "[CNFH-default]" "$@"
             @dryrun "$@"
         fi
-    } #8>/dev/null
+    } >&7 #8>/dev/null
     export -f command_not_found_handle
     bach_actual_stdout="${bach_tmpdir}/actual-stdout.txt"
     bach_expected_stdout="${bach_tmpdir}/expected-stdout.txt"
@@ -405,7 +406,7 @@ function assert-execution() (
             _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
             _bach_framework__run_function "$BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
             "${bach_test_name}"
-        )
+        ) 7>&1
         @echo "# Exit code: $?"
     ) > "${bach_actual_stdout}"
     @cat <(
@@ -417,7 +418,7 @@ function assert-execution() (
             _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
             _bach_framework__run_function "$BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
             "${bach_test_name}"-assert
-        )
+        ) 7>&1
         @echo "# Exit code: $?"
     ) > "${bach_expected_stdout}"
     @cd ..
