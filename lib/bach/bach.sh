@@ -332,11 +332,9 @@ function @mockfalse() {
 export -f @mockfalse
 
 function @mockall() {
-    declare name body
+    declare name
     for name; do
-        body="function ${name}() { @echo \"$name\" \"\$@\"; }; export -f \"$name\";"
-        @debug "Mock $name: $body"
-        eval "$body"
+        @mock "$name"
     done
 }
 export -f @mockall
