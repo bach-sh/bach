@@ -749,3 +749,51 @@ test-bach-framework-COULD-set-PATH-by-full-path-of-env-command() {
 test-bach-framework-COULD-set-PATH-by-full-path-of-env-command-assert() {
     /bin/hostname
 }
+
+
+test-bach-framework-one-pipeline-cat-by-default() {
+    @mock receive-something
+    @echo hello | receive-something done
+}
+test-bach-framework-one-pipeline-cat-by-default-assert() {
+    receive-something done
+    @stdout hello
+}
+
+
+test-bach-framework-two-pipelines-default() {
+    @mock first-cmd
+    @mock second-cmd
+
+    first-cmd done | second-cmd too
+}
+test-bach-framework-two-pipelines-default-assert() {
+    second-cmd too
+    first-cmd done
+}
+
+
+test-bach-framework-pipelines-order-MUST-mocking-every-cmds-in-the-pipeline() {
+    @mock first-cmd
+    @mock second-cmd
+    @mock third-cmd
+
+    first-cmd done | second-cmd too | third-cmd first
+}
+test-bach-framework-pipelines-order-MUST-mocking-every-cmds-in-the-pipeline-assert() {
+    third-cmd first
+    second-cmd too
+    first-cmd done
+}
+
+
+test-bach-framework-two-pipelines-cat-by-default() {
+    @mock receive-something
+    @mock do-the-last-pipeline-command-first
+    @echo hello world | receive-something done | do-the-last-pipeline-command-first another
+}
+test-bach-framework-two-pipelines-cat-by-default-assert() {
+    do-the-last-pipeline-command-first another
+    receive-something done
+    @stdout "hello world"
+}

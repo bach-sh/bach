@@ -286,6 +286,7 @@ SCRIPT
                            \"\${mockfunc}\" \"\$@\"
                       else
                            @dryrun ${name} \"\$@\"
+                           [[ -t 0 ]] || @cat
                       fi
                   }; export -f ${name}"
         fi
