@@ -263,7 +263,7 @@ function @mock() {
         func="$(@cat)"
     else
         @debug "@mock $name $_echo"
-        func="@dryrun \"${name}\" \"\$@\""
+        func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\"; else @cat; fi"
     fi
     if [[ "$name" == */* ]]; then
         [[ -d "${name%/*}" ]] || @mkdir -p "${name%/*}"
@@ -285,8 +285,8 @@ SCRIPT
                       if [[ \"\$(@type -t \"\$mockfunc\")\" == function ]]; then
                            \"\${mockfunc}\" \"\$@\"
                       else
-                           @dryrun ${name} \"\$@\"
                            [[ -t 0 ]] || @cat
+                           @dryrun ${name} \"\$@\" >&7
                       fi
                   }; export -f ${name}"
         fi
