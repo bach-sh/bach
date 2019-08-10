@@ -263,7 +263,7 @@ function @mock() {
         func="$(@cat)"
     else
         @debug "@mock $name $_echo"
-        func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\"; else @cat; fi"
+        func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\" >&7; else @cat; fi"
     fi
     if [[ "$name" == */* ]]; then
         [[ -d "${name%/*}" ]] || @mkdir -p "${name%/*}"

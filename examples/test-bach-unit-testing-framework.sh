@@ -776,3 +776,51 @@ test-bach-framework-one-pipeline-data-directly-if-customize-action() {
 test-bach-framework-one-pipeline-data-directly-if-customize-action-assert() {
     @echo foobar
 }
+
+
+test-bach-framework-two-pipelines-when-both-non-mocking-commands() {
+    @mock first-cmd
+    @mock second-cmd
+
+    @echo something | first-cmd done | second-cmd too
+}
+test-bach-framework-two-pipelines-when-both-non-mocking-commands-assert() {
+    @stdout something
+    first-cmd done
+    second-cmd too
+}
+
+
+test-bach-framework-two-pipelines-when-mock-the-first() {
+    @mock this-is-a-mock command
+    @mock this-non-mock
+
+    @echo hello | this-is-a-mock command | this-non-mock command
+}
+test-bach-framework-two-pipelines-when-mock-the-first-assert() {
+    hello
+    this-non-mock command
+}
+
+
+test-bach-framework-two-pipelines-when-mock-the-second() {
+    @mock this-is-a-mock command
+    @mock this-non-mock
+
+    @echo due to subprocesses running in background | this-non-mock command goes first | this-is-a-mock command
+}
+test-bach-framework-two-pipelines-when-mock-the-second-assert() {
+    this-non-mock command goes first
+    @stdout "due to subprocesses running in background"
+}
+
+
+test-bach-framework-two-pipelines-when-mock-the-both() {
+    @mock this-is-a-mock command
+    @mock another-mock command
+
+    @echo hello | this-is-a-mock command | another-mock command
+}
+test-bach-framework-two-pipelines-when-mock-the-both-assert() {
+    @stdout hello
+}
