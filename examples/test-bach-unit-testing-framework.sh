@@ -135,6 +135,33 @@ test-mock-command-which-something-assert() {
     fake-something
 }
 
+
+test-mock-builtin-command-with-external-commands1() {
+    @mock command mycmd param1 === @stdout myoutput
+
+    @type -t command
+
+    mycmd param1 | @grep -F myoutput
+}
+test-mock-builtin-command-with-external-commands1-assert() {
+    @echo function
+    @echo myoutput
+}
+
+
+test-mock-builtin-command-with-external-commands2() {
+    @mock command mycmd param1 === @stdout myoutput
+
+    @type -t command
+
+    command mycmd param1 | @grep -F myoutput
+}
+test-mock-builtin-command-with-external-commands2-assert() {
+    @echo function
+    @echo myoutput
+}
+
+
 test-@real-function() {
     unset -f bach-real-path
     @mock bach-real-path md5sum === fake-md5sum

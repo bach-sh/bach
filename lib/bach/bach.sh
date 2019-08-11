@@ -79,28 +79,6 @@ function bach_initialize(){
         eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
     unset name
-
-    function xargs() {
-        declare param
-        declare -a xargs_opts
-        while param="${1:-}"; [[ -n "$param" ]]; do
-            shift || true
-            if [[ "$param" == "--" ]]; then
-                xargs_opts+=("${BASH:-bash}" "-c" "$* \$@" "-s")
-                break
-            else
-                xargs_opts+=("$param")
-            fi
-        done
-        @debug "@mock-xargs" "${xargs_opts[@]}"
-        if [[ "$#" -gt 0 ]]; then
-            @xargs "${xargs_opts[@]}"
-        else
-            @dryrun xargs "${xargs_opts[@]}"
-        fi
-    }
-    export -f xargs
-
 }
 
 function bach-real-command() {
@@ -153,9 +131,35 @@ function bach-run-tests() {
         eval "function @${donotpanic}() { builtin true; }; export -f @${donotpanic}"
     done
 
-    function @do-not-panic() {
-        builtin true;
+    function command() {
+        if [[ "$(@type -t "$1")" == function ]]; then
+            "$@"
+        else
+            command_not_found_handle command "$@"
+        fi
     }
+    export -f command
+
+    function xargs() {
+        declare param
+        declare -a xargs_opts
+        while param="${1:-}"; [[ -n "$param" ]]; do
+            shift || true
+            if [[ "$param" == "--" ]]; then
+                xargs_opts+=("${BASH:-bash}" "-c" "$* \$@" "-s")
+                break
+            else
+                xargs_opts+=("$param")
+            fi
+        done
+        @debug "@mock-xargs" "${xargs_opts[@]}"
+        if [[ "$#" -gt 0 ]]; then
+            @xargs "${xargs_opts[@]}"
+        else
+            @dryrun xargs "${xargs_opts[@]}"
+        fi
+    }
+    export -f xargs
 
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
         BACH_ASSERT_DIFF_OPTS+=(-I "^##BACH: ")
@@ -227,15 +231,6 @@ function bach-on-exit() {
 
 trap bach-on-exit EXIT
 
-function @mock-command() {
-    @debug "@mock 'command'" "$@"
-    function command() {
-        command_not_found_handle command "$@"
-    }
-    export -f command
-}
-export -f @mock-command
-
 function @generate_mock_function_name() {
     declare name="$1"
     @echo "mock_exec_${name}_$(@dryrun "${@}" | @md5sum | @cut -b1-32)"
@@ -248,10 +243,11 @@ function @mock() {
     if [[ "$name" == @(builtin|declare|eval|printf) ]]; then
         @die "Cannot mock the builtin command: $name"
     fi
-    desttype="$(@type -t "$name" )"
-    if [[ "$desttype" == builtin ]] && [[ "$(@type -t "@mock-$name" )" == function ]]; then
-        "@mock-$name" "${@:2}"
+    if [[ command == "$name" ]]; then
+        shift
+        name="$1"
     fi
+    desttype="$(@type -t "$name" )"
     while param="${1:-}"; [[ -n "$param" ]]; do
         shift
         [[ "$param" == '===' ]] && break
