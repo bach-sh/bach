@@ -752,10 +752,9 @@ test-bach-framework-COULD-set-PATH-by-full-path-of-env-command-assert() {
 
 test-bach-framework-one-pipeline-dryrun-if-no-mocking() {
     @mock receive-something
-    @echo hello | receive-something done
+    @echo hello | receive-something done | @grep -q '^hello$'
 }
 test-bach-framework-one-pipeline-dryrun-if-no-mocking-assert() {
-    @stdout hello
     receive-something done
 }
 
@@ -782,10 +781,9 @@ test-bach-framework-two-pipelines-when-both-non-mocking-commands() {
     @mock first-cmd
     @mock second-cmd
 
-    @echo something | first-cmd done | second-cmd too
+    @echo something | first-cmd done | second-cmd too | @grep -q '^something$'
 }
 test-bach-framework-two-pipelines-when-both-non-mocking-commands-assert() {
-    @stdout something
     first-cmd done
     second-cmd too
 }
@@ -795,10 +793,9 @@ test-bach-framework-two-pipelines-when-mock-the-first() {
     @mock this-is-a-mock command
     @mock this-non-mock
 
-    @echo hello | this-is-a-mock command | this-non-mock command
+    @echo hello | this-is-a-mock command | this-non-mock command | @grep -q '^hello$'
 }
 test-bach-framework-two-pipelines-when-mock-the-first-assert() {
-    hello
     this-non-mock command
 }
 
