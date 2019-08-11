@@ -389,6 +389,7 @@ function assert-execution() (
 
     function command_not_found_handle() {
         declare mockfunc bach_cmd_name="$1"
+        [[ -n "$bach_cmd_name" ]] || @out "Error: Bach found an empty command at line ${BASH_LINENO}." >&7
         mockfunc="$(@generate_mock_function_name "$@")"
         # @debug "mockid=$mockid" >&2
         if [[ "$(type -t "${mockfunc}")" == function ]]; then

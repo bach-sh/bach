@@ -834,3 +834,11 @@ test-bach-framework-multi-pipelines-assert() {
     @dryrun first non mocking
     two
 }
+
+
+test-bach-framework-handles-an-empty-command() {
+    "" 7>&1 | @grep -Fq 'found an empty command'
+}
+test-bach-framework-handles-an-empty-command-assert() {
+    @true
+}
