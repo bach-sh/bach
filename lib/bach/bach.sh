@@ -269,8 +269,9 @@ function @mock() {
     elif [[ ! -t 0 ]]; then
         @debug "@mock $name @cat"
         func="$(@cat)"
-    else
-        @debug "@mock $name $_echo"
+    fi
+    if [[ -z "${func:-}" ]]; then
+        @debug "@mock default $name"
         func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\" >&7; else @cat; fi"
     fi
     if [[ "$name" == */* ]]; then
