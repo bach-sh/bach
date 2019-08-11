@@ -140,10 +140,18 @@ function bach-run-tests--get-all-tests() {
     done
 }
 
+for donotpanic in donotpanic dontpanic do-not-panic dont-panic do_not_panic dont_panic; do
+    eval "function @${donotpanic}() { builtin printf '\n%s\n  line number: %s\n  script stack: %s\n\n' 'DO NOT PANIC!' \"\${BASH_LINENO}\" \"\${BASH_SOURCE[*]}\"; builtin exit 1; } >&2; export -f @${donotpanic};"
+done
+
 function bach-run-tests() {
     set -euo pipefail
 
     bach_initialize
+
+    for donotpanic in donotpanic dontpanic do-not-panic dont-panic do_not_panic dont_panic; do
+        eval "function @${donotpanic}() { builtin true; }; export -f @${donotpanic}"
+    done
 
     function @do-not-panic() {
         builtin true;
@@ -476,12 +484,6 @@ function @run() {
     @source "$script" "$@"
 }
 export -f @run
-
-function @do-not-panic() {
-    builtin printf "\n%s\n  line number: %s\n  script stack: %s\n\n" "DO NOT PANIC!" "${LINENO}" "${BASH_SOURCE[*]}"
-    builtin exit 1
-} >&2
-export -f @do-not-panic
 
 function @assert-fail() {
     builtin exit "${1:-1}"
