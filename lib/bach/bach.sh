@@ -101,11 +101,12 @@ function bach-get-all-functions() {
 export -f bach-get-all-functions
 
 function bach--skip-the-test() {
-    declare test="$1"
-    if [[ -n "${BACH_TESTS:-}" ]]; then
-        [[ "$test" == $BACH_TESTS ]] ||
-            [[ "$test" == test-$BACH_TESTS ]]
-    fi
+    declare test="$1" test_filter
+    while read -d, test_filter; do
+        [[ -n "$test_filter" ]] || continue
+        [[ "$test" == $test_filter ]] && return 0
+        [[ "$test" == test-$test_filter ]] && return 0
+    done <<< "${BACH_TESTS:-},"
 }
 export -f bach--skip-the-test
 

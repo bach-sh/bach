@@ -636,6 +636,38 @@ test-bach-run-this
 TESTS
 }
 
+test-bach-framework-uses-multi-tests-filters() {
+    export BACH_TESTS='bach-run-this,bach-run-this-too'
+
+    unset -f bach-get-all-functions @shuf
+    @mock @shuf === @sort
+    mock-bach-get-all-functions
+    bach-run-tests--get-all-tests
+}
+test-bach-framework-uses-multi-tests-filters-assert() {
+    @cat <<TESTS
+test-bach-run-this
+test-bach-run-this-too
+TESTS
+}
+
+test-bach-framework-uses-multi-tests-filters-supports-glob() {
+    export BACH_TESTS='bach-run-this*,*bar*'
+
+    unset -f bach-get-all-functions @shuf
+    @mock @shuf === @sort
+    mock-bach-get-all-functions
+    bach-run-tests--get-all-tests
+}
+test-bach-framework-uses-multi-tests-filters-supports-glob-assert() {
+    @cat <<TESTS
+test-bach-run-tests--get-all-tests-bar
+test-bach-run-tests--get-all-tests-bar2
+test-bach-run-this
+test-bach-run-this-too
+TESTS
+}
+
 test-bach-framework-filter-tests-no-matches() {
     export BACH_TESTS="you-can-not-find-me"
 
