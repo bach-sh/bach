@@ -407,29 +407,33 @@ function assert-execution() (
         fi
     } >&7 #8>/dev/null
     export -f command_not_found_handle
+
+    function __bach__pre_run_test_and_assert() {
+        @trap - EXIT RETURN
+        set +euo pipefail
+        declare -gxr PATH=bach-fake-path
+        _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
+    }
+    function __bach__run_test() (
+        __bach__pre_run_test_and_assert
+        _bach_framework__run_function "${BACH_FRAMEWORK__PRE_TEST_FUNCNAME}"
+        "${1}"
+    ) 7>&1
+
+    function __bach__run_assert() (
+        unset -f @mock @mockall @ignore @setup-test
+        __bach__pre_run_test_and_assert
+        _bach_framework__run_function "${BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME}"
+        "${1}-assert"
+    ) 7>&1
     bach_actual_stdout="${bach_tmpdir}/actual-stdout.txt"
     bach_expected_stdout="${bach_tmpdir}/expected-stdout.txt"
     @cat <(
-        (
-            @trap - EXIT RETURN
-            set +euo pipefail
-            declare -gxr PATH=bach-fake-path
-            _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
-            _bach_framework__run_function "$BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
-            "${bach_test_name}"
-        ) 7>&1
+        __bach__run_test "$bach_test_name"
         @echo "# Exit code: $?"
     ) > "${bach_actual_stdout}"
     @cat <(
-        (
-            @trap - EXIT RETURN
-            unset -f @mock @mockall @ignore @setup-test
-            set +euo pipefail
-            declare -gxr PATH=bach-fake-path
-            _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
-            _bach_framework__run_function "$BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
-            "${bach_test_name}"-assert
-        ) 7>&1
+        __bach__run_assert "$bach_test_name"
         @echo "# Exit code: $?"
     ) > "${bach_expected_stdout}"
     @cd ..
