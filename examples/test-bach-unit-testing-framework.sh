@@ -901,3 +901,25 @@ test-bach-framework-handles-an-empty-command() {
 test-bach-framework-handles-an-empty-command-assert() {
     @true
 }
+
+
+test-bach-framework-is_function() {
+    function this_is_a_function() {
+        : do nothing
+    }
+
+    bach--is-function this_is_a_function
+}
+test-bach-framework-is_function-assert() {
+    @true
+}
+
+
+test-bach-framework-is_function-2() {
+    this_is_a_variable=some_value
+
+    bach--is-function this_is_a_variable
+}
+test-bach-framework-is_function-2-assert() {
+    @assert-fail
+}

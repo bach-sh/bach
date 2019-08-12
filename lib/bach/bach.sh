@@ -123,6 +123,11 @@ for donotpanic in donotpanic dontpanic do-not-panic dont-panic do_not_panic dont
     eval "function @${donotpanic}() { builtin printf '\n%s\n  line number: %s\n  script stack: %s\n\n' 'DO NOT PANIC!' \"\${BASH_LINENO}\" \"\${BASH_SOURCE[*]}\"; builtin exit 1; } >&2; export -f @${donotpanic};"
 done
 
+function bach--is-function() {
+    [[ "$(@type -t "$1")" == function ]]
+}
+export -f bach--is-function
+
 function bach-run-tests() {
     set -euo pipefail
 
@@ -133,7 +138,7 @@ function bach-run-tests() {
     done
 
     function command() {
-        if [[ "$(@type -t "$1")" == function ]]; then
+        if bach--is-function "$1"; then
             "$@"
         else
             command_not_found_handle command "$@"
@@ -288,7 +293,7 @@ SCRIPT
         if [[ -z "$desttype" ]]; then
             eval "function ${name}() {
                       declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\"
-                      if [[ \"\$(@type -t \"\$mockfunc\")\" == function ]]; then
+                      if bach--is-function \"\$mockfunc\"; then
                            \"\${mockfunc}\" \"\$@\"
                       else
                            [[ -t 0 ]] || @cat
@@ -302,7 +307,7 @@ SCRIPT
         mockfunc_seq="${mockfunc_seq//-/__}"
         body="function ${mockfunc}() {
             declare -gxi ${mockfunc_seq}=\"\${${mockfunc_seq}:-0}\";
-            if [[ \"\$(@type -t \"${mockfunc}_\$(( ${mockfunc_seq} + 1))\")\" == function ]]; then
+            if bach--is-function \"${mockfunc}_\$(( ${mockfunc_seq} + 1))\"; then
                 let ${mockfunc_seq}++;
             fi;
             \"${mockfunc}_\${${mockfunc_seq}}\" \"\$@\";
@@ -310,7 +315,7 @@ SCRIPT
         @debug "$body"
         eval "$body"
         for (( mockfunc__SEQ=1; mockfunc__SEQ <= ${BACH_MOCK_FUNCTION_MAX_COUNT:-0}; mockfunc__SEQ++ )); do
-            [[ "$(@type -t "${mockfunc}_${mockfunc__SEQ}")" == function ]] || break
+            bach--is-function "${mockfunc}_${mockfunc__SEQ}" || break
         done
         body="${mockfunc}_${mockfunc__SEQ}() {
             # @mock ${name} ${cmd[@]} ===
@@ -357,7 +362,7 @@ alias @setup-assert="function $BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
 
 function _bach_framework__run_function() {
     declare name="$1"
-    if [[ "$(@type -t "$name")" == function ]]; then
+    if bach--is-function "$name"; then
         "$name"
     fi
 }
@@ -390,7 +395,7 @@ function assert-execution() (
         [[ -n "$bach_cmd_name" ]] || @out "Error: Bach found an empty command at line ${BASH_LINENO}." >&7
         mockfunc="$(@generate_mock_function_name "$@")"
         # @debug "mockid=$mockid" >&2
-        if [[ "$(type -t "${mockfunc}")" == function ]]; then
+        if bach--is-function "${mockfunc}"; then
             @debug "[CNFH-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
         elif [[ "${bach_cmd_name}" == @(cd|command|echo|eval|exec|false|popd|pushd|pwd|source|true|type) ]]; then
@@ -432,15 +437,6 @@ function assert-execution() (
         "${bach_actual_stdout##*/}" "${bach_expected_stdout##*/}"
     then
         retval=0
-    fi
-    if [[ "$(@type -t "${bach_test_name}-assert")" != function ]]; then
-        : @cat >&2 <<-EOF
-# Could not find the assertion function for $bach_test_name
-function ${bach_test_name}-assert() {
-
-}
-
-EOF
     fi
     @popd &>/dev/null
     @rm -rf "$bach_tmpdir"
