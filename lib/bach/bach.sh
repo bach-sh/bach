@@ -128,6 +128,12 @@ function bach--is-function() {
 }
 export -f bach--is-function
 
+declare -gr __bach_run_test__ignore_prefix="## BACH:"
+function @comment() {
+    @out "${__bach_run_test__ignore_prefix}" "$@"
+}
+export -f @comment
+
 function bach-run-tests() {
     set -euo pipefail
 
@@ -168,7 +174,7 @@ function bach-run-tests() {
     export -f xargs
 
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
-        BACH_ASSERT_DIFF_OPTS+=(-I "^##BACH: ")
+        BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
     fi
     @mockall cd echo
 
@@ -451,11 +457,6 @@ function assert-execution() (
     @rm -rf "$bach_tmpdir"
     return "$retval"
 )
-
-function @comment() {
-    @out "##BACH:" "$@"
-}
-export -f @comment
 
 function @ignore() {
     declare bach_test_name="$1"
