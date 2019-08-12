@@ -583,6 +583,7 @@ test-bach-framework-should-clear-the-exit-trap-in-assertion-assert() {
     builtin trap -p EXIT
 }
 
+
 test-bach-framework-set--u-should-work-in-tests() {
     set -ue
     unset foobar
@@ -595,12 +596,11 @@ test-bach-framework-set--u-should-work-in-tests-assert() {
     @assert-fail
 }
 
+
 test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-test() {
     @false
 }
-test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-test-assert() {
-    @true
-}
+
 
 test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion() {
     @true
@@ -608,6 +608,7 @@ test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion() {
 test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion-assert() {
     @assert-fail
 }
+
 
 function mock-bach-get-all-functions() {
     @mock bach-get-all-functions <<EOF
@@ -898,9 +899,6 @@ test-bach-framework-multi-pipelines-assert() {
 test-bach-framework-handles-an-empty-command() {
     "" 7>&1 | @grep -Fq 'found an empty command'
 }
-test-bach-framework-handles-an-empty-command-assert() {
-    @assert-success
-}
 
 
 test-bach-framework-is_function() {
@@ -944,16 +942,10 @@ test-bach-framework-@assert-equals-pass-one-parameter-assert() {
 test-bach-framework-@assert-equals-integers() {
     @assert-equals 9 9
 }
-test-bach-framework-@assert-equals-integers-assert() {
-    @assert-success
-}
 
 
 test-bach-framework-@assert-equals-strings() {
     @assert-equals "hello world" "hello world"
-}
-test-bach-framework-@assert-equals-strings-assert() {
-    @assert-success
 }
 
 
@@ -961,7 +953,4 @@ test-bach-framework-@assert-equals-variables() {
     foo="hello world"
     bar="hello world"
     @assert-equals "$foo" "$bar"
-}
-test-bach-framework-@assert-equals-variables-assert() {
-    @assert-success
 }

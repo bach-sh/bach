@@ -428,19 +428,24 @@ function assert-execution() (
     ) 7>&1
     bach_actual_stdout="${bach_tmpdir}/actual-stdout.txt"
     bach_expected_stdout="${bach_tmpdir}/expected-stdout.txt"
-    @cat <(
+    if bach--is-function "${bach_test_name}-assert"; then
+        @cat <(
+            __bach__run_test "$bach_test_name"
+            @echo "# Exit code: $?"
+        ) > "${bach_actual_stdout}"
+        @cat <(
+            __bach__run_assert "$bach_test_name"
+            @echo "# Exit code: $?"
+        ) > "${bach_expected_stdout}"
+        @cd ..
+        if @real "${BACH_ASSERT_DIFF}" "${BACH_ASSERT_DIFF_OPTS[@]}" -- \
+            "${bach_actual_stdout##*/}" "${bach_expected_stdout##*/}"
+        then
+            retval=0
+        fi
+    else
         __bach__run_test "$bach_test_name"
-        @echo "# Exit code: $?"
-    ) > "${bach_actual_stdout}"
-    @cat <(
-        __bach__run_assert "$bach_test_name"
-        @echo "# Exit code: $?"
-    ) > "${bach_expected_stdout}"
-    @cd ..
-    if @real "${BACH_ASSERT_DIFF}" "${BACH_ASSERT_DIFF_OPTS[@]}" -- \
-        "${bach_actual_stdout##*/}" "${bach_expected_stdout##*/}"
-    then
-        retval=0
+        retval="$?"
     fi
     @popd &>/dev/null
     @rm -rf "$bach_tmpdir"
