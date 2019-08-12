@@ -124,7 +124,7 @@ test-run-with-no-filename() {
     @run
 }
 test-run-with-no-filename-assert() {
-    @assert-fail
+    @fail
 }
 
 test-mock-command-which-something() {
@@ -293,7 +293,7 @@ test-gp-running-not-inside-a-valid-git-repo() {
     gp
 }
 test-gp-running-not-inside-a-valid-git-repo-assert() {
-    @assert-fail
+    @fail
 }
 
 
@@ -305,7 +305,7 @@ test-gp-running-not-inside-a-valid-git-repo-again() {
     gp origin
 }
 test-gp-running-not-inside-a-valid-git-repo-again-assert() {
-    @assert-fail
+    @fail
 }
 
 
@@ -370,7 +370,7 @@ test-cannot-mock-absolute-path-of-script() {
 test-cannot-mock-absolute-path-of-script-assert() {
     #printf "\e[1;31m%s\e[0;m\n"
     @echo 'Cannot mock an absolute path: /tmp/cannot-mock-this'
-    @assert-fail
+    @fail
 }
 
 test-mock-script() {
@@ -384,12 +384,12 @@ test-mock-script-assert() {
 test-cannot-mock-existed-script() {
     @mock ./cannot-mock-existed-script 2>&1 || return 1
     @mock ./cannot-mock-existed-script 2>&1
-    @assert-fail Should not go here
+    @fail 2 It should not go here
     ./cannot-mock-existed-script foo bar    2>&1
 }
 test-cannot-mock-existed-script-assert() {
     @echo 'Cannot mock an existed path: ./cannot-mock-existed-script'
-    @assert-fail
+    @fail
 }
 
 test-mock-script-with-custom-action() {
@@ -544,7 +544,7 @@ test-bach-framework-set--e-should-work() {
 }
 test-bach-framework-set--e-should-work-assert() {
     do-this
-    @assert-fail
+    @fail
 }
 
 test-bach-framework-set--o-pipefail-should-work() {
@@ -555,7 +555,7 @@ test-bach-framework-set--o-pipefail-should-work() {
 test-bach-framework-set--o-pipefail-should-work-assert() {
     do-this
 
-    @assert-fail
+    @fail
 }
 
 test-bach-framework-mock-builtin-trap-function() {
@@ -593,7 +593,7 @@ test-bach-framework-set--u-should-work-in-tests() {
     should-not-show-this
 }
 test-bach-framework-set--u-should-work-in-tests-assert() {
-    @assert-fail
+    @fail
 }
 
 
@@ -606,7 +606,7 @@ test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion() {
     @true
 }
 test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion-assert() {
-    @assert-fail
+    @fail
 }
 
 
@@ -716,7 +716,7 @@ test-ASSERT-FAIL-bach-framework-api-assert-fail() {
 }
 test-ASSERT-FAIL-bach-framework-api-assert-fail-assert() {
     do-something
-    @assert-fail
+    @fail
 
     should-not-do-this
 }
@@ -753,7 +753,7 @@ test-bach-framework-could-not-set-PATH-during-testing() {
 }
 test-bach-framework-could-not-set-PATH-during-testing-assert() {
     /bin/hostname
-    @assert-fail
+    @fail
 }
 
 
@@ -767,7 +767,7 @@ test-bach-framework-could-not-export-PATH() {
 }
 test-bach-framework-could-not-export-PATH-assert() {
     @dryrun ls -al foobar
-    @assert-fail
+    @fail
 }
 
 
@@ -782,7 +782,7 @@ test-bach-framework-could-not-declare-PATH() {
 test-bach-framework-could-not-declare-PATH-assert() {
     @dryrun ls -al foobar
 
-    @assert-fail
+    @fail
 }
 
 
@@ -798,7 +798,7 @@ test-bach-framework-could-not-set-PATH-by-full-path-of-env-command() {
     PATH=/bin:/usr/bin @env hostname
 }
 test-bach-framework-could-not-set-PATH-by-full-path-of-env-command-assert() {
-    @assert-fail 127
+    @fail 127
 }
 
 
@@ -908,9 +908,6 @@ test-bach-framework-is_function() {
 
     bach--is-function this_is_a_function
 }
-test-bach-framework-is_function-assert() {
-    @assert-success
-}
 
 
 test-bach-framework-is_function-2() {
@@ -919,7 +916,7 @@ test-bach-framework-is_function-2() {
     bach--is-function this_is_a_variable
 }
 test-bach-framework-is_function-2-assert() {
-    @assert-fail
+    @fail
 }
 
 
@@ -927,7 +924,7 @@ test-bach-framework-@assert-equals-no-parameters() {
     @assert-equals
 }
 test-bach-framework-@assert-equals-no-parameters-assert() {
-    @assert-fail
+    @fail
 }
 
 
@@ -935,7 +932,7 @@ test-bach-framework-@assert-equals-pass-one-parameter() {
     @assert-equals only-one
 }
 test-bach-framework-@assert-equals-pass-one-parameter-assert() {
-    @assert-fail
+    @fail
 }
 
 

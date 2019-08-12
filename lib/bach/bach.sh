@@ -490,10 +490,10 @@ function @run() {
 }
 export -f @run
 
-function @assert-fail() {
+function @fail() {
     builtin exit "${1:-1}"
 }
-export -f @assert-fail
+export -f @fail
 
 function @assert-success() {
     builtin exit 0
