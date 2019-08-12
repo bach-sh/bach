@@ -899,7 +899,7 @@ test-bach-framework-handles-an-empty-command() {
     "" 7>&1 | @grep -Fq 'found an empty command'
 }
 test-bach-framework-handles-an-empty-command-assert() {
-    @true
+    @assert-success
 }
 
 
@@ -911,7 +911,7 @@ test-bach-framework-is_function() {
     bach--is-function this_is_a_function
 }
 test-bach-framework-is_function-assert() {
-    @true
+    @assert-success
 }
 
 

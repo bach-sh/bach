@@ -488,3 +488,8 @@ function @assert-fail() {
     builtin exit "${1:-1}"
 }
 export -f @assert-fail
+
+function @assert-success() {
+    builtin exit 0
+}
+export -f @assert-success
