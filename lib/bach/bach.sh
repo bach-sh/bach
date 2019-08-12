@@ -493,3 +493,14 @@ function @assert-success() {
     builtin exit 0
 }
 export -f @assert-success
+
+function @assert-equals() {
+    declare expected="${1:?missing the expected result}" actual="${2:?missing the actual result}"
+    [[ "${expected}" == "${actual}" ]] ||
+        @die - <<EOF
+Assert Fail!
+    Expected: $expected
+     But got: $actual
+EOF
+}
+export -f @assert-equals

@@ -923,3 +923,45 @@ test-bach-framework-is_function-2() {
 test-bach-framework-is_function-2-assert() {
     @assert-fail
 }
+
+
+test-bach-framework-@assert-equals-no-parameters() {
+    @assert-equals
+}
+test-bach-framework-@assert-equals-no-parameters-assert() {
+    @assert-fail
+}
+
+
+test-bach-framework-@assert-equals-pass-one-parameter() {
+    @assert-equals only-one
+}
+test-bach-framework-@assert-equals-pass-one-parameter-assert() {
+    @assert-fail
+}
+
+
+test-bach-framework-@assert-equals-integers() {
+    @assert-equals 9 9
+}
+test-bach-framework-@assert-equals-integers-assert() {
+    @assert-success
+}
+
+
+test-bach-framework-@assert-equals-strings() {
+    @assert-equals "hello world" "hello world"
+}
+test-bach-framework-@assert-equals-strings-assert() {
+    @assert-success
+}
+
+
+test-bach-framework-@assert-equals-variables() {
+    foo="hello world"
+    bar="hello world"
+    @assert-equals "$foo" "$bar"
+}
+test-bach-framework-@assert-equals-variables-assert() {
+    @assert-success
+}
