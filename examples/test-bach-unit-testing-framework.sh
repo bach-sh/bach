@@ -550,7 +550,7 @@ test-bach-framework-set--e-should-work-assert() {
 test-bach-framework-set--o-pipefail-should-work() {
     set -o pipefail
 
-    @false | do-this
+    @false | do-this | @true
 }
 test-bach-framework-set--o-pipefail-should-work-assert() {
     do-this
@@ -607,6 +607,41 @@ test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion() {
 }
 test-ASSERT-FAIL-bach-frmework-should-output-error-code-in-assertion-assert() {
     @fail
+}
+
+
+test-bach-framework-@fail-function-default-error-code-is-1() {
+    set -euo pipefail
+    @fail
+}
+test-bach-framework-@fail-function-default-error-code-is-1-assert() {
+    builtin return 1
+}
+
+
+test-bach-framework-@fail-function-return-a-certain-error-code() {
+    @fail 42
+}
+test-bach-framework-@fail-function-return-a-certain-error-code-assert() {
+    builtin return 42
+}
+
+
+test-bach-framework-@fail-function-with-code-and-message() {
+    @fail 43 "the error code is 43"
+}
+test-bach-framework-@fail-function-with-code-and-message-assert() {
+    @out the error code is 43
+    builtin return 43
+}
+
+
+test-bach-framework-@fail-function-with-error-message() {
+    @fail "the error code is 1"
+}
+test-bach-framework-@fail-function-with-error-message-assert() {
+    @out the error code is 1
+    builtin return 1
 }
 
 
@@ -711,15 +746,17 @@ test-bach-run-this-too
 TESTS
 }
 
-test-ASSERT-FAIL-bach-framework-api-assert-fail() {
-    do-something
-}
-test-ASSERT-FAIL-bach-framework-api-assert-fail-assert() {
+
+test-ASSERT-FAIL-bach-framework-api-fail() {
     do-something
     @fail
 
     should-not-do-this
 }
+test-ASSERT-FAIL-bach-framework-api-fail-assert() {
+    do-something
+}
+
 
 test-bach-framework-run-script-with-relative-path() {
     unset -f @source
