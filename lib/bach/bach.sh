@@ -198,7 +198,7 @@ function bach-run-tests() {
         friendly_name="${name/#test-/}"
         friendly_name="${friendly_name//-/ }"
         friendly_name="${friendly_name//  / -}"
-        : $(( total++ ))
+        : $(( ++total ))
         testresult="$(@mktemp)"
         set +e
         assert-execution "$name" &>"$testresult"; test_retval="$?"
@@ -213,7 +213,7 @@ function bach-run-tests() {
         if [[ "$test_retval" -eq 0 ]]; then
             printf "${color_ok}ok %d - ${test_name_assert_fail}${color_ok}%s${color_end}\n" "$total" "$friendly_name"
         else
-            : $(( error++ ))
+            : $(( ++error ))
             printf "${color_err}not ok %d - ${test_name_assert_fail}${color_err}%s${color_end}\n" "$total" "$friendly_name"
             {
                 printf "\n"
@@ -314,13 +314,13 @@ SCRIPT
         body="function ${mockfunc}() {
             declare -gxi ${mockfunc_seq}=\"\${${mockfunc_seq}:-0}\";
             if bach--is-function \"${mockfunc}_\$(( ${mockfunc_seq} + 1))\"; then
-                let ${mockfunc_seq}++;
+                let ++${mockfunc_seq};
             fi;
             \"${mockfunc}_\${${mockfunc_seq}}\" \"\$@\";
         }; export -f ${mockfunc}"
         @debug "$body"
         eval "$body"
-        for (( mockfunc__SEQ=1; mockfunc__SEQ <= ${BACH_MOCK_FUNCTION_MAX_COUNT:-0}; mockfunc__SEQ++ )); do
+        for (( mockfunc__SEQ=1; mockfunc__SEQ <= ${BACH_MOCK_FUNCTION_MAX_COUNT:-0}; ++mockfunc__SEQ )); do
             bach--is-function "${mockfunc}_${mockfunc__SEQ}" || break
         done
         body="${mockfunc}_${mockfunc__SEQ}() {
@@ -377,7 +377,7 @@ export -f _bach_framework__run_function
 function @dryrun() {
     builtin declare param
     [[ "$#" -le 1 ]] || builtin printf -v param '  %s' "${@:2}"
-    builtin echo "${1}${param}"
+    builtin echo "${1}${param:-}"
 }
 export -f @dryrun
 

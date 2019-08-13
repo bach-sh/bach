@@ -782,6 +782,26 @@ test-bach-framework-run-script-with-absolute-path-assert() {
     @dryrun @source /awesome-bach/script.sh
 }
 
+
+test-bach-framework-run-script-with-mocking() {
+    @mock do-this === @stdout "THIS"
+    @mock do-that === @stdout "THAT"
+    @run <(@cat <<SCRIPT
+set -euo pipefail
+
+do-this
+do-something foo bar
+do-that
+SCRIPT
+          )
+}
+test-bach-framework-run-script-with-mocking-assert() {
+    @echo THIS
+    @dryrun do-something foo bar
+    @echo THAT
+}
+
+
 test-bach-framework-could-not-set-PATH-during-testing() {
     @real hostname
     PATH=/bin:/usr/bin
