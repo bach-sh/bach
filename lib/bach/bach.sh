@@ -180,6 +180,7 @@ function bach-run-tests() {
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
         BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
     fi
+
     @mockall cd echo
 
     declare color_ok color_err color_end
@@ -454,7 +455,8 @@ function assert-execution() (
             retval=0
         fi
     else
-        __bach__run_test "$bach_test_name"
+        __bach__run_test "$bach_test_name" |
+            @tee /dev/stderr | @grep -q "^${__bach_run_test__ignore_prefix} \\[assert-"
         retval="$?"
     fi
     @popd &>/dev/null
@@ -507,18 +509,33 @@ function @fail() {
 }
 export -f @fail
 
-function @assert-success() {
-    builtin exit 0
-}
-export -f @assert-success
-
 function @assert-equals() {
     declare expected="${1:?missing the expected result}" actual="${2:?missing the actual result}"
-    [[ "${expected}" == "${actual}" ]] ||
-        @die - <<EOF
-Assert Fail!
-    Expected: $expected
-     But got: $actual
+
+    if [[ "${expected}" == "${actual}" ]]; then
+        @out <<EOF
+${__bach_run_test__ignore_prefix} [assert-equals] expected: ${expected}
+##                         actual: ${actual}
 EOF
-}
+    else
+        @die - <<EOF
+Assert Failed:
+     Expected: $expected
+      But got: $actual
+EOF
+    fi
+} >&7
 export -f @assert-equals
+
+function @assert-fail() {
+    declare expected="<non-zero>" actual="$?"
+    [[ "$actual" -eq 0 ]] || expected="$actual"
+    @assert-equals "$expected" "$actual"
+}
+export -f @assert-fail
+
+function @assert-success() {
+    declare expected=0 actual="$?"
+    @assert-equals "$expected" "$actual"
+}
+export -f @assert-success

@@ -333,11 +333,11 @@ test-bach-simple-command-assert() {
 }
 
 test-must-have-an-assertion() {
-    test-must-have-an-assertion-assert
+    : do nothing
 }
 
-test-SKIP-must-have-an-assertion-assert() {
-    :
+test-must-have-an-assertion-assert() {
+    : do nothing
 }
 
 function load-ff() {
@@ -955,6 +955,7 @@ test-bach-framework-multi-pipelines-assert() {
 
 test-bach-framework-handles-an-empty-command() {
     "" 7>&1 | @grep -Fq 'found an empty command'
+    @assert-success
 }
 
 
@@ -964,6 +965,7 @@ test-bach-framework-is_function() {
     }
 
     bach--is-function this_is_a_function
+    @assert-success
 }
 
 
@@ -1007,4 +1009,65 @@ test-bach-framework-@assert-equals-variables() {
     foo="hello world"
     bar="hello world"
     @assert-equals "$foo" "$bar"
+}
+
+
+test-ASSERT-FAIL-bach-framework-each-test-case-does-not-have-an-assertion() {
+    @echo Every test case must have an assertion
+}
+
+test-ASSERT-FAIL-bach-framework-each-test-case-has-a-failed-assertion() {
+    @echo Every test case must have an assertion, it is fail
+    @assert-equals "Answer to the Ultimate Question of Life, the Universe, and Everything" 42
+}
+
+test-bach-framework-each-test-case-has-a-successful-assertion() {
+    @echo Every test case must have an assertion, it is success
+    @assert-success
+}
+
+test-ASSERT-FAIL-bach-framework-each-test-case-has-assert-fail() {
+    @echo Every test case must have an assertion
+    @assert-fail
+}
+
+
+test-bach-framework-API-@assert-fail() {
+    @echo Every test case must have an assertion
+    @false
+    @assert-fail
+}
+test-bach-framework-API-@assert-fail-assert() {
+    @echo Every test case must have an assertion
+    @cat <<EOF
+## BACH: [assert-equals] expected: 1
+##                         actual: 1
+EOF
+}
+
+
+test-bach-framework-API-@assert-success() {
+    @echo Every test case must have an assertion
+    @assert-success
+}
+test-bach-framework-API-@assert-success-assert() {
+    @echo Every test case must have an assertion
+    @cat <<EOF
+## BACH: [assert-equals] expected: 0
+##                         actual: 0
+EOF
+}
+
+
+test-ASSERT-FAIL-bach-framework-one-success-and-one-fail-should-be-fail() {
+    @echo one success and one fail
+    @assert-success
+    @assert-fail
+}
+
+
+test-ASSERT-FAIL-bach-framework-one-fail-and-one-success-should-be-fail() {
+    @echo one success and one fail
+    @assert-fail
+    @assert-success
 }
