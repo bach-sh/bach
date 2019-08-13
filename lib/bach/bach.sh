@@ -64,8 +64,12 @@ export -f bach-real-path
 function bach_initialize(){
     declare name
 
-    for name in cd command echo eval exec false popd pushd pwd source trap true type; do
+    for name in cd command echo exec false popd pushd pwd trap true type; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
+    done
+
+    for name in eval source; do
+        eval "function @${name}() { builtin $name \"\$@\"; }; export -f @${name}"
     done
 
     for name in echo pwd test; do
