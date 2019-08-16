@@ -519,7 +519,7 @@ ${__bach_run_test__ignore_prefix} [assert-equals] expected: ${expected}
 ##                         actual: ${actual}
 EOF
     else
-        @die - <<EOF
+        @die - 2>&7 <<EOF
 Assert Failed:
      Expected: $expected
       But got: $actual

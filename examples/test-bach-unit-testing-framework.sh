@@ -1064,6 +1064,21 @@ EOF
 }
 
 
+test-bach-framework-API-@assert-fail-2() {
+    @echo Every test case must have an assertion
+    @assert-fail
+}
+test-bach-framework-API-@assert-fail-2-assert() {
+    @echo Every test case must have an assertion
+    @cat <<EOF
+Assert Failed:
+     Expected: <non-zero>
+      But got: 0
+EOF
+    builtin return 1
+}
+
+
 test-bach-framework-API-@assert-success() {
     @echo Every test case must have an assertion
     @assert-success
