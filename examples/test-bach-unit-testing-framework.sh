@@ -108,6 +108,24 @@ out3 three
 EOF
 }
 
+
+test-output-function-@out-stdin() {
+    set -euo pipefail
+    @out - <<EOF
+one
+two
+three
+EOF
+}
+test-output-function-@out-stdin-assert() {
+    @cat <<EOF
+one
+two
+three
+EOF
+}
+
+
 test-run-a-script() {
     @mock load-script === @echo "'for param; do \"${_echo}\" \"script.sh - \$param\"; done'"
 

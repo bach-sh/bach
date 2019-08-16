@@ -11,7 +11,8 @@ while builtin read -r -d: folder; do
 done <<< "${PATH}"
 
 function @out() {
-    if [[ ! -t 0 ]]; then
+    if [[ "${1:-}" == "-" || ! -t 0 ]]; then
+        [[ "${1:-}" == "-" ]] && shift
         while IFS=$'\n' read -r line; do
             printf "%s\n" "${*}$line"
         done
