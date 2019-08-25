@@ -6,6 +6,7 @@ matrix:
         dist: trusty
       - os: linux
         dist: xenial
+      - os: windows
 
 script:
   - find examples \( -name 'test*' -or -name 'learn*' \) -exec bash -euo pipefail {} \;
