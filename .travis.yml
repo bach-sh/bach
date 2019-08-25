@@ -1,0 +1,4 @@
+dist: trusty
+language: generic
+script:
+  - find examples/ -type f -perm /u+x -exec {} \;
