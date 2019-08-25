@@ -8,7 +8,7 @@ matrix:
         dist: xenial
 
 script:
-- find examples/ -type f -perm /u+x -exec {} \;
+  - find examples \( -name 'test*' -or -name 'learn*' \) -exec bash -euo pipefail {} \;
 
 notifications:
   slack:
