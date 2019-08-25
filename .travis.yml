@@ -9,7 +9,7 @@ matrix:
       - os: osx
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update && brew install bash; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update && brew install bash coreutils; fi
 
 script:
   - find examples \( -name 'test*' -or -name 'learn*' \) -exec bash -euo pipefail {} \;
