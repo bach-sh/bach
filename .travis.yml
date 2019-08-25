@@ -1,4 +1,7 @@
 dist: trusty
 language: generic
 script:
-  - find examples/ -type f -perm /u+x -exec {} \;
+- find examples/ -type f -perm /u+x -exec {} \;
+notifications:
+  slack:
+    secure: RaD+J6pY+gvNAsNXZ5xK9ta+aHadoj9f28fUGRAL+fIP2OSo3cHXwthaN0bsWcDjYH3AZDoXPLS3jfeCBNB2+lDjlasw6SMW8lIEn8K111chM8d8TAkpqT44BM+HDcmeWvHKuQEsolO5wBikV2COgvB3FqCoRXSTj+A1tDfFNgwslhDq7riDqQrWRIeNKrZLSOj/ZtR7kYtGUz8zGUmzZAscC4cL4DqowfOAtFGi3n24A2PSR9CC9wHl21fgsEfK6oS5XlGwwTwFcCq3sjKoq2T6u4mjsfy+8IE0wniRfnFz1LYAoZMcP7V/0yt+DnxupiQ/yE8AvXsGxdbv9tNU6yXAy7OkfzaDmB4hHaaSjhtwZVKsX6vQknjr8CYw848wgwwHFuQTRQJ1Kz/7ZhCfq5QjZ7JeS67shZp5Bq1H1wM3Zck6HVbiYyDKH7QptBrpT1Y97XAn4VzyRwUGiqmnU0zDjcSuAAFmn2EUzOncAAQvCC855KwXTFArA1TFPWFBHDvSQEm9wSnZbavh9/gfA/BrbtsWHEWka6yX8moUmbZreB644tnOLL+iSBPhuVshPXLIGINMfP1n64mtsVXbUGdww2PnBHN/NAV6o14fHnNHTqWqloCyEgWmCL1MMQVAIIlvDBWyicPof1cRQS8ECNCqatpDS1ew1zfAwRZcobE=
