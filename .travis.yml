@@ -9,7 +9,11 @@ matrix:
       - os: windows
 
 script:
-  - find examples \( -name 'test*' -or -name 'learn*' \) -exec bash -euo pipefail {} \;
+- bash -euo pipefail examples/learn-bash-programming-with-bach.cn.md
+- bash -euo pipefail examples/learn-bash-programming-with-bach.md
+- bash -euo pipefail examples/test-bach-unit-testing-framework.sh
+- bash -euo pipefail examples/test-require.sh
+- bash -euo pipefail examples/test_gnu_generic_getopts.sh
 
 notifications:
   slack:
