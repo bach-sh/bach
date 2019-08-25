@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-declare -grx self="$(realpath "${BASH_SOURCE}")"
+declare -grx self="$(readlink -f "${BASH_SOURCE}")"
 source <("${self%/*/*}"/cflib-import.sh)
 require bach
 
