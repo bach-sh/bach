@@ -939,11 +939,10 @@ test-bach-framework-two-pipelines-when-mock-the-second() {
     @mock this-is-a-mock command
     @mock this-non-mock
 
-    @echo due to subprocesses running in background | this-non-mock command goes first | this-is-a-mock command
+    @echo -n | this-non-mock command | this-is-a-mock command
 }
 test-bach-framework-two-pipelines-when-mock-the-second-assert() {
-    this-non-mock command goes first
-    @stdout "due to subprocesses running in background"
+    this-non-mock command
 }
 
 
