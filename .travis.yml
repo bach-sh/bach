@@ -5,7 +5,7 @@ matrix:
       - os: linux
         dist: trusty
       - os: linux
-        dist: xenial
+        dist: bionic
 
 script:
   - find examples \( -name 'test*' -or -name 'learn*' \) -exec bash -euo pipefail {} \;
