@@ -435,8 +435,8 @@ test-mock-script-with-custom-complex-action-assert() {
 }
 
 test-bach-framework-can-get-all-tests() {
-    unset -f bach-get-all-functions @shuf
-    @mock @shuf === @sort
+    unset -f bach-get-all-functions @sort
+    @mock @sort -R === @real sort
     @mock bach-get-all-functions <<EOF
 @echo declare -f gp
 @echo declare -f test-bach-run-tests--get-all-tests-foo
@@ -679,8 +679,8 @@ EOF
 test-bach-framework-only-run-a-certain-test() {
     export BACH_TESTS=bach-run-this
 
-    unset -f bach-get-all-functions @shuf
-    @mock @shuf === @sort
+    unset -f bach-get-all-functions @sort
+    @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
 }
@@ -693,8 +693,8 @@ TESTS
 test-bach-framework-uses-multi-tests-filters() {
     export BACH_TESTS='bach-run-this,bach-run-this-too'
 
-    unset -f bach-get-all-functions @shuf
-    @mock @shuf === @sort
+    unset -f bach-get-all-functions @sort
+    @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
 }
@@ -708,8 +708,8 @@ TESTS
 test-bach-framework-uses-multi-tests-filters-supports-glob() {
     export BACH_TESTS='bach-run-this*,*bar*'
 
-    unset -f bach-get-all-functions @shuf
-    @mock @shuf === @sort
+    unset -f bach-get-all-functions @sort
+    @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
 }
@@ -725,8 +725,8 @@ TESTS
 test-bach-framework-filter-tests-no-matches() {
     export BACH_TESTS="you-can-not-find-me"
 
-    unset -f bach-get-all-functions @shuf
-    @mock @shuf === @sort
+    unset -f bach-get-all-functions @sort
+    @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
 }
@@ -737,8 +737,8 @@ test-bach-framework-filter-tests-no-matches-assert() {
 test-bach-framework-filter-tests-by-glob() {
     export BACH_TESTS="bach-run-this*"
 
-    unset -f bach-get-all-functions @shuf
-    @mock @shuf === @sort
+    unset -f bach-get-all-functions @sort
+    @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
 }
@@ -752,8 +752,8 @@ TESTS
 test-bach-framework-filter-tests-by-glob-two-stars() {
     export BACH_TESTS="*run-this*"
 
-    unset -f bach-get-all-functions @shuf
-    @mock @shuf === @sort
+    unset -f bach-get-all-functions @sort
+    @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
 }

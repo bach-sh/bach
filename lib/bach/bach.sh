@@ -77,7 +77,7 @@ function bach_initialize(){
         declare -grx "_${name}"="$(bach-real-path "$name")"
     done
 
-    declare -a bach_core_utils=(cat chmod cut diff find env grep ls shasum mkdir mktemp rm rmdir sed shuf sort tee touch which xargs)
+    declare -a bach_core_utils=(cat chmod cut diff find env grep ls shasum mkdir mktemp rm rmdir sed sort tee touch which xargs)
 
     for name in "${bach_core_utils[@]}"; do
         declare -grx "_${name}"="$(bach-real-path "$name")"
@@ -116,7 +116,7 @@ function bach--skip-the-test() {
 export -f bach--skip-the-test
 
 function bach-run-tests--get-all-tests() {
-    bach-get-all-functions | @shuf | while read -r _ _ name; do
+    bach-get-all-functions | @sort -R | while read -r _ _ name; do
         [[ "$name" == test?* ]] || continue
         [[ "$name" == *-assert ]] && continue
         bach--skip-the-test "$name" || continue
