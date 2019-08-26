@@ -6,6 +6,10 @@ Bach is a unit testing framework used for testing Bash scripts.
 
 It's part of Shell Common Functions Library
 
+## Requires
+
+- Bash v4.3+
+
 ## Examples
 
     #!/usr/bin/env bash
