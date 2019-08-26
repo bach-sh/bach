@@ -3,8 +3,7 @@
 
 ## Using Shell Common Functions Library to import Bach Testing Framework
 
-    declare -grx self="$(readlink -f "${BASH_SOURCE}")"
-    source <("${self%/*/*}"/cflib-import.sh)
+    source <("$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"/../cflib-import.sh)
     require bach
 
 ## Why double quotes are so important to Bash?

@@ -3,8 +3,7 @@
 
 ## 利用 Shell Common Functions Library 导入 Bach 测试框架
 
-    declare -grx self="$(readlink -f "${BASH_SOURCE}")"
-    source <("${self%/*/*}"/cflib-import.sh)
+    source <("$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"/../cflib-import.sh)
     require bach
 
 ## 为什么双引号很重要
