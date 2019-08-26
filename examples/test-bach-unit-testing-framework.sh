@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-declare -grx self="$(readlink -f "${BASH_SOURCE}")"
-source <("${self%/*/*}"/cflib-import.sh)
+curr_dir="$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"
+source <("${curr_dir}"/../cflib-import.sh)
 require bach
 
 # export BACH_DISABLED=false
@@ -262,7 +262,7 @@ test-bach-framework-error-output-assert() {
 }
 
 function load-gp() {
-    @load_function "${self%/*}/example-functions" gp
+    @load_function "${curr_dir}/example-functions" gp
 }
 
 test-gp-running-inside-a-git-repo-and-the-branch-has-upstream() {
@@ -359,7 +359,7 @@ test-must-have-an-assertion-assert() {
 }
 
 function load-ff() {
-    @load_function "${self%/*}/example-functions" ff
+    @load_function "${curr_dir}/example-functions" ff
 }
 
 test-load-and-test-ff-function() {

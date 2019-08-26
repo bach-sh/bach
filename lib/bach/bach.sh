@@ -484,7 +484,7 @@ export -f @stdout
 function @load_function() {
     local file="${1:?script filename}"
     local func="${2:?function name}"
-    @source <(@sed -Ene "/^function\s+${func}\\b/,/^}\$/p" "$file")
+    @source <(@sed -Ene "/^function[[:space:]]+${func}([\(\{\[[:space:]]|[[:space:]]*\$)/,/^}\$/p" "$file")
 } 8>/dev/null
 export -f @load_function
 
