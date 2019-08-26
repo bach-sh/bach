@@ -959,14 +959,13 @@ test-bach-framework-two-pipelines-when-mock-the-both-assert() {
 
 test-bach-framework-multi-pipelines() {
     @mock first
-    @mock second === two
+    @mock second === @echo -n
     @mock third 3
 
     @echo gone | first non mocking | second | third 3
 }
 test-bach-framework-multi-pipelines-assert() {
     @dryrun first non mocking
-    two
 }
 
 
