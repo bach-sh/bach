@@ -9,7 +9,7 @@ matrix:
       - os: osx
 
 script:
-  - ./run-tests.sh
+  - bash -xv ./run-tests.sh
 
 notifications:
   slack:
