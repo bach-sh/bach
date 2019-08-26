@@ -12,7 +12,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update && brew install bash; ln -sfv "$(brew --prefix coreutils)"/{bin/md5sum,bin/shuf,libexec/gnubin/realpath,libexec/gnubin/readlink} /usr/local/bin; fi
 
 script:
-  - find examples \( -name 'test*' -or -name 'learn*' \) -exec bash -euo pipefail {} \;
+  - for file in examples/{test,learn}*; do bash -euo pipefail "$file"; done
 
 notifications:
   slack:
