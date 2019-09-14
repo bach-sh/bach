@@ -181,7 +181,7 @@ test-mock-builtin-command-with-external-commands2-assert() {
 
 
 test-@real-function() {
-    unset -f bach-real-path
+    @unset -f bach-real-path
     @mock bach-real-path md5sum === fake-md5sum
 
     @real md5sum
@@ -435,7 +435,7 @@ test-mock-script-with-custom-complex-action-assert() {
 }
 
 test-bach-framework-can-get-all-tests() {
-    unset -f bach-get-all-functions @sort
+    @unset -f bach-get-all-functions @sort
     @mock @sort -R === @real sort
     @mock bach-get-all-functions <<EOF
 @echo declare -f gp
@@ -487,7 +487,7 @@ test-mock-cd-builtin-command-assert() {
 }
 
 test-mock-echo-builtin-command() {
-    unset -f echo
+    @unset -f echo
     @mock echo
     @type -t echo
     echo done
@@ -604,7 +604,7 @@ test-bach-framework-should-clear-the-exit-trap-in-assertion-assert() {
 
 test-bach-framework-set--u-should-work-in-tests() {
     set -ue
-    unset foobar
+    @unset foobar
 
     visit-an-undefined-variable "$foobar"
 
@@ -679,7 +679,7 @@ EOF
 test-bach-framework-only-run-a-certain-test() {
     export BACH_TESTS=bach-run-this
 
-    unset -f bach-get-all-functions @sort
+    @unset -f bach-get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
@@ -693,7 +693,7 @@ TESTS
 test-bach-framework-uses-multi-tests-filters() {
     export BACH_TESTS='bach-run-this,bach-run-this-too'
 
-    unset -f bach-get-all-functions @sort
+    @unset -f bach-get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
@@ -708,7 +708,7 @@ TESTS
 test-bach-framework-uses-multi-tests-filters-supports-glob() {
     export BACH_TESTS='bach-run-this*,*bar*'
 
-    unset -f bach-get-all-functions @sort
+    @unset -f bach-get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
@@ -725,7 +725,7 @@ TESTS
 test-bach-framework-filter-tests-no-matches() {
     export BACH_TESTS="you-can-not-find-me"
 
-    unset -f bach-get-all-functions @sort
+    @unset -f bach-get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
@@ -737,7 +737,7 @@ test-bach-framework-filter-tests-no-matches-assert() {
 test-bach-framework-filter-tests-by-glob() {
     export BACH_TESTS="bach-run-this*"
 
-    unset -f bach-get-all-functions @sort
+    @unset -f bach-get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
@@ -752,7 +752,7 @@ TESTS
 test-bach-framework-filter-tests-by-glob-two-stars() {
     export BACH_TESTS="*run-this*"
 
-    unset -f bach-get-all-functions @sort
+    @unset -f bach-get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
     bach-run-tests--get-all-tests
@@ -777,7 +777,7 @@ test-ASSERT-FAIL-bach-framework-api-fail-assert() {
 
 
 test-bach-framework-run-script-with-relative-path() {
-    unset -f @source
+    @unset -f @source
     @mock @source
 
     BACH_STARTUP_PWD=/foo/bar/bach
@@ -789,7 +789,7 @@ test-bach-framework-run-script-with-relative-path-assert() {
 }
 
 test-bach-framework-run-script-with-absolute-path() {
-    unset -f @source
+    @unset -f @source
     @mock @source
 
     BACH_STARTUP_PWD=/foo/bar/bach

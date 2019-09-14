@@ -65,7 +65,7 @@ export -f bach-real-path
 function bach_initialize(){
     declare name
 
-    for name in cd command echo exec false popd pushd pwd trap true type; do
+    for name in cd command echo exec false popd pushd pwd set trap true type unset; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
@@ -83,7 +83,7 @@ function bach_initialize(){
         declare -grx "_${name}"="$(bach-real-path "$name")"
         eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
-    unset name
+    @unset name
 }
 
 function bach-real-command() {
@@ -392,7 +392,7 @@ declare -gx BACH_ASSERT_IGNORE_COMMENT="${BACH_ASSERT_IGNORE_COMMENT:-true}"
 declare -gx BACH_ASSERT_DIFF="${BACH_ASSERT_DIFF:-diff}"
 
 function assert-execution() (
-    unset BACH_TESTS
+    @unset BACH_TESTS
     declare bach_test_name="$1" bach_tmpdir bach_actual_output bach_expected_output
     bach_tmpdir="$(@mktemp -d)"
     #trap '/bin/rm -vrf "$bach_tmpdir"' RETURN
@@ -433,7 +433,7 @@ function assert-execution() (
     ) 7>&1
 
     function __bach__run_assert() (
-        unset -f @mock @mockall @ignore @setup-test
+        @unset -f @mock @mockall @ignore @setup-test
         __bach__pre_run_test_and_assert
         _bach_framework__run_function "${BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME}"
         "${1}-assert"
