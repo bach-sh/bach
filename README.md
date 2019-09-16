@@ -4,17 +4,31 @@
 
 ## Bach
 
-Bach is a unit testing framework used for testing Bash scripts.
+Bach is a Bash testing framework, can be used to test scripts that contain dangerous commands like rm -rf /. No surprises, no pain.
 
-## Requires
+- [查看本文档的中文版](README-cn.md)
+
+## Getting Started
+
+Bach Testing Framework is a **real** unit testing framework. All commands in the `PATH` environment variable become external dependencies of bash scripts being tested. No commands can be actually executed. In other words, all commands in Bach test cases are **dry run**. Because that unit tests should verify the behavior of bash scripts, not to test commands. Bach Testing Framework also provides APIs to mock commands.
+
+### Prerequisites
 
 - Bash v4.3+
 
-## Examples
+### Installing
+
+Installing Bach Testing Framework is very simple. Download `bach.sh` to your project, use the `source` command to import `bach.sh`.
+
+For example:
+
+    source path/to/bach.sh
+
+#### A complete example
 
     #!/usr/bin/env bash
     set -euo pipefail
-    source path/to/bach.sh
+    source bach.sh
 
     test-rm-rf() {
         # Write your test case
@@ -43,9 +57,388 @@ Bach is a unit testing framework used for testing Bash scripts.
         rm -rf ~/src/your-awesome-project/.git ~/src/code/.git
     }
     
-### More Examples
+See [tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh) for more examples.
 
-[tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh)
+### Write test cases
+
+Unlike the other testing frameworks, A standard test case of Bach is composed of two Bash functions. One is for running tests, the other is for asserting. Bach will run the two functions separately and then compare whether the same sequence of commands will be executed in either of both functions. The name of a testing function must start with `test-`, the name of the corresponding asserting function ends with `-assert`.
+
+For example:
+
+    source bach.sh
+    
+    test-rm-rf() {
+        project_log_path=/tmp/project/logs
+        sudo rm -rf "$project_log_ptah/" # Typo! 
+        # An undefined bash variable is an empty string, which can be a serious problem!
+    }
+    test-rm-rf-assert() {
+        sudo rm -rf /
+    }
+
+Bach will run the two functions separately, `test-rm-rf` and `test-rm-rf-assert`. In the testing function, `test-rm-rf`, the final actual command to be executed is `sudo rm -rf "/"`. It's the same as the asserting function `test-rm-rf-assert`. So this test case is passed.
+
+If Bach does not find the asserting function for a testing function. Bach will try to use a traditional test method. In this case, the testing function must have a call to assert the APIs. Otherwise, the test case will fail.
+
+For example:
+
+    test-single-function-style() {
+        declare i=2
+        @assert-equals 4 "$((i*2))"
+    }
+
+If Bach does not find the corresponding asserting function and there is no assertion API call in the testing function, the test case must fail.
+
+If the name of a test case starts with `test-ASSERT-FAIL`, it means that the asserting result of this test case is reversed. That is, if the asserting result is successful, the test case fails, if the asserting result fails, the test case is successful.
+
+The assertion APIs of Bach Testing Framework:
+
+- `@assert-equals`
+- `@assert-fail`
+- `@assert-success`
+
+### Mock commands
+
+There are mock APIs in the Bach test framework that can be used to mock commands and scripts.
+
+The Mock APIs:
+
+- `@mock`
+- `@ignore`
+- `@mockall`
+- `@mocktrue`
+- `@mockfalse`
+- `@@mock`
+
+But it doesn't allow to mock the following built-in commands in Bach Testing Framework:
+
+- `builtin`
+- `declare`
+- `eval`
+- `printf`
+
+Test cases will fail if you attempt to mock these built-in commands. In this case, we can extract a new function which contains the built-in commands in our scripts, and then use Bach to mock this new function.
+
+### Run the actual commands in Bach
+
+In order to make test cases fast, stable, repetitive, and run in random order. We should write unit-testing cases and avoid calling real commands. But Bach also provides a set of APIs for executing real commands.
+
+Because Bach mocks all commands by default. If it is unavoidable to execute a real command in a test case, Bach provides an API called `@real` to execute the real command, just put `@real` at the beginning of commands.
+
+Bach also provides APIs for commonly used commands. The real commands for these APIs are obtained from the system's PATH environment variable before Bach starts.
+
+These common used APIs are:
+
+- `@cd`
+- `@command`
+- `@echo`
+- `@exec`
+- `@false`
+- `@popd`
+- `@pushd`
+- `@pwd`
+- `@set`
+- `@trap`
+- `@true`
+- `@type`
+- `@unset`
+- `@eval`
+- `@source`
+- `@cat`
+- `@chmod`
+- `@cut`
+- `@diff`
+- `@find`
+- `@env`
+- `@grep`
+- `@ls`
+- `@shasum`
+- `@mkdir`
+- `@mktemp`
+- `@rm`
+- `@rmdir`
+- `@sed`
+- `@sort`
+- `@tee`
+- `@touch`
+- `@which`
+- `@xargs`
+
+Due to the command `command` and `xargs` are a bit special. Bach mocks both commands by default to make the similar behavior of themselves.
+
+In Bach Testing Framework the `xargs` is a mock function. It's behavior is similar to the real `xargs` command if you put `--` between `xargs` and the command. But the commands to be executed by  `xargs` are dry run.
+
+For examples:
+
+    test-xargs-no-dash-dash() {
+        @mock ls === @stdout foo bar
+        
+        ls | xargs -n1 rm -v
+    }
+    test-xargs-no-dash-dash-assert() {
+        xargs -n1 rm -v
+    }
+    
+
+    test-xargs() {
+        @mock ls === @stdout foo bar
+        
+        ls | xargs -n1 -- rm -v
+    }
+    test-xargs-assert() {
+        rm -v foo
+        rm -v bar
+    }
+    
+
+    test-xargs-0() {
+        @mock ls === @stdout foo bar
+        
+        ls | xargs -- rm -v
+    }
+    test-xargs-0-assert() {
+        rm -v foo bar
+    }
+    
+### Configure Bach
+
+There are some environment variables starting with `BACH_` for configuring Bach Festing Framework.
+
+- `BACH_DEBUG`
+  The default is `false`. `true` to enable Bach's `@debug` API.
+- `BACH_COLOR`
+  The default is `auto`. It can be `always` or `no`.
+- `BACH_TESTS`
+  It is empty to allow all test cases. You can use glob wildcards to match the test cases to execute.
+- `BACH_DISABLED`
+  The default is `false`. `true`  to disable Bach Testing Framework.
+- `BACH_ASSERT_DIFF`
+  The default is the first `diff` command found in the original `PATH` environment variable of the system. Used to compare the execution results of testing functions and asserting functions.
+- `BACH_ASSERT_DIFF_OPTS`
+  The default is `-u` for the `$BACH_ASSERT_DIFF` command.
+
+## Limitation in Bach
+
+### Cannot block absolute path command calls
+
+In this case, the OS runs the command directly, and no interact with Bash(or Shell). So Bach cannot intercept such commands. We can wrap this kind of commands in a new function, and then use the `@mock` API to mock the function.
+
+### Prohibit resetting the PATH environment variable
+
+Because Bach wants to intercept all command calls. So Bach set `PATH` to read-only to avoid resetting its value. 
+
+In the case that PATH needs to be re-assignment, it is recommended to use the `declare` builtin command in our scripts to avoid errors caused by resetting a read-only environment variable.
+
+### Unable to intercept I/O redirection in Bach
+
+Bach already support mock functions to read from pipelines. But for the use of operators such as `>`, `>>`, the solution is to wrap the redirected command in a function. Another way is to use the `sed` command to put `>`  or `>>` in quotation marks, convert the I/O redirected operation to a normal argument.
+
+### Must mock all command in the pipeline
+
+The pipeline commands in Bash are running in sub-processes. Test cases may not be stable if we don't use `@mock` API to mock them.
+
+## Bach APIs
+
+The names of all APIs provided in the Bach test framework start with `@`.
+
+### @assert-equals
+
+    @assert-equals "hello world" "HELLO WORLD"
+    @assert-equals 1 1
+
+### @assert-fail
+
+    [[ 1 -eq 3 ]]
+    @assert-fail
+
+### @assert-success
+
+    [[ 0 -eq 0 ]]
+    @assert-success
+
+### @comment
+
+Output comments in the test output, but Bach will ignore these comments.
+
+### @debug
+
+### @die
+
+Terminate the current running immediately
+
+### @do-not-panic
+
+Don't panic.
+
+This API has the following aliases:
+- `donotpanic`
+- `dontpanic`
+- `do-not-panic`
+- `dont-panic`
+- `do_not_panic`
+- `dont_panic`
+
+### @dryrun
+
+Bach uses `@dryrun` API to dry run commands by default.
+
+For example:
+
+    test-dryrun() {
+        @mock ls === @stdout file1 file2 # mock `ls` command
+        ls # outputs file1 file2
+        @dryrun ls # Dry run `ls` command
+    }
+    test-dryrun-assert() {
+        @out file1
+        @out file2
+        ls # @dryrun ls
+    }
+
+### @err
+
+Output error message on stderr console
+
+### @ignore
+
+    test-ignore-echo() {
+        @ignore echo
+        
+        echo Updating APT caches
+        apt-get update
+    }
+    test-ignore-echo-assert() {
+        apt-get update
+    }
+
+### @load_function
+
+Loading a function definenation from a script.
+
+    test-gp() {
+        @load_function ./examples/example-functions gp
+        
+        gp -f
+    }
+    test-gp-assert() {
+        git push -f origin master
+    }
+
+### @mock
+
+Mock commands or scripts.
+
+Note: cannot mock commands that have absolute paths.
+
+Use `===` to split commands and output
+
+For example:
+
+#### Mock a command that followed by parameters
+
+    test-mock-ls() {
+        @mock ls file1 === @stdout file2
+
+        ls file1
+
+        ls foo bar
+    }
+    test-mock-ls-assert() {
+        @out file2 # To list file1, but got file2, It's strange, right?
+        
+        ls foo bar
+    }
+
+#### Mock commands with complex implementations
+
+For example:
+    
+    test-mock-foobar() {
+      @mock foobar <<<\CMD
+        if [[ "$var" -eq 1 ]]; then
+          @stdout one
+        else
+          @stdout others
+        fi
+    CMD
+    
+      var=1 foobar
+      foobar
+    }
+    test-mock-foobar() {
+      @out one
+      @out others
+    }
+    
+### @mockall
+
+Mock many simple commands
+
+### @mocktrue
+
+Mock the return code of a command is successful.
+
+### @mockfalse
+
+Mock the return code of a command is non-zero
+
+### @out
+
+Output on the stdout console.
+
+### @real
+
+Executing the real command
+
+### @run
+
+Executing the script to be tested.
+
+#### `@setup`
+
+Executing at the beginning of the testing functions and the asserting functions.
+
+Note: It doesn't make sense to run mock in asserting functions, so it's forbidden to mock any commands in asserting functions.
+
+We cannot mock commands in `@setup` API.
+
+example:
+
+    @setup {
+        @echo executing in both the testing function and the asserting function.
+    }
+
+### @setup-assert
+
+Executing at the beginning of all asserting functions.
+
+Note: the test cases will fail if we mock any commands inside `@setup-assert`
+
+For example:
+
+    @setup-assert {
+        @echo executing in the asserting functions
+    }
+
+### @setup-test
+
+Executing at the beginning of all testing functions.
+
+This is the only place allows to mock commands.
+
+For example:
+
+    @setup-test {
+        @echo executing in the testing functions
+    }
+
+### @stderr
+
+Output content on the stderr console, one line per parameter.
+
+### @stdout
+
+Output content on the stdout console, one line per parameter.
 
 ## Learn Bash Programming with Bach
 
@@ -83,3 +476,24 @@ Bach is a unit testing framework used for testing Bash scripts.
 
 - a command line tool
 - run inside docker containers
+
+## Clients
+
+* BMW Group
+* Huawei (华为)
+
+## Versioning
+
+The latest version of Bach is 0.2. See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
+
+## Author
+
+* **Chai Feng** [github.com/chaifeng](https://github.com/chaifeng), [chaifeng.com](https://chaifeng.com)
+
+## Licenses
+
+Bach Testing Framework is dual licensed under:
+- GNU General Public License v3.0
+- Mzilla Public License 2.0
+
+See [LICENSE.md](LICENSE.md) for more.
