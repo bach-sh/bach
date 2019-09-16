@@ -4,8 +4,6 @@
 
 Bach is a unit testing framework used for testing Bash scripts.
 
-It's part of Shell Common Functions Library
-
 ## Requires
 
 - Bash v4.3+
@@ -14,8 +12,7 @@ It's part of Shell Common Functions Library
 
     #!/usr/bin/env bash
     set -euo pipefail
-    source <(path/to/common-functions-lib/cflib-import.sh)
-    require bach
+    source path/to/bach.sh
 
     test-rm-rf() {
         # Write your test case
@@ -46,7 +43,7 @@ It's part of Shell Common Functions Library
     
 ### More Examples
 
-[examples/test-bach-unit-testing-framework.sh](../../examples/test-bach-unit-testing-framework.sh)
+[tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh)
 
 ## Learn Bash Programming with Bach
 

@@ -17,7 +17,7 @@ esac
 "$bash_bin" --version
 
 retval=0
-for file in examples/{test,learn}*; do
+for file in tests/*.test.sh examples/{test,learn}*; do
     "$bash_bin" -euo pipefail "$file" || retval=1
 done
 

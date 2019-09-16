@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # Using Bach to learn Bash programming
 
-## Using Shell Common Functions Library to import Bach Testing Framework
+## Import Bach Testing Framework
 
-    source <("$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"/../cflib-import.sh)
-    require bach
+    source "$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"/../bach.sh
 
 ## Why double quotes are so important to Bash?
 

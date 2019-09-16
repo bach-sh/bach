@@ -1,4 +1,10 @@
 # -*- mode: sh -*-
+# Bach Testing Framework, https://bach.sh
+# Copyright (C) 2019  Chai Feng <chaifeng@chaifeng.com>
+#
+# Bach Testing Framework is dual licensed under:
+# - GNU General Public License v3.0
+# - Mozilla Public License 2.0
 set -euo pipefail
 shopt -s expand_aliases
 

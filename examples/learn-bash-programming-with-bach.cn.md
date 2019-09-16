@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 # 用 Bach 来学习 Bash 编程
 
-## 利用 Shell Common Functions Library 导入 Bach 测试框架
+## 导入 Bach 测试框架
 
-    source <("$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"/../cflib-import.sh)
-    require bach
+    source "$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"/../bach.sh
 
 ## 为什么双引号很重要
 

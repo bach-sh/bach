@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 curr_dir="$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"
-source <("${curr_dir}"/../cflib-import.sh)
-require bach
+source "${curr_dir}"/../bach.sh
 
 # export BACH_DISABLED=false
 # export BACH_COLOR=auto
