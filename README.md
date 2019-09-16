@@ -1,5 +1,7 @@
 # Bach Testing Framework
 
+[![Build Status](https://travis-ci.org/bach-sh/bach.svg)](https://travis-ci.org/bach-sh/bach)
+
 ## Bach
 
 Bach is a unit testing framework used for testing Bash scripts.
