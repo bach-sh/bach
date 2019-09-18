@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
+unset BACH_ASSERT_DIFF BACH_ASSERT_DIFF_OPTS
 PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
 
 bash_bin="$BASH"
