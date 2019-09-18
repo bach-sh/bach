@@ -1,16 +1,13 @@
 language: bash
-
 matrix:
-    include:
-      - os: linux
-        dist: trusty
-      - os: linux
-        dist: bionic
-      - os: osx
-
+  include:
+  - os: linux
+    dist: trusty
+  - os: linux
+    dist: bionic
+  - os: osx
 script:
-  - bash -xv ./run-tests.sh
-
+- bash -xv ./run-tests.sh
 notifications:
   slack:
-    secure: RaD+J6pY+gvNAsNXZ5xK9ta+aHadoj9f28fUGRAL+fIP2OSo3cHXwthaN0bsWcDjYH3AZDoXPLS3jfeCBNB2+lDjlasw6SMW8lIEn8K111chM8d8TAkpqT44BM+HDcmeWvHKuQEsolO5wBikV2COgvB3FqCoRXSTj+A1tDfFNgwslhDq7riDqQrWRIeNKrZLSOj/ZtR7kYtGUz8zGUmzZAscC4cL4DqowfOAtFGi3n24A2PSR9CC9wHl21fgsEfK6oS5XlGwwTwFcCq3sjKoq2T6u4mjsfy+8IE0wniRfnFz1LYAoZMcP7V/0yt+DnxupiQ/yE8AvXsGxdbv9tNU6yXAy7OkfzaDmB4hHaaSjhtwZVKsX6vQknjr8CYw848wgwwHFuQTRQJ1Kz/7ZhCfq5QjZ7JeS67shZp5Bq1H1wM3Zck6HVbiYyDKH7QptBrpT1Y97XAn4VzyRwUGiqmnU0zDjcSuAAFmn2EUzOncAAQvCC855KwXTFArA1TFPWFBHDvSQEm9wSnZbavh9/gfA/BrbtsWHEWka6yX8moUmbZreB644tnOLL+iSBPhuVshPXLIGINMfP1n64mtsVXbUGdww2PnBHN/NAV6o14fHnNHTqWqloCyEgWmCL1MMQVAIIlvDBWyicPof1cRQS8ECNCqatpDS1ew1zfAwRZcobE=
+    secure: HMocfyLAxizspgRHpMqFTSMTnRqkHQIrqaLdjCkBYTznKcqkVS2/S5gsUWBtO5T1JHZjOMEYnUyCOY8SB/dLDEIHdzbm/lzgAV+0+BwRjoVMMaiQVzReenQ+tkkDfeJDRXJD3fch6UQE1ydIqiUlLLW9QZHvrzo+5X8GqCc7BwYDU6ZMCgZ1c5R8A+vfg9LozPZocIZYYLB5r2m4czMibTQDFzbmPFFIHAHrHaYDm112fYydyNDSEN/aJ3rZs4Eq4/K3tGXLny9eEKH9tOJt1onf4N3BKzFez3/tv3jVi3HIA4kXwff5sITuNXhDLOad0d9UrSQ/p+WQXSboBudIKYinHS6l2xJxyase6DDk0weL6m+sAfcXNPIZUNNdzxHrYYS91JA54CYv/3rF7aeiVmwhMgjv9BLeGWJOJCb+qYATNUi/SMiAKnTkFm8fqIqZ2Dioo2IS1Dq60KDpJYKIlOIZJ2HrPsKFQHw/JPiUxYEhp8D+93mglF5bv6h7quIpkok1kHoN48ZFwINfDpUhN9H3pRbAvK/nVKnn6KgkDKhMdAD5RHViaXDFMk8zpeVzNJqVDIhBO8ne/ruiVUOAbukf4M4b7RRtxbWxj1kh919mC+BIfUWrqsbB6R7WnqU4yx3OnyIto8aGynMf608pWcx02KdigaGyTVrMIGDHAd8=
