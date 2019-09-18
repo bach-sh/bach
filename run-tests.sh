@@ -3,14 +3,16 @@ set -uo pipefail
 
 PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
 
-bash_bin=/bin/bash
+bash_bin="$BASH"
 
 case "$(uname)" in
     Darwin)
         if ! brew list --full-name --versions bash &>/dev/null; then
             brew install bash
         fi
-        bash_bin="$(brew --prefix)"/bin/bash
+        if [[ "$BASH" == /bin/bash ]]; then
+            bash_bin="$(brew --prefix)"/bin/bash
+        fi
         ;;
 esac
 
