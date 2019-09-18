@@ -50,7 +50,7 @@ if [[ "${BACH_DEBUG:-}" != true ]]; then
         :
     }
 else
-    exec 8>&2
+    @exec 8>&2
     function @debug() {
         builtin printf '[DEBUG] %s\n' "$*"
     } >&8
@@ -188,7 +188,7 @@ function bach-run-tests() {
         BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
     fi
 
-    @mockall cd echo
+    @mockall cd echo exec popd pushd pwd trap type
 
     declare color_ok color_err color_end
     if [[ "$BACH_COLOR" == "always" ]] || [[ "$BACH_COLOR" != "no" && -t 1 && -t 2 ]]; then
@@ -212,9 +212,9 @@ function bach-run-tests() {
         friendly_name="${friendly_name//  / -}"
         : $(( ++total ))
         testresult="$(@mktemp)"
-        set +e
+        @set +e
         assert-execution "$name" &>"$testresult"; test_retval="$?"
-        set -e
+        @set -e
         if [[ "$name" == test-ASSERT-FAIL-* ]]; then
             test_retval="$(( test_retval == 0?1:0 ))"
             test_name_assert_fail="${color_err}ASSERT FAIL${color_end}"
@@ -406,7 +406,7 @@ function assert-execution() (
     @pushd "${bach_tmpdir}/test_root" &>/dev/null
     declare retval=1
 
-    exec 7>&2
+    @exec 7>&2
 
     function command_not_found_handle() {
         declare mockfunc bach_cmd_name="$1"
@@ -428,7 +428,7 @@ function assert-execution() (
 
     function __bach__pre_run_test_and_assert() {
         @trap - EXIT RETURN
-        set +euo pipefail
+        @set +euo pipefail
         declare -gxr PATH=bach-fake-path
         _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
     }

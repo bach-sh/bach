@@ -478,11 +478,61 @@ test-forbidden-running-mock-inside-assertion-assert() {
 }
 
 test-mock-cd-builtin-command() {
-    exec 2>&1
+    @exec 2>&1
     cd /path
 }
 test-mock-cd-builtin-command-assert() {
     @dryrun cd /path
+}
+
+test-builtin-true()  {
+    true
+    @assert-success
+}
+
+test-builtin-false() {
+    false
+    @assert-fail
+}
+
+test-builtin-exec() {
+    @exec 2>&1
+    exec '7>&2'
+}
+test-builtin-exec-assert() {
+    @dryrun exec '7>&2'
+}
+
+test-builtin-pushd() {
+    @exec 2>&1
+    pushd /path
+}
+test-builtin-pushd-assert() {
+    @dryrun pushd /path
+}
+
+test-builtin-popd() {
+    @exec 2>&1
+    popd
+}
+test-builtin-popd-assert() {
+    @dryrun popd
+}
+
+test-builtin-type() {
+    @exec 2>&1
+    type -a ls
+}
+test-builtin-type-assert() {
+    @dryrun type -a ls
+}
+
+test-builtin-trap() {
+    @exec 2>&1
+    trap - EXIT
+}
+test-builtin-trap-assert() {
+    @dryrun trap - EXIT
 }
 
 test-mock-echo-builtin-command() {
