@@ -50,7 +50,7 @@ if [[ "${BACH_DEBUG:-}" != true ]]; then
         :
     }
 else
-    @exec 8>&2
+    exec 8>&2
     function @debug() {
         builtin printf '[DEBUG] %s\n' "$*"
     } >&8
