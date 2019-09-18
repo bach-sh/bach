@@ -14,7 +14,7 @@ export PS4='+ ${FUNCNAME:-}:${LINENO} '
 declare -gxa bach_origin_paths=()
 while builtin read -r -d: folder; do
     bach_origin_paths+=("$folder")
-done <<< "${PATH}"
+done <<< "${PATH}:"
 
 function @out() {
     if [[ "${1:-}" == "-" || ! -t 0 ]]; then
