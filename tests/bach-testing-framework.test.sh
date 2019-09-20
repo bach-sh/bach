@@ -264,6 +264,10 @@ function load-gp() {
     @load_function "${curr_dir}/example-functions" gp
 }
 
+function load-gpr() {
+    @load_function "${curr_dir}/example-functions" gpr
+}
+
 test-gp-running-inside-a-git-repo-and-the-branch-has-upstream() {
     load-gp
 
@@ -294,6 +298,17 @@ test-gp-running-inside-a-git-repo-and-the-branch-does-not-have-upstream-assert()
     git push -u another-remote branch-name
     git push -u another-remote another-branch
     git push -f -u remote-master branch-name
+}
+
+test-gpr-typical() {
+    load-gpr
+    gpr
+}
+test-gpr-typical-assert() {
+    gp
+    sed 's/^.*: //'
+    git reflog -1
+    hub  pull-request  -F-
 }
 
 function init-current-working-dir-is-not-a-repo() {
@@ -1151,3 +1166,5 @@ test-ASSERT-FAIL-bach-framework-one-fail-and-one-success-should-be-fail() {
     @assert-fail
     @assert-success
 }
+
+BACH_TESTS="test-gpr-typical"

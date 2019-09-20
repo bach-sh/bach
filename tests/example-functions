@@ -24,6 +24,13 @@ function gp() {
     git push "${gp_opts[@]}"
 }
 
+unalias gpr &>/dev/null || true
+function gpr() {
+    gp
+    last_commit_message=$(git reflog -1 | sed 's/^.*: //')
+    hub pull-request -F- <<<"WIP $last_commit_message"
+}
+
 function ff() {
     declare -a ff_opts=(-name "${1:+*$1}*");
     [[ "$#" -ge 1 ]] && shift
