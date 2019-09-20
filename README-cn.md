@@ -6,6 +6,8 @@ Bach is a [Bash](https://www.gnu.org/software/bash/) testing framework, can be u
 
 [Bach](https://bach.sh) 是一个 Bash 脚本测试框架，可以用来测试包含了类似 `rm -rf /` 这样危险命令的脚本，不会给你惊喜，不会让你感到痛苦。
 
+- 网站: https://bach.sh
+- 代码: https://github.com/bach-sh/bach
 - [See the English version of this document](README.md)
 
 ## Bach 入门
@@ -541,7 +543,7 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
 ## 版本
 
-Bach 当前最新的版本是 0.2，查看[Bach 的发布列表](https://github.com/bach-sh/bach/releases)
+Bach 当前最新的版本是 0.2.2，查看[Bach 的发布列表](https://github.com/bach-sh/bach/releases)
 
 ## 作者
 
@@ -550,7 +552,8 @@ Bach 当前最新的版本是 0.2，查看[Bach 的发布列表](https://github.
 ## 版权
 
 Bach 测试框架采用了双版权协议：
-- GPL 3.0
-- MPL 2.0
 
-请查看 [LICENSE.md](LICENSE.md)。
+- [GNU General Public License v3.0](LICENSE.GPL-3.0)
+- [Mzilla Public License 2.0](LICENSE.MPL-2.0)
+
+请查看 [LICENSE](LICENSE)。

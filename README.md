@@ -6,6 +6,8 @@
 
 Bach is a Bash testing framework, can be used to test scripts that contain dangerous commands like rm -rf /. No surprises, no pain.
 
+- Website: https://bach.sh
+- Repo: https://github.com/bach-sh/bach
 - [查看本文档的中文版](README-cn.md)
 
 ## Getting Started
@@ -484,7 +486,7 @@ Output content on the stdout console, one line per parameter.
 
 ## Versioning
 
-The latest version of Bach is 0.2. See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
+The latest version of Bach is 0.2.2, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
 
 ## Author
 
@@ -493,7 +495,8 @@ The latest version of Bach is 0.2. See [Bach Releases](https://github.com/bach-s
 ## Licenses
 
 Bach Testing Framework is dual licensed under:
-- GNU General Public License v3.0
-- Mzilla Public License 2.0
 
-See [LICENSE.md](LICENSE.md) for more.
+- [GNU General Public License v3.0](LICENSE.GPL-3.0)
+- [Mzilla Public License 2.0](LICENSE.MPL-2.0)
+
+See [LICENSE](LICENSE) for more.
