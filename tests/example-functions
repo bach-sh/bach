@@ -24,6 +24,16 @@ function gp() {
     git push "${gp_opts[@]}"
 }
 
+function gpr() {
+    gp "$@"
+    git log -1 --pretty="${GPPR_PREFIX:+$GPPR_PREFIX }%B" |
+    hub pull-request -F-
+}
+
+function gpw() {
+    GPPR_PREFIX="WIP" gpr "$@"
+}
+
 function ff() {
     declare -a ff_opts=(-name "${1:+*$1}*");
     [[ "$#" -ge 1 ]] && shift
