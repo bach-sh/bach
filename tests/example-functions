@@ -24,11 +24,14 @@ function gp() {
     git push "${gp_opts[@]}"
 }
 
-unalias gpr &>/dev/null || true
 function gpr() {
-    gp
-    last_commit_message=$(git reflog -1 | sed 's/^.*: //')
-    hub pull-request -F- <<<"WIP $last_commit_message"
+    gp "$@"
+    git log -1 --pretty="${GPPR_PREFIX:+$GPPR_PREFIX }%B" |
+    hub pull-request -F-
+}
+
+function gpw() {
+    GPPR_PREFIX="WIP" gpr "$@"
 }
 
 function ff() {

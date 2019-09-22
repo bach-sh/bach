@@ -264,10 +264,6 @@ function load-gp() {
     @load_function "${curr_dir}/example-functions" gp
 }
 
-function load-gpr() {
-    @load_function "${curr_dir}/example-functions" gpr
-}
-
 test-gp-running-inside-a-git-repo-and-the-branch-has-upstream() {
     load-gp
 
@@ -300,15 +296,34 @@ test-gp-running-inside-a-git-repo-and-the-branch-does-not-have-upstream-assert()
     git push -f -u remote-master branch-name
 }
 
+function load-gpr() {
+    @load_function "${curr_dir}/example-functions" gpr
+    @load_function "${curr_dir}/example-functions" gpw
+}
+
 test-gpr-typical() {
+    @mock git log -1 --pretty=%B === @out "This is the latest commit message"
+    @mock hub pull-request -F-
     load-gpr
-    gpr
+
+    gpr -f
 }
 test-gpr-typical-assert() {
-    gp
-    sed 's/^.*: //'
-    git reflog -1
-    hub  pull-request  -F-
+    gp -f
+    @out "This is the latest commit message"
+}
+
+
+test-gpw-typical() {
+    @mock git log -1 --pretty="WIP %B" === @out "WIP This is the latest commit message"
+    @mock hub pull-request -F-
+    load-gpr
+
+    gpw -u
+}
+test-gpw-typical-assert() {
+    gp -u
+    @out "WIP This is the latest commit message"
 }
 
 function init-current-working-dir-is-not-a-repo() {
@@ -1167,4 +1182,3 @@ test-ASSERT-FAIL-bach-framework-one-fail-and-one-success-should-be-fail() {
     @assert-success
 }
 
-BACH_TESTS="test-gpr-typical"
