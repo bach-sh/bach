@@ -427,6 +427,14 @@ function assert-execution() (
     export -f command_not_found_handle
 
     function __bach__pre_run_test_and_assert() {
+        if [[ ! -t 0 ]]; then
+            for ptmx in /dev/ptmx /dev/pts/ptmx; do
+                if [[ -c "$ptmx" ]]; then
+                    exec 0<"$ptmx"
+                    break
+                fi
+            done
+        fi
         @trap - EXIT RETURN
         @set +euo pipefail
         declare -gxr PATH=bach-fake-path
