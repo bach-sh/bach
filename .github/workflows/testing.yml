@@ -1,0 +1,20 @@
+name: Testing Bach
+
+on: [push]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+    
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+    - name: Test Shell Common Functions Library
+      run: ./run-tests.sh
