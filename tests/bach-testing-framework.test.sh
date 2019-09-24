@@ -527,6 +527,7 @@ test-builtin-false() {
 
 test-builtin-exec() {
     @exec 2>&1
+    @mock exec
     exec '7>&2'
 }
 test-builtin-exec-assert() {

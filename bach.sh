@@ -188,7 +188,7 @@ function bach-run-tests() {
         BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
     fi
 
-    @mockall cd echo exec popd pushd pwd trap type
+    @mockall cd echo popd pushd pwd trap type
 
     declare color_ok color_err color_end
     if [[ "$BACH_COLOR" == "always" ]] || [[ "$BACH_COLOR" != "no" && -t 1 && -t 2 ]]; then
@@ -406,7 +406,7 @@ function assert-execution() (
     @pushd "${bach_tmpdir}/test_root" &>/dev/null
     declare retval=1
 
-    @exec 7>&2
+    exec 7>&2
 
     function command_not_found_handle() {
         declare mockfunc bach_cmd_name="$1"
