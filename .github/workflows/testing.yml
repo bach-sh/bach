@@ -16,5 +16,5 @@ jobs:
     - uses: actions/checkout@master
       with:
         submodules: true
-    - name: Test Shell Common Functions Library
+    - name: Test Bach Testing Framework
       run: ./run-tests.sh
