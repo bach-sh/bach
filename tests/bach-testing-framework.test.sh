@@ -1204,3 +1204,10 @@ test-ASSERT-FAIL-bach-framework-one-fail-and-one-success-should-be-fail() {
     @assert-success
 }
 
+
+test-API-do-nothing() {
+    @do-nothing
+}
+test-API-do-nothing-assert() {
+    @true
+}

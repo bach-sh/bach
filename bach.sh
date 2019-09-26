@@ -560,3 +560,8 @@ function @assert-success() {
     @assert-equals "$expected" "$actual"
 }
 export -f @assert-success
+
+function @do-nothing() {
+    :
+}
+export -f @do-nothing
