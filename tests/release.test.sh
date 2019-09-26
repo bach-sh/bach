@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+curr_dir="$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"
+source "${curr_dir}"/../bach.sh
+
+@setup-test {
+    @ignore echo
+    @mocktrue sed -Ene '/^## Versioning$/,+2p' README.md
+}
+
+test-ASSERT-FAIL-without-parameters() {
+    @run release.sh
+}
+
+
+test-pass-a-valid-tag() {
+    @mock git tag --list 1.2.3 === @out 1.2.3
+    @mocktrue grep -F 1.2.3
+    @run release.sh 1.2.3
+}
+test-pass-a-valid-tag-assert() {
+    git push
+    git push --tags
+    hub release create -m "v1.2.3
+
+Version 1.2.3" 1.2.3
+}
+
+
+test-pass-a-valid-tag-but-readme-not-updated() {
+    @mock git tag --list 1.2.4 === @out 1.2.4
+    @mockfalse grep -F 1.2.4
+    @run release.sh 1.2.4
+}
+test-pass-a-valid-tag-but-readme-not-updated-assert() {
+    @false
+}
+
+
+test-pass-a-non-existed-tag() {
+    @mocktrue git tag --list 42.0
+    @run release.sh 42.0
+}
+test-pass-a-non-existed-tag-assert() {
+    @false
+}
