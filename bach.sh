@@ -75,9 +75,15 @@ function bach_initialize(){
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
-    for name in eval source; do
+    for name in eval; do
         eval "function @${name}() { builtin $name \"\$@\"; }; export -f @${name}"
     done
+
+    function @source() {
+        declare script="$1"
+        shift
+        builtin source "$script" "$@"
+    }
 
     for name in echo pwd test; do
         declare -grx "_${name}"="$(bach-real-path "$name")"

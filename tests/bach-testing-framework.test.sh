@@ -144,6 +144,27 @@ test-run-with-no-filename-assert() {
     @fail
 }
 
+
+test-run-script-filename-only() {
+    @unset -f @source
+    BACH_STARTUP_PWD=/path/to/testing/folder
+    @run foo.sh
+}
+test-run-script-filename-only-assert() {
+    @dryrun @source /path/to/testing/folder/foo.sh
+}
+
+
+test-run-script-filename-only-with-parameters() {
+    @unset -f @source
+    BACH_STARTUP_PWD=/path/to/testing/folder
+    @run foo.sh bar baz
+}
+test-run-script-filename-only-with-parameters-assert() {
+    @dryrun @source /path/to/testing/folder/foo.sh bar baz
+}
+
+
 test-mock-command-which-something() {
     @mock command which something === fake-something
     command which something
