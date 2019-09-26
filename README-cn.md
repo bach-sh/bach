@@ -71,7 +71,7 @@ Bach 的安装很简单，只需要下载到你的项目中，在测试脚本中
 例子：
 
     source bach.sh
-    
+
     test-rm-rf() {
         project_log_path=/tmp/project/logs
         sudo rm -rf "$project_log_ptah/" # 这里写错了变量名，Bash 默认让变量变成空字符串，这可能是个严重的问题！
@@ -246,7 +246,7 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
     true # 这个命令的返回值为 0，则断言会成功
     @assert-fail
-    
+
     false # 这个命令的返回值不为 0，则断言会失败
     @assert-fail
 
@@ -338,7 +338,9 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
 模拟命令或脚本的执行，如果命令执行的时候需要指定不同的参数，那就需要多次模拟。
 
-注意，如果要模拟一个脚本的执行，该脚本的路径必须是相对路径，不能模拟绝对路径的脚本。
+注意：
+- 如果要模拟一个脚本的执行，该脚本的路径必须是相对路径，不能模拟绝对路径的脚本。
+- 多次模拟一个命令，只有最后一次的模拟生效
 
 使用 `===` 来分割命令和输出
 
@@ -347,15 +349,15 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 #### 模拟命令
 
     @mock ls file1 === @stdout file2
-    
+
     ls file1 # 会在控制台输出 file2，列出文件 `file1`，但显示的是 `file2`，很怪，对不对？
-    
+
     ls foo bar # 因为没有模拟 `ls` 命令和特定的参数，所以 `ls foo bar` 需要被验证
 
 #### 模拟命令，但希望使用复杂的实现
 
 例子：
-    
+
     @mock ls <<<\CMD
       if [[ "$var" -eq 1 ]]; then
         @stdout one
@@ -363,14 +365,14 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
         @stdout others
       fi
     CMD
-    
-    
+
+
     var=1
     ls # 会输出 one，因为变量 `var` 的值是 `1`
 
     @unset var
     ls # 会输出 others，因为还没有定义变量 `var`
-    
+
 ### @@mock
 
 模拟命令的多次执行返回不同的值。

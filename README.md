@@ -34,7 +34,7 @@ For example:
 
     test-rm-rf() {
         # Write your test case
-    
+
         project_log_path=/tmp/project/logs
         sudo rm -rf "$project_log_ptah/" # Typo here!
     }
@@ -58,7 +58,7 @@ For example:
 
         rm -rf ~/src/your-awesome-project/.git ~/src/code/.git
     }
-    
+
 See [tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh) for more examples.
 
 ### Write test cases
@@ -68,7 +68,7 @@ Unlike the other testing frameworks, A standard test case of Bach is composed of
 For example:
 
     source bach.sh
-    
+
     test-rm-rf() {
         project_log_path=/tmp/project/logs
         sudo rm -rf "$project_log_ptah/" # Typo! 
@@ -174,34 +174,34 @@ For examples:
 
     test-xargs-no-dash-dash() {
         @mock ls === @stdout foo bar
-        
+
         ls | xargs -n1 rm -v
     }
     test-xargs-no-dash-dash-assert() {
         xargs -n1 rm -v
     }
-    
+
 
     test-xargs() {
         @mock ls === @stdout foo bar
-        
+
         ls | xargs -n1 -- rm -v
     }
     test-xargs-assert() {
         rm -v foo
         rm -v bar
     }
-    
+
 
     test-xargs-0() {
         @mock ls === @stdout foo bar
-        
+
         ls | xargs -- rm -v
     }
     test-xargs-0-assert() {
         rm -v foo bar
     }
-    
+
 ### Configure Bach
 
 There are some environment variables starting with `BACH_` for configuring Bach Festing Framework.
@@ -305,7 +305,7 @@ Output error message on stderr console
 
     test-ignore-echo() {
         @ignore echo
-        
+
         echo Updating APT caches
         apt-get update
     }
@@ -319,7 +319,7 @@ Loading a function definenation from a script.
 
     test-gp() {
         @load_function ./examples/example-functions gp
-        
+
         gp -f
     }
     test-gp-assert() {
@@ -330,7 +330,10 @@ Loading a function definenation from a script.
 
 Mock commands or scripts.
 
-Note: cannot mock commands that have absolute paths.
+Note:
+
+- cannot mock commands that have absolute paths.
+- Mock a command multiple times, only the last mock takes effect
 
 Use `===` to split commands and output
 
@@ -347,14 +350,14 @@ For example:
     }
     test-mock-ls-assert() {
         @out file2 # To list file1, but got file2, It's strange, right?
-        
+
         ls foo bar
     }
 
 #### Mock commands with complex implementations
 
 For example:
-    
+
     test-mock-foobar() {
       @mock foobar <<<\CMD
         if [[ "$var" -eq 1 ]]; then
@@ -363,7 +366,7 @@ For example:
           @stdout others
         fi
     CMD
-    
+
       var=1 foobar
       foobar
     }
@@ -371,7 +374,37 @@ For example:
       @out one
       @out others
     }
-    
+
+### @@mock
+
+Mock the same command but return different values.
+
+For example:
+
+    test-mock-function-multiple-times() {
+        @@mock random numbers === @out num 1
+        @@mock random numbers === @out num 22
+        @@mock random numbers === @out num 333
+
+        random
+        random hello
+        random numbers
+        random numbers
+        random numbers
+        random numbers
+    }
+    test-mock-function-multiple-times-assert() {
+        @dryrun random
+        @dryrun random hello
+
+        @cat << EOF
+    num 1
+    num 22
+    num 333
+    num 333
+    EOF
+    }
+
 ### @mockall
 
 Mock many simple commands
