@@ -280,6 +280,24 @@ This API has the following aliases:
 - `do_not_panic`
 - `dont_panic`
 
+### @do-nothing
+
+Do nothing.
+
+Usually there is only this API in asserting funciongs to verify that no any commands to be executed in testing functions.
+
+For example:
+
+    test-nothing() {
+        declare i=9
+        if [[ "$i" -eq 0 ]]; then
+            do-something
+        fi
+    }
+    test-nothing-assert() {
+        @do-nothing
+    }
+
 ### @dryrun
 
 Bach uses `@dryrun` API to dry run commands by default.
