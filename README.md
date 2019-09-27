@@ -20,7 +20,7 @@ Bach Testing Framework is a **real** unit testing framework. All commands in the
 
 ### Installing
 
-Installing Bach Testing Framework is very simple. Download `bach.sh` to your project, use the `source` command to import `bach.sh`.
+Installing Bach Testing Framework is very simple. Download [bach.sh](https://github.com/bach-sh/bach/raw/master/bach.sh) to your project, use the `source` command to import `bach.sh`.
 
 For example:
 

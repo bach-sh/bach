@@ -20,7 +20,7 @@ Bach 需要 Bash v4.3 或更高版本，也已经在 Linux/macOS/Cygwin/Git Bash
 
 ### 安装 Bach
 
-Bach 的安装很简单，只需要下载到你的项目中，在测试脚本中用 `source` 命令导入 Bach 框架的 `bach.sh` 即可。
+Bach 的安装很简单，只需要下载 [bach.sh](https://github.com/bach-sh/bach/raw/master/bach.sh) 到你的项目中，在测试脚本中用 `source` 命令导入 Bach 框架的 `bach.sh` 即可。
 
 比如：
 
