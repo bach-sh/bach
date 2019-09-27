@@ -38,6 +38,7 @@ function err() {
 } >&2
 
 retval=0
+cd "$(dirname "${BASH_SOURCE}")"
 for file in tests/*.test.sh examples/learn*; do
     out "Running $file"
     if grep -E "^[[:blank:]]*BACH_TESTS=.+" "$file"; then
