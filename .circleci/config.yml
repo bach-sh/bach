@@ -1,0 +1,35 @@
+version: 2.1
+
+jobs:
+  test-on-4_3:
+    docker:
+      - image: bash:4.3
+    steps: &step
+      - run: apk update
+      - run: apk add git
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+      - run: ./run-tests.sh
+  test-on-4_4:
+    docker:
+      - image: bash:4.4
+    steps: *step
+  test-on-5:
+    docker:
+      - image: bash:5
+    steps: *step
+  test-on-devel:
+    docker:
+      - image: bash:devel
+    steps: *step
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test-on-4_3
+      - test-on-4_4
+      - test-on-5
+      - test-on-devel
+
