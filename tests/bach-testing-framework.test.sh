@@ -652,6 +652,46 @@ test-xargs-with-double-dashes-assert() {
     do-something bar with other parameters
 }
 
+
+test-xargs-complicated-command() {
+    @mock ls === @stdout foo bar foobar
+    ls | xargs -n2 -- bash -c "do-something \$@" -s
+}
+test-xargs-complicated-command-assert() {
+    bash -c 'do-something $@' -s foo bar
+    bash -c 'do-something $@' -s foobar
+}
+
+
+test-xargs-complicated-command-curly-brackets() {
+    @mock ls === @stdout foo bar foobar
+    ls | xargs -n2 -- bash -c 'do-something ${@}' -s
+}
+test-xargs-complicated-command-curly-brackets-assert() {
+    bash -c 'do-something ${@}' -s foo bar
+    bash -c 'do-something ${@}' -s foobar
+}
+
+
+test-xargs-complicated-command-curly-brackets-expressions() {
+    @mock ls === @stdout foo bar foobar
+    ls | xargs -n2 -- bash -c 'do-something ${@//aaa/xxx}' -s
+}
+test-xargs-complicated-command-curly-brackets-expressions-assert() {
+    bash -c 'do-something ${@//aaa/xxx}' -s foo bar
+    bash -c 'do-something ${@//aaa/xxx}' -s foobar
+}
+
+
+test-xargs-complicated-command-without-dash-dash() {
+    @mock ls === @stdout foo bar foobar
+    ls | xargs -n2 bash -c 'do-something ${@//aaa/xxx}' -s
+}
+test-xargs-complicated-command-without-dash-dash-assert() {
+    xargs -n2 bash -c 'do-something ${@//aaa/xxx}' -s
+}
+
+
 test-bach-framework-set--e-should-work() {
     set -e
 

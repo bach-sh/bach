@@ -175,7 +175,7 @@ function bach-run-tests() {
         while param="${1:-}"; [[ -n "$param" ]]; do
             shift || true
             if [[ "$param" == "--" ]]; then
-                xargs_opts+=("${BASH:-bash}" "-c" "$* \$@" "-s")
+                xargs_opts+=("${BASH:-bash}" "-c" "$(printf "'%s' " "$@") \$@" "-s")
                 break
             else
                 xargs_opts+=("$param")
