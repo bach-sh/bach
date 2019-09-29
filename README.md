@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/bach-sh/bach.svg)](https://travis-ci.org/bach-sh/bach)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![License: MPL v2](https://img.shields.io/badge/License-MPL%20vr-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
+[![License: MPL v2](https://img.shields.io/badge/License-MPL%20v2-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
 
 
 ## Bach
