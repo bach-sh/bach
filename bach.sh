@@ -60,6 +60,7 @@ export -f @debug
 function bach-real-path() {
     declare folder name="$1"
     declare altname="${name#*|}"
+    name="${name%|*}"
     for folder in "${bach_origin_paths[@]}"; do
         if [[ -x "$folder/$name" ]]; then
            builtin echo "$folder/$name"

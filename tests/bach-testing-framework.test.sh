@@ -209,13 +209,29 @@ function setup-bach-real-path() {
     @chmod +x usr/bin/sha1sum
 }
 
+
 test-bach-real-path-typical() {
+    setup-bach-real-path
+
+    @rm usr/bin/sha1sum
+
+    @touch bin/shasum
+    @chmod +x bin/shasum
+
+    bach-real-path 'shasum|sha1sum'
+}
+test-bach-real-path-typical-assert() {
+    @out bin/shasum
+}
+
+
+test-bach-real-path-fallback() {
     setup-bach-real-path
 
     bach-real-path sha1sum
     bach-real-path 'shasum|sha1sum'
 }
-test-bach-real-path-typical-assert() {
+test-bach-real-path-fallback-assert() {
     @out usr/bin/sha1sum
     @out usr/bin/sha1sum
 }
