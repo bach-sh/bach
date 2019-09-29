@@ -9,7 +9,7 @@ set -euo pipefail
 shopt -s expand_aliases
 
 export BACH_COLOR="${BACH_COLOR:-auto}"
-export PS4='+ ${FUNCNAME:-}:${LINENO} '
+export PS4='+(${BASH_SOURCE##*/}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 declare -gxa bach_origin_paths=()
 while builtin read -r -d: folder; do
