@@ -49,7 +49,7 @@ for file in tests/*.test.sh examples/learn*; do
 done
 
 if [[ "$retval" -ne 0 ]]; then
-    echo "Test failed!"
+    err "Test failed!"
 fi
 
 exit "$retval"
