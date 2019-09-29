@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
+set -euo pipefail
 curr_dir="$(cd "$(dirname "$BASH_SOURCE")"; pwd -P)"
 source "${curr_dir}"/../bach.sh
 
 # export BACH_DISABLED=false
 # export BACH_COLOR=auto
-# export BACH_DEBUG=true
+# export BACH_DEBUG=false
 # export BACH_ASSERT_DIFF=diff
 # export BACH_ASSERT_IGNORE_COMMENT=true
 # declare -a BACH_ASSERT_DIFF_OPTS=(-u)
@@ -197,6 +198,33 @@ test-mock-builtin-command-with-external-commands2() {
 test-mock-builtin-command-with-external-commands2-assert() {
     @echo function
     @echo myoutput
+}
+
+
+function setup-bach-real-path() {
+    declare -ag bach_origin_paths=(bin sbin opt/bin usr/bin usr/sbin)
+    @mkdir -p "${bach_origin_paths[@]}"
+
+    @touch usr/bin/sha1sum
+    @chmod +x usr/bin/sha1sum
+}
+
+test-bach-real-path-typical() {
+    setup-bach-real-path
+
+    bach-real-path sha1sum
+    bach-real-path 'shasum|sha1sum'
+}
+test-bach-real-path-typical-assert() {
+    @out usr/bin/sha1sum
+    @out usr/bin/sha1sum
+}
+
+
+test-ASSERT-FAIL-bach-real-path-not-found() {
+    setup-bach-real-path
+
+    bach-real-path foobar
 }
 
 

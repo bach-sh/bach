@@ -18,7 +18,11 @@ Bach 作为一个真正的单元测试框架，意味着任何在 PATH 环境变
 
 ### Bach 的依赖
 
-Bach 需要 Bash v4.3 或更高版本，也已经在 Linux/macOS/Cygwin/Git Bash 等运行环境中验证通过。
+Bach 需要 Bash v4.3 或更高版本。在 GNU/Linux 上还需要 Coreutils 和 Diffutils，在常用的发行版中都已经默认安装好了。Bach 在 Linux/macOS/Cygwin/Git Bash 等运行环境中验证通过。
+
+- [Bash](https://www.gnu.org/software/bash/) v4.3+
+- [Coreutils](https://www.gnu.org/software/coreutils/coreutils.html) (*GNU/Linux*)
+- [Diffutils](https://www.gnu.org/software/diffutils/diffutils.html) (*GNU/Linux*)
 
 ### 安装 Bach
 

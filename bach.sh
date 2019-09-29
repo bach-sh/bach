@@ -59,17 +59,22 @@ export -f @debug
 
 function bach-real-path() {
     declare folder name="$1"
+    declare altname="${name#*|}"
     for folder in "${bach_origin_paths[@]}"; do
-        [[ -x "$folder/$name" ]] || continue
-        builtin echo "$folder/$name"
-        return 0
+        if [[ -x "$folder/$name" ]]; then
+           builtin echo "$folder/$name"
+           return 0
+        elif [[ "$name" != "$altname" && -x "$folder/$altname" ]]; then
+            builtin echo "$folder/$altname"
+            return 0
+        fi
     done
     return 1
 }
 export -f bach-real-path
 
 function bach_initialize(){
-    declare name
+    declare util name
 
     for name in cd command echo exec false popd pushd pwd set trap true type unset; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
@@ -89,10 +94,11 @@ function bach_initialize(){
         declare -grx "_${name}"="$(bach-real-path "$name")"
     done
 
-    declare -a bach_core_utils=(cat chmod cut diff find env grep ls shasum mkdir mktemp rm rmdir sed sort tee touch which xargs)
+    declare -a bach_core_utils=(cat chmod cut diff find env grep ls "shasum|sha1sum" mkdir mktemp rm rmdir sed sort tee touch which xargs)
 
-    for name in "${bach_core_utils[@]}"; do
-        declare -grx "_${name}"="$(bach-real-path "$name")"
+    for util in "${bach_core_utils[@]}"; do
+        name="${util%|*}"
+        declare -grx "_${name}"="$(bach-real-path "$util")"
         eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
     @unset name

@@ -19,7 +19,9 @@ Bach Testing Framework is a **real** unit testing framework. All commands in the
 
 ### Prerequisites
 
-- Bash v4.3+
+- [Bash](https://www.gnu.org/software/bash/) v4.3+
+- [Coreutils](https://www.gnu.org/software/coreutils/coreutils.html) (*GNU/Linux*)
+- [Diffutils](https://www.gnu.org/software/diffutils/diffutils.html) (*GNU/Linux*)
 
 ### Installing
 

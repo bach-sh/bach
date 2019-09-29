@@ -22,7 +22,7 @@ case "$OS_NAME" in
         ;;
     Linux-alpine-*)
         apk update
-        apk add coreutils diffutils perl-utils
+        apk add coreutils diffutils
         ;;
 esac
 
