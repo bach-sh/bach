@@ -493,8 +493,13 @@ function assert-execution() (
 )
 
 function @ignore() {
-    declare bach_test_name="$1"
-    eval "function $bach_test_name() { : ignore command '$bach_test_name'; }"
+    declare name="$1"
+    eval "function ${name}() {
+              declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\";
+              if bach--is-function \"\$mockfunc\"; then
+                  \"\${mockfunc}\" \"\$@\";
+              else [[ -t 0 ]] || @cat; fi
+          }; export -f ${name}"
 }
 export -f @ignore
 
@@ -572,3 +577,11 @@ function @do-nothing() {
     :
 }
 export -f @do-nothing
+
+function @unmock() {
+    declare name="${1:?missing command name}"
+    if bach--is-function "$name"; then
+        unset -f "$name"
+    fi
+}
+export -f @unmock

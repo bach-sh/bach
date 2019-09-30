@@ -1295,3 +1295,30 @@ test-API-do-nothing() {
 test-API-do-nothing-assert() {
     @true
 }
+
+
+test-ASSERT-FAIL-API-unmock-no-parameters() {
+    @unmock
+}
+
+
+test-API-unmock() {
+    @ignore echo
+    echo nothing happened
+    @unmock echo
+    echo show something
+}
+test-API-unmock-assert() {
+    @out show something
+}
+
+
+test-API-unmock-1() {
+    @mock echo foo === @out bar
+    echo foo
+    @unmock echo
+    echo foobar
+}
+test-API-unmock-1-assert() {
+    @stdout bar foobar
+}
