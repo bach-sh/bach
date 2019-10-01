@@ -20,6 +20,9 @@ case "$OS_NAME" in
             bash_bin="$(brew --prefix)"/bin/bash
         fi
         ;;
+    FreeBSD)
+        hash bash || pkg install -y bash
+        ;;
     Linux-alpine-*)
         apk update
         apk add coreutils diffutils
