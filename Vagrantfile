@@ -11,6 +11,11 @@ Vagrant.configure("2") do |config|
     docker run --rm -v /vagrant:/src \
                --name "test-bach-on-bash-${bash_version}" \
                bash:"$bash_version" /src/run-tests.sh
-  SHELL
+    SHELL
   end
+  config.vm.provision "Test Done", type: "shell", inline: <<-SHELL
+    echo ======================
+    echo Yes, all tests passed.
+    echo ======================
+  SHELL
 end
