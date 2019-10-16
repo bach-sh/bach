@@ -11,6 +11,7 @@ source "${curr_dir}"/../bach.sh
 # declare -a BACH_ASSERT_DIFF_OPTS=(-u)
 
 test-rm--rf() {
+    set +u
     @do-not-panic
     project_log_path=/tmp/project/logs
     sudo rm -rf "$project_log_ptah/" # Typo here!
@@ -260,6 +261,7 @@ this_variable_exists=""
 this_variable_exists_in_test=""
 this_variable_exists_in_assert=""
 @setup {
+    set -euo pipefail
     declare -g this_variable_exists=in_test_and_assert
     declare -g this_variable_exists_in_test=""
     declare -g this_variable_exists_in_assert=""
@@ -567,6 +569,7 @@ test-forbidden-running-mock-inside-assertion() {
     @dryrun @ignore foobar
 }
 test-forbidden-running-mock-inside-assertion-assert() {
+    set +e
     @type -t @mock 2>&1
     @mock anything === anything
     @ignore foobar
@@ -586,6 +589,8 @@ test-builtin-true()  {
 }
 
 test-builtin-false() {
+    set +e
+
     false
     @assert-fail
 }
@@ -729,6 +734,7 @@ test-xargs-complicated-command-curly-brackets-expressions-assert() {
 
 test-xargs-complicated-command-without-dash-dash() {
     @mock ls === @stdout foo bar foobar
+
     ls | xargs -n2 bash -c 'do-something ${@//aaa/xxx}' -s
 }
 test-xargs-complicated-command-without-dash-dash-assert() {
@@ -823,17 +829,21 @@ test-bach-framework-@fail-function-default-error-code-is-1-assert() {
 
 
 test-bach-framework-@fail-function-return-a-certain-error-code() {
+    set +e # needed by Bash v4.3
     @fail 42
 }
 test-bach-framework-@fail-function-return-a-certain-error-code-assert() {
+    set +e # needed by Bash v4.3
     builtin return 42
 }
 
 
 test-bach-framework-@fail-function-with-code-and-message() {
+    set +e # needed by Bash v4.3
     @fail 43 "the error code is 43"
 }
 test-bach-framework-@fail-function-with-code-and-message-assert() {
+    set +e # needed by Bash v4.3
     @out the error code is 43
     builtin return 43
 }
@@ -1026,7 +1036,6 @@ test-bach-framework-could-not-export-PATH() {
     [[ "$PATH" == "$new_path" ]]
 }
 test-bach-framework-could-not-export-PATH-assert() {
-    @dryrun ls -al foobar
     @fail
 }
 
@@ -1040,17 +1049,16 @@ test-bach-framework-could-not-declare-PATH() {
     [[ "$PATH" == "$new_path" ]]
 }
 test-bach-framework-could-not-declare-PATH-assert() {
-    @dryrun ls -al foobar
-
     @fail
 }
 
 
 test-bach-framework-could-not-set-PATH-for-a-command() {
     PATH=/bin:/usr/bin ls -al
+    we should not see this
 }
 test-bach-framework-could-not-set-PATH-for-a-command-assert() {
-    @dryrun ls -al
+    @fail
 }
 
 
@@ -1058,7 +1066,7 @@ test-bach-framework-could-not-set-PATH-by-full-path-of-env-command() {
     PATH=/bin:/usr/bin @env hostname
 }
 test-bach-framework-could-not-set-PATH-by-full-path-of-env-command-assert() {
-    @fail 127
+    @fail
 }
 
 
@@ -1144,8 +1152,12 @@ test-bach-framework-two-pipelines-when-mock-the-both-assert() {
 
 test-bach-framework-multi-pipelines() {
     @mock first
-    @mock second === @echo -n
+    @mock second === read
     @mock third 3
+
+    {
+        declare -pf first
+    } >&2
 
     @echo gone | first non mocking | second | third 3
 }
@@ -1155,6 +1167,7 @@ test-bach-framework-multi-pipelines-assert() {
 
 
 test-bach-framework-handles-an-empty-command() {
+    set +eo pipefail
     "" 7>&1 | @grep -Fq 'found an empty command'
     @assert-success
 }
@@ -1234,6 +1247,7 @@ test-ASSERT-FAIL-bach-framework-each-test-case-has-assert-fail() {
 
 
 test-bach-framework-API-@assert-fail() {
+    set +e
     @echo Every test case must have an assertion
     @false
     @assert-fail

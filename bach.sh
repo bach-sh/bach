@@ -179,7 +179,7 @@ function bach-run-tests() {
     function xargs() {
         declare param
         declare -a xargs_opts
-        while param="${1:-}"; [[ -n "$param" ]]; do
+        while param="${1:-}"; [[ -n "${param:-}" ]]; do
             shift || true
             if [[ "$param" == "--" ]]; then
                 xargs_opts+=("${BASH:-bash}" "-c" "$(printf "'%s' " "$@") \$@" "-s")
@@ -192,6 +192,7 @@ function bach-run-tests() {
         if [[ "$#" -gt 0 ]]; then
             @xargs "${xargs_opts[@]}"
         else
+            [[ -t 0 ]] || @cat &>/dev/null
             @dryrun xargs "${xargs_opts[@]}"
         fi
     }
@@ -284,7 +285,7 @@ function @mock() {
         shift
         name="$1"
     fi
-    desttype="$(@type -t "$name" )"
+    desttype="$(@type -t "$name" || true)"
     while param="${1:-}"; [[ -n "$param" ]]; do
         shift
         [[ "$param" == '===' ]] && break
