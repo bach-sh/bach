@@ -102,6 +102,16 @@ function bach_initialize(){
         declare -grx "_${name}"="$(bach-real-path "$util")"
         eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
+
+    if [[ ! -t 0 ]]; then
+        for name in /dev/ptmx /dev/pts/ptmx; do
+            if [[ -c "$name" ]]; then
+                exec 0<&-
+                exec 0<"$name"
+                break
+            fi
+        done
+    fi
     @unset name
 }
 
@@ -444,14 +454,6 @@ function assert-execution() (
     export -f command_not_found_handle
 
     function __bach__pre_run_test_and_assert() {
-        if [[ ! -t 0 ]]; then
-            for ptmx in /dev/ptmx /dev/pts/ptmx; do
-                if [[ -c "$ptmx" ]]; then
-                    exec 0<"$ptmx"
-                    break
-                fi
-            done
-        fi
         @trap - EXIT RETURN
         @set +euo pipefail
         declare -gxr PATH=bach-fake-path
