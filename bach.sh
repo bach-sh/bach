@@ -286,11 +286,14 @@ function @mock() {
         name="$1"
     fi
     desttype="$(@type -t "$name" || true)"
-    while param="${1:-}"; [[ -n "$param" ]]; do
-        shift
-        [[ "$param" == '===' ]] && break
+    for param; do
+        if [[ "$param" == '===' ]]; then
+            shift
+            break
+        fi
         cmd+=("$param")
     done
+    shift "${#cmd[@]}"
     if [[ "$name" == /* ]]; then
         @die "Cannot mock an absolute path: $name"
     elif [[ "$name" == */* ]] && [[ -e "$name" ]]; then

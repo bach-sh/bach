@@ -202,6 +202,15 @@ test-mock-builtin-command-with-external-commands2-assert() {
 }
 
 
+test-mock-there-is-an-empty-string-in-parameters() {
+    @mock foo abc "" def === bar
+    foo abc "" def
+}
+test-mock-there-is-an-empty-string-in-parameters-assert() {
+    @out bar
+}
+
+
 function setup-bach-real-path() {
     declare -ag bach_origin_paths=(bin sbin opt/bin usr/bin usr/sbin)
     @mkdir -p "${bach_origin_paths[@]}"
@@ -576,7 +585,6 @@ test-forbidden-running-mock-inside-assertion-assert() {
 }
 
 test-mock-cd-builtin-command() {
-    @exec 2>&1
     cd /path
 }
 test-mock-cd-builtin-command-assert() {
