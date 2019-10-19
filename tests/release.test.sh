@@ -18,7 +18,7 @@ test-ASSERT-FAIL-without-parameters() {
 
 
 test-pass-a-valid-tag() {
-    @mock git tag --list 1.2.3 === @out 1.2.3
+    @mock git tag --list 1.2.3 === @stdout 1.2.3
     @mocktrue grep -F 1.2.3
     release-sh 1.2.3
 }
@@ -32,7 +32,7 @@ Version 1.2.3" 1.2.3
 
 
 test-pass-a-valid-tag-but-readme-not-updated() {
-    @mock git tag --list 1.2.4 === @out 1.2.4
+    @mock git tag --list 1.2.4 === @stdout 1.2.4
     @mockfalse grep -F 1.2.4
     release-sh 1.2.4
 }

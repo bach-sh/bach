@@ -621,7 +621,6 @@ test-builtin-pushd-assert() {
 }
 
 test-builtin-popd() {
-    @exec 2>&1
     popd
 }
 test-builtin-popd-assert() {

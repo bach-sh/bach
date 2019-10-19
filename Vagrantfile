@@ -12,6 +12,7 @@ Vagrant.configure("2") do |config|
     config.vm.provision "Test on Bash-#{bash_version}", type: "shell", inline: <<-SHELL
       set -euo pipefail
       bash_version="#{bash_version}"
+      if [[ "$bash_version" == devel ]]; then docker pull bash:"$bash_version"; fi
       docker run --rm -v /vagrant:/src \
                  --name "test-bach-on-bash-${bash_version}" \
                  bash:"$bash_version" /src/run-tests.sh

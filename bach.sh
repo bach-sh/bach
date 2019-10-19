@@ -74,6 +74,23 @@ function bach-real-path() {
 }
 export -f bach-real-path
 
+export BACH_DEV_STDIN=""
+
+function bach_restore_stdin() {
+    if [[ ! -t 0 ]]; then
+        declare name
+        [[ -n "$BACH_DEV_STDIN" ]] || for name in /dev/ptmx /dev/pts/ptmx; do
+            if [[ -c "$name" ]]; then
+                ls -l "$name" >&2
+                BACH_DEV_STDIN="$name"
+                break
+            fi
+        done
+        exec 0<&-
+        exec 0<"$BACH_DEV_STDIN"
+    fi
+}
+
 function bach_initialize(){
     declare util name
 
@@ -103,16 +120,10 @@ function bach_initialize(){
         eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
-    if [[ ! -t 0 ]]; then
-        for name in /dev/ptmx /dev/pts/ptmx; do
-            if [[ -c "$name" ]]; then
-                exec 0<&-
-                exec 0<"$name"
-                break
-            fi
-        done
-    fi
     @unset name
+
+    bach_restore_stdin
+    @mockall cd echo popd pushd pwd trap type
 }
 
 function bach-real-command() {
@@ -211,8 +222,6 @@ function bach-run-tests() {
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
         BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
     fi
-
-    @mockall cd echo popd pushd pwd trap type
 
     declare color_ok color_err color_end
     if [[ "$BACH_COLOR" == "always" ]] || [[ "$BACH_COLOR" != "no" && -t 1 && -t 2 ]]; then
@@ -457,6 +466,7 @@ function assert-execution() (
         @trap - EXIT RETURN
         @set +euo pipefail
         declare -gxr PATH=bach-fake-path
+        bach_restore_stdin
         _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
     }
     function __bach__run_test() (
