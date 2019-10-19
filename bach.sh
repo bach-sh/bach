@@ -126,7 +126,7 @@ function bach_initialize(){
     @mockall cd echo popd pushd pwd trap type
 }
 
-function bach-real-command() {
+function @real() {
     declare name="$1"
     if [[ "$name" == */* ]]; then
         @echo "$@"
@@ -137,8 +137,7 @@ function bach-real-command() {
     @debug "[REAL-CMD]" "${cmd[@]}"
     "${cmd[@]}"
 }
-export -f bach-real-command
-alias @real=bach-real-command
+export -f @real
 
 function bach-get-all-functions() {
     declare -F
@@ -321,7 +320,9 @@ function @mock() {
     @debug "@mock $name"
     if [[ "$#" -gt 0 ]]; then
         @debug "@mock $name $*"
-        func="$*"
+        declare -a params=("$@")
+        func="$(declare -p params); \"\${params[@]}\""
+        #func="$*"
     elif [[ ! -t 0 ]]; then
         @debug "@mock $name @cat"
         func="$(@cat)"

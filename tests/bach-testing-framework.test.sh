@@ -127,8 +127,35 @@ EOF
 }
 
 
+test-@stdout-typical() {
+    @stdout abc 123
+}
+test-@stdout-typical-assert() {
+    @echo abc
+    @echo 123
+}
+
+
+test-@stdout-include-space() {
+    @stdout "abc 123" "def 456"
+}
+test-@stdout-include-space-assert() {
+    @echo abc 123
+    @echo def 456
+}
+
+
+test-mock-@stdout-include-space() {
+    @mock foo bar === @stdout "abc 123"
+    foo bar
+}
+test-mock-@stdout-include-space-assert() {
+    @echo abc 123
+}
+
+
 test-run-a-script() {
-    @mock load-script === @echo "'for param; do \"${_echo}\" \"script.sh - \$param\"; done'"
+    @mock load-script === @echo "for param; do \"${_echo}\" \"script.sh - \$param\"; done"
 
     @run <(load-script) foo bar
 }
@@ -138,6 +165,7 @@ script.sh - foo
 script.sh - bar
 EOF
 }
+
 
 test-run-with-no-filename() {
     @run
@@ -442,7 +470,7 @@ test-bach-real-command-mock-builtin-assert() {
 }
 
 test-bach-real-command-slash-bin() {
-    bach-real-command hostname -f
+    @real hostname -f
 }
 test-bach-real-command-slash-bin-assert() {
     /bin/hostname -f
@@ -906,6 +934,7 @@ test-bach-run-this
 test-bach-run-this-too
 TESTS
 }
+
 
 test-bach-framework-uses-multi-tests-filters-supports-glob() {
     export BACH_TESTS='bach-run-this*,*bar*'
