@@ -1202,6 +1202,56 @@ test-bach-framework-multi-pipelines-assert() {
 }
 
 
+test-bach-framework-pipeline-in-if-statement() {
+    @mock curl website
+    @mock sed something
+
+    if curl website | sed something; then
+        do-something
+    else
+        show-error
+    fi
+}
+test-bach-framework-pipeline-in-if-statement-assert() {
+    curl website
+    do-something
+}
+
+
+test-bach-framework-pipeline-in-if-statement-turn-off-pipefail() {
+    set +eo pipefail
+
+    @mock curl website
+    @mock sed something
+
+    if curl website | sed something; then
+        do-something
+    else
+        show-error
+    fi
+}
+test-bach-framework-pipeline-in-if-statement-turn-off-pipefail-assert() {
+    curl website
+    do-something
+}
+
+
+test-bach-framework-pipeline-in-if-statement-else() {
+    @mock curl website
+    @mockfalse sed something
+
+    if curl website | sed something; then
+        do-something
+    else
+        show-error
+    fi
+}
+test-bach-framework-pipeline-in-if-statement-else-assert() {
+    curl website
+    show-error
+}
+
+
 test-bach-framework-handles-an-empty-command() {
     set +eo pipefail
     "" 7>&1 | @grep -Fq 'found an empty command'

@@ -268,7 +268,7 @@ function bach-run-tests() {
         @rm "$testresult" &>/dev/null
     done
 
-    declare color_result=""
+    declare color_result="$color_ok"
     if (( error > 0 )); then
         color_result="$color_err"
     fi
