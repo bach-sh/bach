@@ -1,13 +1,12 @@
-#!/usr/bin/env bash
-set -uo pipefail
+#!/bin/sh
+set -ue
+[ -z "${DEBUG:-}" ] || set -x
 
 unset BACH_ASSERT_DIFF BACH_ASSERT_DIFF_OPTS
 PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
 
-bash_bin="$BASH"
-
 OS_NAME="$(uname)"
-if [[ -e /etc/os-release ]]; then
+if [ -e /etc/os-release ]; then
     source /etc/os-release
     OS_NAME="${OS_NAME}-${ID}-${VERSION_ID}"
 fi
@@ -16,12 +15,17 @@ case "$OS_NAME" in
         if ! brew list --full-name --versions bash &>/dev/null; then
             brew install bash
         fi
-        if [[ "$BASH" == /bin/bash ]]; then
-            bash_bin="$(brew --prefix)"/bin/bash
-        fi
+        bash_bin="$(brew --prefix)"/bin/bash
         ;;
     FreeBSD)
-        hash bash || pkg install -y bash
+        pkg_install_bash="pkg install -y bash"
+        if ! hash bash; then
+            if [ "$(id -u)" -gt 0 ] && hash sudo; then
+                sudo $pkg_install_bash
+            else
+                $pkg_install_bash
+            fi
+        fi
         ;;
     Linux-alpine-*)
         apk update
@@ -29,21 +33,23 @@ case "$OS_NAME" in
         ;;
 esac
 
-echo "$bash_bin"
+if [ -z "${bash_bin:-}" ]; then
+    bash_bin="$(which bash)"
+fi
+
+echo "Bash: $bash_bin"
+test -n "$bash_bin"
 "$bash_bin" --version
 
-function out() {
-    printf "\n\e[1;37;497;m%s\e[0;m\n" "$@"
-} >&2
+err() {
+  echo "$*" >&2
+}
 
-function err() {
-    printf "\n\e[1;37;41;m%s\e[0;m\n\n" "$@"
-} >&2
-
+set +e
 retval=0
-cd "$(dirname "${BASH_SOURCE}")"
+cd "$(dirname "$0")"
 for file in tests/*.test.sh examples/learn*; do
-    out "Running $file"
+    echo "Running $file"
     if grep -E "^[[:blank:]]*BACH_TESTS=.+" "$file"; then
         err "Found defination of BACH_TESTS in $file"
         retval=1
@@ -51,7 +57,7 @@ for file in tests/*.test.sh examples/learn*; do
     "$bash_bin" -euo pipefail "$file" || retval=1
 done
 
-if [[ "$retval" -ne 0 ]]; then
+if [ "$retval" -ne 0 ]; then
     err "Test failed!"
 fi
 
