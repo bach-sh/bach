@@ -1,0 +1,11 @@
+test_task:
+  test_script: ./run-tests.sh
+
+  matrix:
+    - name: freebsd
+      freebsd_instance:
+        image_family: freebsd-12-0
+    - name: bash-devel
+      container:
+        image: bash:devel
+
