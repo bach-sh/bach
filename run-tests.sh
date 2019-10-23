@@ -7,7 +7,7 @@ PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
 
 OS_NAME="$(uname)"
 if [ -e /etc/os-release ]; then
-    source /etc/os-release
+    . /etc/os-release
     OS_NAME="${OS_NAME}-${ID}-${VERSION_ID}"
 fi
 case "$OS_NAME" in
