@@ -82,8 +82,8 @@ export BACH_DEV_STDIN=""
 function bach_restore_stdin() {
     if [[ ! -t 0 ]]; then
         declare name
-        [[ -n "$BACH_DEV_STDIN" ]] || for name in /dev/ptmx /dev/pts/ptmx; do
-            if [[ -c "$name" ]]; then
+        [[ -n "$BACH_DEV_STDIN" ]] || for name in /dev/ptmx /dev/pts/ptmx /dev/ttyv[0-9a-f]; do
+            if [[ -r "$name" && -c "$name" ]]; then
                 ls -l "$name" >&2
                 BACH_DEV_STDIN="$name"
                 break
