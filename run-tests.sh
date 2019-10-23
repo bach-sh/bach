@@ -54,7 +54,7 @@ for file in tests/*.test.sh examples/learn*; do
         err "Found defination of BACH_TESTS in $file"
         retval=1
     fi
-    "$bash_bin" -euo pipefail "$file" || retval=1
+    "$bash_bin" -exuo pipefail "$file" || retval=1
 done
 
 if [ "$retval" -ne 0 ]; then
