@@ -11,6 +11,9 @@ shopt -s expand_aliases
 export BACH_COLOR="${BACH_COLOR:-auto}"
 export PS4='+(${BASH_SOURCE##*/}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
+BACH_OS_NAME="$(uname)"
+declare -gxr BACH_OS_NAME
+
 declare -gxa bach_origin_paths=()
 while builtin read -r -d: folder; do
     bach_origin_paths+=("$folder")
@@ -115,6 +118,9 @@ function bach_initialize(){
     declare -a bach_core_utils=(cat chmod cut diff find env grep ls "shasum|sha1sum" mkdir mktemp rm rmdir sed sort tee touch which xargs)
 
     for util in "${bach_core_utils[@]}"; do
+        if [[ "$util" == "shasum|"* && "$BACH_OS_NAME" == FreeBSD ]]; then
+            util="shasum|sha1"
+        fi
         name="${util%|*}"
         declare -grx "_${name}"="$(bach-real-path "$util")"
         eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
