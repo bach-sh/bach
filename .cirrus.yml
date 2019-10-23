@@ -1,5 +1,5 @@
 test_task:
-  test_script: DEBUG=true ./run-tests.sh
+  test_script: ./run-tests.sh
 
   matrix:
     - name: freebsd
