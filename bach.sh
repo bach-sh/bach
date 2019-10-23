@@ -278,6 +278,10 @@ function bach-run-tests() {
 }
 
 function bach-on-exit() {
+    if [[ -o xtrace ]]; then
+        exec 8>&2
+        BASH_XTRACEFD=8
+    fi
     if [[ "$?" -eq 0 ]]; then
         [[ "${BACH_DISABLED:-false}" == true ]] || bach-run-tests
     else
