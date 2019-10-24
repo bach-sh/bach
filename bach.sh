@@ -97,10 +97,10 @@ function bach_restore_stdin() {
 function bach_initialize(){
     declare util name
 
-    declare -a bash_builtin_cmds=(alias bg bind cd dirs disown echo enable exec fc fg hash help history jobs kill popd \
+    declare -a bash_builtin_cmds=(alias bg bind cd dirs disown echo enable fc fg hash help history jobs kill popd \
                                         pushd pwd shopt suspend test times trap type ulimit umask unalias wait)
 
-    for name in command false set true unset "${bash_builtin_cmds[@]}"; do
+    for name in command exec false set true unset "${bash_builtin_cmds[@]}"; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
