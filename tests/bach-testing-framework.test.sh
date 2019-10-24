@@ -1422,3 +1422,20 @@ test-API-unmock-1() {
 test-API-unmock-1-assert() {
     @stdout bar foobar
 }
+
+
+test-builtin-commands() {
+    for cmd in alias bg bind cd dirs disown echo enable exec fc fg
+               hash help history jobs kill popd pushd pwd shopt suspend
+               test times trap type ulimit umask unalias wait; do
+        @mock "$cmd" foobar
+        "$cmd" foobar
+    done
+}
+test-builtin-commands-assert() {
+    for cmd in alias bg bind cd dirs disown echo enable exec fc fg
+               hash help history jobs kill popd pushd pwd shopt suspend
+               test times trap type ulimit umask unalias wait; do
+        @dryrun "$cmd" foobar
+    done
+}

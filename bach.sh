@@ -97,7 +97,10 @@ function bach_restore_stdin() {
 function bach_initialize(){
     declare util name
 
-    for name in cd command echo exec false popd pushd pwd set trap true type unset; do
+    declare -a bash_builtin_cmds=(alias bg bind cd dirs disown echo enable exec fc fg hash help history jobs kill popd \
+                                        pushd pwd shopt suspend test times trap type ulimit umask unalias wait)
+
+    for name in command false set true unset "${bash_builtin_cmds[@]}"; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
@@ -129,7 +132,7 @@ function bach_initialize(){
     @unset name
 
     bach_restore_stdin
-    @mockall cd echo popd pushd pwd trap type
+    @mockall "${bash_builtin_cmds[@]}"
 }
 
 function @real() {
@@ -349,13 +352,7 @@ ${func}
 SCRIPT
         @chmod +x "$name" >&2
     else
-        declare mockfunc
-        if [[ "$desttype" == builtin && "${#cmd[@]}" -eq 1 ]]; then
-            mockfunc="$name"
-        else
-            mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
-        fi
-        if [[ -z "$desttype" ]]; then
+        if [[ -z "$desttype" || "$desttype" == builtin ]]; then
             eval "function ${name}() {
                       declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\"
                       if bach--is-function \"\$mockfunc\"; then
@@ -366,6 +363,8 @@ SCRIPT
                       fi
                   }; export -f ${name}"
         fi
+        declare mockfunc
+        mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
         #stderr name="$name"
         #body="function ${mockfunc}() { @debug Running mock : '${cmd[*]}' :; $func; }"
         declare mockfunc_seq="${mockfunc//@/__}_SEQ"
