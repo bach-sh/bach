@@ -28,5 +28,5 @@ jobs:
       with:
         submodules: true
     - name: Test Bach Testing Framework
-      run: $Env:ProgramFiles\Git\bin\bash.exe -c './run-tests.sh'
+      run: $Env:ProgramFiles\\Git\\bin\\bash.exe -c './run-tests.sh'
       shell: pwsh
