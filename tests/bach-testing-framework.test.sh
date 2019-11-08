@@ -243,7 +243,7 @@ function setup-bach-real-path() {
     declare -ag bach_origin_paths=(bin sbin opt/bin usr/bin usr/sbin)
     @mkdir -p "${bach_origin_paths[@]}"
 
-    @touch usr/bin/sha1sum
+    @echo '#!/bin/bash' > usr/bin/sha1sum
     @chmod +x usr/bin/sha1sum
 }
 
@@ -253,7 +253,7 @@ test-bach-real-path-typical() {
 
     @rm usr/bin/sha1sum
 
-    @touch bin/shasum
+    @echo '#!/bin/bash' > bin/shasum
     @chmod +x bin/shasum
 
     bach-real-path 'shasum|sha1sum'
