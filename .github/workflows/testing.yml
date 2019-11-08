@@ -11,10 +11,22 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
-    
+
     steps:
     - uses: actions/checkout@master
       with:
         submodules: true
     - name: Test Bach Testing Framework
       run: ./run-tests.sh
+
+  test-on-windows:
+    name: Test on Windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@master
+      with:
+        submodules: true
+    - name: Test Bach Testing Framework
+      run: $Env:ProgramFiles\Git\bin\bash.exe -c './run-tests.sh'
+      shell: pwsh
