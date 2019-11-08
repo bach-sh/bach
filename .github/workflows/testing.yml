@@ -24,6 +24,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Ensure a specific version of Git
+      run: choco install -y --accept-license git --version 2.24.0 --force
+      shell: pwsh
     - uses: actions/checkout@master
       with:
         submodules: true
