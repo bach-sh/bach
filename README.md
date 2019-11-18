@@ -543,7 +543,7 @@ Output content on the stdout console, one line per parameter.
 
 ## Versioning
 
-The latest version of Bach is 0.2.8, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
+The latest version of Bach is 0.2.9, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
 
 ## Author
 
