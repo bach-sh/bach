@@ -13,9 +13,13 @@ jobs:
           - macOS-latest
 
     steps:
-    - uses: actions/checkout@master
-      with:
-        submodules: true
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
     - name: Test Bach Testing Framework
       run: ./run-tests.sh
 
@@ -24,12 +28,12 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Ensure a specific version of Git
-      run: choco install -y --accept-license git --version 2.24.0 --force
-      shell: pwsh
-    - uses: actions/checkout@master
-      with:
-        submodules: true
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
     - name: Test Bach Testing Framework
       run: |
         & $Env:ProgramFiles\\Git\\bin\\bash.exe -c './run-tests.sh'
