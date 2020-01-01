@@ -1,0 +1,10 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: Testing on Bash-4.3
+  image: bash:4.3
+  commands:
+  - ./run-tests.sh
