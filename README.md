@@ -5,6 +5,8 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![License: MPL v2](https://img.shields.io/badge/License-MPL%20v2-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
 
+[![Run on Repl.it](https://repl.it/badge/github/bach-sh/bach)](https://repl.it/github/bach-sh/bach)
+
 
 ## Bach
 
@@ -13,6 +15,7 @@ Bach is a Bash testing framework, can be used to test scripts that contain dange
 - Website: https://bach.sh
 - Repo: https://github.com/bach-sh/bach
 - [查看本文档的中文版](README-cn.md)
+
 
 ## Getting Started
 

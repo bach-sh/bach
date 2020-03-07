@@ -5,6 +5,8 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![License: MPL v2](https://img.shields.io/badge/License-MPL%20v2-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
 
+[![Run on Repl.it](https://repl.it/badge/github/bach-sh/bach)](https://repl.it/github/bach-sh/bach)
+
 Bach is a [Bash](https://www.gnu.org/software/bash/) testing framework, can be used to test scripts that contain dangerous commands like `rm -rf /`. No surprises, no pain.
 
 [Bach](https://bach.sh) 是一个 Bash 脚本测试框架，可以用来测试包含了类似 `rm -rf /` 这样危险命令的脚本，不会给你惊喜，不会让你感到痛苦。
