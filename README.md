@@ -10,7 +10,7 @@
 
 ## Bach
 
-Bach is a Bash testing framework, can be used to test scripts that contain dangerous commands like rm -rf /. No surprises, no pain.
+Bach is a Bash testing framework, can be used to test scripts that contain dangerous commands like `rm -rf /`. No surprises, no pain.
 
 - Website: https://bach.sh
 - Repo: https://github.com/bach-sh/bach
@@ -19,7 +19,7 @@ Bach is a Bash testing framework, can be used to test scripts that contain dange
 
 ## Getting Started
 
-Bach Testing Framework is a **real** unit testing framework. All commands in the `PATH` environment variable become external dependencies of bash scripts being tested. No commands can be actually executed. In other words, all commands in Bach test cases are **dry run**. Because that unit tests should verify the behavior of bash scripts, not to test commands. Bach Testing Framework also provides APIs to mock commands.
+Bach Testing Framework is a **real** unit testing framework. All commands in the `PATH` environment variable become external dependencies of bash scripts being tested. No commands can be actually executed. In other words, all commands in Bach test cases are **dry run**. Because that unit tests should verify the behavior of bash scripts, not test commands. Bach Testing Framework also provides APIs to mock commands.
 
 ### Prerequisites
 
@@ -72,7 +72,7 @@ See [tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh)
 
 ### Write test cases
 
-Unlike the other testing frameworks, A standard test case of Bach is composed of two Bash functions. One is for running tests, the other is for asserting. Bach will run the two functions separately and then compare whether the same sequence of commands will be executed in either of both functions. The name of a testing function must start with `test-`, the name of the corresponding asserting function ends with `-assert`.
+Unlike the other testing frameworks, A standard test case of Bach is composed of two Bash functions. One is for running tests, the other is for asserting. Bach will run the two functions separately and then compare whether the same sequence of commands will be executed in both functions. The name of a testing function must start with `test-`, the name of the corresponding asserting function ends with `-assert`.
 
 For example:
 
@@ -87,9 +87,9 @@ For example:
         sudo rm -rf /
     }
 
-Bach will run the two functions separately, `test-rm-rf` and `test-rm-rf-assert`. In the testing function, `test-rm-rf`, the final actual command to be executed is `sudo rm -rf "/"`. It's the same as the asserting function `test-rm-rf-assert`. So this test case is passed.
+Bach will run the two functions separately, `test-rm-rf` and `test-rm-rf-assert`. In the testing function, `test-rm-rf`, the final actual command to be executed is `sudo rm -rf "/"`. It's the same as the asserting function `test-rm-rf-assert`. So this test case passes.
 
-If Bach does not find the asserting function for a testing function. Bach will try to use a traditional test method. In this case, the testing function must have a call to assert the APIs. Otherwise, the test case will fail.
+If Bach does not find the asserting function for a testing function. It will try to use a traditional test method. In this case, the testing function must have a call to assert the APIs. Otherwise, the test case will fail.
 
 For example:
 
@@ -128,13 +128,13 @@ But it doesn't allow to mock the following built-in commands in Bach Testing Fra
 - `eval`
 - `printf`
 
-Test cases will fail if you attempt to mock these built-in commands. In this case, we can extract a new function which contains the built-in commands in our scripts, and then use Bach to mock this new function.
+Test cases will fail if you attempt to mock these built-in commands. If they are needed in the script under test, we can extract a new function which contains the built-in commands in our scripts, and then use Bach to mock this new function.
 
 ### Run the actual commands in Bach
 
 In order to make test cases fast, stable, repetitive, and run in random order. We should write unit-testing cases and avoid calling real commands. But Bach also provides a set of APIs for executing real commands.
 
-Because Bach mocks all commands by default. If it is unavoidable to execute a real command in a test case, Bach provides an API called `@real` to execute the real command, just put `@real` at the beginning of commands.
+Bach mocks all commands by default. If it is unavoidable to execute a real command in a test case, Bach provides an API called `@real` to execute the real command, just put `@real` at the beginning of commands.
 
 Bach also provides APIs for commonly used commands. The real commands for these APIs are obtained from the system's PATH environment variable before Bach starts.
 
@@ -175,7 +175,7 @@ These common used APIs are:
 - `@which`
 - `@xargs`
 
-Due to the command `command` and `xargs` are a bit special. Bach mocks both commands by default to make the similar behavior of themselves.
+`command` and `xargs` are a bit special. Bach mocks both commands by default to make the similar behavior of themselves.
 
 In Bach Testing Framework the `xargs` is a mock function. It's behavior is similar to the real `xargs` command if you put `--` between `xargs` and the command. But the commands to be executed by  `xargs` are dry run.
 
@@ -228,29 +228,29 @@ There are some environment variables starting with `BACH_` for configuring Bach 
 - `BACH_ASSERT_DIFF_OPTS`
   The default is `-u` for the `$BACH_ASSERT_DIFF` command.
 
-## Limitation in Bach
+## Limitation of Bach
 
 ### Cannot block absolute path command calls
 
-In this case, the OS runs the command directly, and no interact with Bash(or Shell). So Bach cannot intercept such commands. We can wrap this kind of commands in a new function, and then use the `@mock` API to mock the function.
+In this case, the OS runs the command directly, and does not interact with Bash(or Shell). Bach cannot intercept such commands. We can wrap this kind of commands in a new function, and then use the `@mock` API to mock the function.
 
 ### Prohibit resetting the PATH environment variable
 
-Because Bach wants to intercept all command calls. So Bach set `PATH` to read-only to avoid resetting its value. 
+Because Bach wants to intercept all command calls, the `PATH` is set to read-only to avoid resetting its value. 
 
-In the case that PATH needs to be re-assignment, it is recommended to use the `declare` builtin command in our scripts to avoid errors caused by resetting a read-only environment variable.
+In the case that PATH needs to be re-assigned, it is recommended to use the `declare` builtin command in our scripts to avoid errors caused by resetting a read-only environment variable.
 
-### Unable to intercept I/O redirection in Bach
+### Bach is unable to intercept I/O redirection
 
 Bach already support mock functions to read from pipelines. But for the use of operators such as `>`, `>>`, the solution is to wrap the redirected command in a function. Another way is to use the `sed` command to put `>`  or `>>` in quotation marks, convert the I/O redirected operation to a normal argument.
 
-### Must mock all command in the pipeline
+### All command in the pipeline must be mocked
 
-The pipeline commands in Bash are running in sub-processes. Test cases may not be stable if we don't use `@mock` API to mock them.
+The pipeline commands in Bash are running in sub-processes. Test cases may not be stable if we don't use `@mock` API to mock these pipeline commands.
 
 ## Bach APIs
 
-The names of all APIs provided in the Bach test framework start with `@`.
+The names of all APIs provided in the Bach testing framework start with `@`.
 
 ### @assert-equals
 
@@ -275,7 +275,7 @@ Output comments in the test output, but Bach will ignore these comments.
 
 ### @die
 
-Terminate the current running immediately
+Terminate the current run immediately
 
 ### @do-not-panic
 
@@ -293,7 +293,7 @@ This API has the following aliases:
 
 Do nothing.
 
-Usually there is only this API in asserting funciongs to verify that no any commands to be executed in testing functions.
+Usually this API is used only in asserting funcions to verify that no any commands to be executed in testing functions.
 
 For example:
 
@@ -309,7 +309,7 @@ For example:
 
 ### @dryrun
 
-Bach uses `@dryrun` API to dry run commands by default.
+Bach uses `@dryrun` API to dry run commands by default. But if you want to dry run a mocked command, just put `@dryrun` in front of this mocked command.
 
 For example:
 
@@ -360,7 +360,7 @@ Mock commands or scripts.
 Note:
 
 - cannot mock commands that have absolute paths.
-- Mock a command multiple times, only the last mock takes effect
+- If a command is mocked multiple times, only the last mock takes effect
 
 Use `===` to split commands and output
 
@@ -404,7 +404,7 @@ For example:
 
 ### @@mock
 
-Mock the same command but return different values.
+Mock the same command multiple times and return different values for each run.
 
 For example:
 
@@ -438,19 +438,19 @@ Mock many simple commands
 
 ### @mocktrue
 
-Mock the return code of a command is successful.
+Mock the return code of a command as successful.
 
 ### @mockfalse
 
-Mock the return code of a command is non-zero
+Mock the return code of a command as non-zero value.
 
 ### @out
 
-Output on the stdout console.
+Output to the stdout console.
 
 ### @real
 
-Executing the real command
+Executing the real command.
 
 ### @run
 
@@ -458,7 +458,7 @@ Executing the script to be tested.
 
 #### `@setup`
 
-Executing at the beginning of the testing functions and the asserting functions.
+Executed at the beginning of the testing functions and the asserting functions.
 
 Note: It doesn't make sense to run mock in asserting functions, so it's forbidden to mock any commands in asserting functions.
 
@@ -484,9 +484,9 @@ For example:
 
 ### @setup-test
 
-Executing at the beginning of all testing functions.
+Executed at the beginning of all testing functions.
 
-This is the only place allows to mock commands.
+This is the only place that allows mock commands outside testing functions.
 
 For example:
 
@@ -496,11 +496,11 @@ For example:
 
 ### @stderr
 
-Output content on the stderr console, one line per parameter.
+Output content to the stderr console, one line per parameter.
 
 ### @stdout
 
-Output content on the stdout console, one line per parameter.
+Output content to the stdout console, one line per parameter.
 
 ## Learn Bash Programming with Bach
 
@@ -538,7 +538,7 @@ Output content on the stdout console, one line per parameter.
 
 - a command line tool
 - run inside docker containers
-
+n
 ## Clients
 
 * BMW Group
