@@ -213,7 +213,7 @@ For examples:
 
 ### Configure Bach
 
-There are some environment variables starting with `BACH_` for configuring Bach Festing Framework.
+There are some environment variables starting with `BACH_` for configuring Bach Testing Framework.
 
 - `BACH_DEBUG`
   The default is `false`. `true` to enable Bach's `@debug` API.
@@ -293,7 +293,7 @@ This API has the following aliases:
 
 Do nothing.
 
-Usually this API is used only in asserting funcions to verify that no any commands to be executed in testing functions.
+Usually this API is used only in asserting functions to verify that no any commands to be executed in testing functions.
 
 For example:
 
@@ -342,7 +342,7 @@ Output error message on stderr console
 
 ### @load_function
 
-Loading a function definenation from a script.
+Loading a function definition from a script.
 
     test-gp() {
         @load_function ./examples/example-functions gp
@@ -557,6 +557,6 @@ The latest version of Bach is 0.2.9, See [Bach Releases](https://github.com/bach
 Bach Testing Framework is dual licensed under:
 
 - [GNU General Public License v3.0](LICENSE.GPL-3.0)
-- [Mzilla Public License 2.0](LICENSE.MPL-2.0)
+- [Mozilla Public License 2.0](LICENSE.MPL-2.0)
 
 See [LICENSE](LICENSE) for more.
