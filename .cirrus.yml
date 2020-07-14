@@ -4,7 +4,7 @@ test_task:
   matrix:
     - name: freebsd
       freebsd_instance:
-        image_family: freebsd-12-0
+        image_family: freebsd-12-1
     - name: bash-devel
       container:
         image: bash:devel

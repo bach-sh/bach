@@ -20,7 +20,7 @@ case "$OS_NAME" in
     FreeBSD)
         export PATH="/usr/local/sbin:$PATH"
         export ASSUME_ALWAYS_YES=yes
-        pkg_install_bash="pkg bootstrap -fy; hash -r; pkg update -f; pkg install -y bash"
+        pkg_install_bash="pkg -vv; pkg update -f; pkg install -y bash"
         if ! hash bash; then
             if [ "$(id -u)" -gt 0 ] && hash sudo; then
                 sudo /bin/sh -c "$pkg_install_bash"
@@ -39,6 +39,7 @@ if [ -z "${bash_bin:-}" ]; then
     bash_bin="$(which bash)"
 fi
 
+uname -a
 echo "Bash: $bash_bin"
 test -n "$bash_bin"
 "$bash_bin" --version
