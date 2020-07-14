@@ -18,7 +18,9 @@ case "$OS_NAME" in
         bash_bin="$(brew --prefix)"/bin/bash
         ;;
     FreeBSD)
-        pkg_install_bash="pkg bootstrap -fy; pkg update -f; pkg install -y bash"
+        export PATH="/usr/local/sbin:$PATH"
+        export ASSUME_ALWAYS_YES=yes
+        pkg_install_bash="pkg bootstrap -fy; hash -r; pkg update -f; pkg install -y bash"
         if ! hash bash; then
             if [ "$(id -u)" -gt 0 ] && hash sudo; then
                 sudo /bin/sh -c "$pkg_install_bash"
