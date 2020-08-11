@@ -133,7 +133,7 @@ function bach_initialize(){
     @unset name
 
     bach_restore_stdin
-    @mockall "${bash_builtin_cmds[@]}"
+    @mockall "${bash_builtin_cmds[@]}" source
 }
 
 function @real() {
