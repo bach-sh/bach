@@ -20,12 +20,12 @@ case "$OS_NAME" in
     FreeBSD)
         export PATH="/usr/local/sbin:$PATH"
         export ASSUME_ALWAYS_YES=yes
-        pkg_install_bash="pkg -vv; pkg update -f; pkg install -y bash"
-        if ! hash bash; then
+        pkg_install_pkgs="pkg -vv; pkg update -f; pkg install -y bash xxd"
+        if ! hash bash || ! hash xxd; then
             if [ "$(id -u)" -gt 0 ] && hash sudo; then
-                sudo /bin/sh -c "$pkg_install_bash"
+                sudo /bin/sh -c "$pkg_install_pkgs"
             else
-                /bin/sh -c "$pkg_install_bash"
+                /bin/sh -c "$pkg_install_pkgs"
             fi
         fi
         ;;
