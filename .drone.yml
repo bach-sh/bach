@@ -6,5 +6,6 @@ name: default
 steps:
 - name: Testing on Bash-4.3
   image: bash:4.3
+  pull: always
   commands:
   - ./run-tests.sh
