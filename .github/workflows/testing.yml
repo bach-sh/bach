@@ -29,9 +29,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Ensure a specific version of Git
-      run: choco install -y --accept-license git --version 2.28.0 --force
-      shell: pwsh
+    - name: Ensure PortableGit
+      shell: bash
+      run: |
+        set -x
+        curl -Lo PortableGit-2.28.0-64-bit.7z.exe https://github.com/git-for-windows/git/releases/download/v2.28.0.windows.1/PortableGit-2.28.0-64-bit.7z.exe
+        7z x PortableGit-2.28.0-64-bit.7z.exe -o./portable-git
+        ./portable-git/bin/bash --login -c "./portable-git/bin/git --version"
     - name: Checkout submodules
       shell: bash
       run: |
@@ -39,6 +43,6 @@ jobs:
         git submodule sync --recursive
         git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
     - name: Test Bach Testing Framework
+      shell: bash
       run: |
-        & $Env:ProgramFiles\\Git\\bin\\bash.exe -c './run-tests.sh'
-      shell: pwsh
+        ./portable-git/bin/bash -c "./run-tests.sh"
