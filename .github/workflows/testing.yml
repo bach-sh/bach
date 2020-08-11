@@ -30,7 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Ensure a specific version of Git
-      run: choco install -y --accept-license git --version 2.27.0 --force
+      run: choco install -y --accept-license git --version 2.28.0 --force
       shell: pwsh
     - name: Checkout submodules
       shell: bash
