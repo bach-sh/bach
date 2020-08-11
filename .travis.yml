@@ -5,6 +5,7 @@ matrix:
     dist: trusty
   - os: linux
     dist: bionic
+  - os: windows
 script:
 - bash -xv ./run-tests.sh
 notifications:
