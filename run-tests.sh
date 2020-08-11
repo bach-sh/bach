@@ -31,7 +31,8 @@ case "$OS_NAME" in
         ;;
     Linux-alpine-*)
         apk update
-        apk add coreutils diffutils
+        apk add bash coreutils diffutils
+        apk add xxd # for running `@real xxd` in ./tests/demo-xxd.test.sh
         ;;
 esac
 
