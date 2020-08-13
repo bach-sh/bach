@@ -336,6 +336,9 @@ test-bach-framework-mock-commands() {
     ls $(find . -name fn)
 
     @mock ls file1 file2 === @stdout file2 file1
+
+    @real printenv >&8
+
     ls $(find . -name fn) | xargs -n1 -- do-something
 }
 test-bach-framework-mock-commands-assert() {
