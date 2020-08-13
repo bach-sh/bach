@@ -97,7 +97,7 @@ function bach_restore_stdin() {
 function bach_initialize(){
     enable -n alias bg bind dirs disown fc fg hash help history jobs kill suspend times ulimit umask unalias wait
 
-    declare util name
+    declare util name util_path
 
     declare -a bash_builtin_cmds=(cd echo enable popd pushd pwd shopt test trap type)
 
@@ -115,10 +115,6 @@ function bach_initialize(){
         builtin source "$script" "$@"
     }
 
-    for name in echo pwd test; do
-        declare -grx "_${name}"="$(bach-real-path "$name")"
-    done
-
     declare -a bach_core_utils=(cat chmod cut diff find env grep ls "shasum|sha1sum" mkdir mktemp rm rmdir sed sort tee touch which xargs)
 
     for util in "${bach_core_utils[@]}"; do
@@ -126,11 +122,11 @@ function bach_initialize(){
             util="shasum|sha1"
         fi
         name="${util%|*}"
-        declare -grx "_${name}"="$(bach-real-path "$util")"
-        eval "[[ -n \"\$_${name}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"\${_${name}}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
+        util_path="$(bach-real-path "$util")"
+        eval "[[ -n \"${util_path}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"${util_path}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
-    @unset name
+    @unset name util_path
 
     bach_restore_stdin
     @mockall "${bash_builtin_cmds[@]}" source .

@@ -155,7 +155,7 @@ test-mock-@stdout-include-space-assert() {
 
 
 test-run-a-script() {
-    @mock load-script === @echo "for param; do \"${_echo}\" \"script.sh - \$param\"; done"
+    @mock load-script === @echo "for param; do @echo \"script.sh - \$param\"; done"
 
     @run <(load-script) foo bar
 }
