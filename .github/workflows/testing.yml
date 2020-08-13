@@ -14,7 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Checkout submodules
+    - &checkout_submodules
+      name: Checkout submodules
       shell: bash
       run: |
         auth_header="$(git config --local --get http.https://github.com/.extraheader)"
@@ -22,3 +23,15 @@ jobs:
         git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
     - name: Test Bach Testing Framework
       run: ./run-tests.sh
+
+  test-on-windows:
+    name: Test on Windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      <<: *checkout_submodules
+    - name: Test Bach Testing Framework
+      shell: bash
+      run: bash ./run-tests.sh
