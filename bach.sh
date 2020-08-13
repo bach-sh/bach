@@ -299,7 +299,7 @@ trap bach-on-exit EXIT
 
 function @generate_mock_function_name() {
     declare name="$1"
-    @echo "mock_exec_${name}_$(@dryrun "${@}" | @shasum | @cut -b1-40)"
+    @echo "mock_exec_${name}_$(@dryrun "${@}" | @shasum | @cut -b1-7)"
 }
 export -f @generate_mock_function_name
 
