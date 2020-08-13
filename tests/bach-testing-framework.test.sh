@@ -1439,3 +1439,18 @@ test-builtin-commands-assert() {
         @dryrun "$cmd" foobar
     done
 }
+
+test-dot-command() {
+    . file.sh
+}
+test-dot-command-assert() {
+    @dryrun . file.sh
+}
+
+test-at_dot-command() {
+    @echo "do-something" > file.sh
+    @. file.sh
+}
+test-at_dot-command-assert() {
+    do-something
+}

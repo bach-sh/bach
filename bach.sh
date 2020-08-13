@@ -101,7 +101,7 @@ function bach_initialize(){
 
     declare -a bash_builtin_cmds=(cd echo enable popd pushd pwd shopt test trap type)
 
-    for name in command exec false set true unset "${bash_builtin_cmds[@]}"; do
+    for name in . command exec false set true unset "${bash_builtin_cmds[@]}"; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
@@ -133,7 +133,7 @@ function bach_initialize(){
     @unset name
 
     bach_restore_stdin
-    @mockall "${bash_builtin_cmds[@]}" source
+    @mockall "${bash_builtin_cmds[@]}" source .
 }
 
 function @real() {
