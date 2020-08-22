@@ -275,10 +275,14 @@ test-bach-real-path-fallback-assert() {
 }
 
 
-test-ASSERT-FAIL-bach-real-path-not-found() {
+test-bach-real-path-not-found() {
     setup-bach-real-path
 
     bach-real-path foobar
+}
+
+test-bach-real-path-not-found-assert() {
+    @fail
 }
 
 
@@ -292,6 +296,16 @@ test-@real-function() {
 test-@real-function-assert() {
     fake-md5sum
     fake-md5sum --version
+}
+
+test-@real-function-command-not-found() {
+    @unset -f bach-real-path
+    @mock bach-real-path md5sum === @stdout ""
+
+    @real md5sum file.txt
+}
+test-@real-function-command-not-found-assert() {
+    @dryrun md5sum_not_found file.txt
 }
 
 this_variable_exists=""

@@ -133,13 +133,16 @@ function bach_initialize(){
 }
 
 function @real() {
-    declare name="$1"
+    declare name="$1" real_cmd
     if [[ "$name" == */* ]]; then
         @echo "$@"
         return
     fi
-    declare -a cmd
-    cmd=("$(bach-real-path "$1" 7>&1)" "${@:2}")
+    real_cmd="$(bach-real-path "$1" 7>&1)"
+    if [[ -z "${real_cmd}" ]]; then
+        real_cmd="${name}_not_found"
+    fi
+    declare -a cmd=("${real_cmd}" "${@:2}")
     @debug "[REAL-CMD]" "${cmd[@]}"
     "${cmd[@]}"
 }
