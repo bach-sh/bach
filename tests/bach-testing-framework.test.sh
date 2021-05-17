@@ -217,6 +217,16 @@ test-mock-builtin-command-with-external-commands1-assert() {
 }
 
 
+test-mock-command-contains-special-characters() {
+    set -x
+    @mock 'omg_!@[1]{2}+~.sh'
+
+    'omg_!@[1]{2}+~.sh' --version
+}
+test-mock-command-contains-special-characters-assert() {
+    @dryrun 'omg_!@[1]{2}+~.sh' --version
+}
+
 test-mock-builtin-command-with-external-commands2() {
     @mock command mycmd param1 === @stdout myoutput
 

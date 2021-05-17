@@ -367,8 +367,8 @@ SCRIPT
         mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
         #stderr name="$name"
         #body="function ${mockfunc}() { @debug Running mock : '${cmd[*]}' :; $func; }"
-        declare mockfunc_seq="${mockfunc//@/__}_SEQ"
-        mockfunc_seq="${mockfunc_seq//-/__}"
+        declare mockfunc_seq="${mockfunc//_/__}_SEQ"
+        mockfunc_seq="${mockfunc_seq//[-\!+.@\[\]\{\}~]/_}"
         body="function ${mockfunc}() {
             declare -gxi ${mockfunc_seq}=\"\${${mockfunc_seq}:-0}\";
             if bach--is-function \"${mockfunc}_\$(( ${mockfunc_seq} + 1))\"; then
