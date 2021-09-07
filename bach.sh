@@ -434,7 +434,13 @@ export -f _bach_framework__run_function
 
 function @dryrun() {
     builtin declare param
-    [[ "$#" -le 1 ]] || builtin printf -v param '  %s' "${@:2}"
+    builtin declare -a input
+    [[ "$#" -le 1 ]] || {
+        for param in "${@:2}"; do
+	    if [[ -z "$param" ]]; then input+=($'\x1b[31m\u2205\x1b[0m'); else input+=("$param"); fi
+        done
+        builtin printf -v param '  %s' "${input[@]}"
+    }
     builtin echo "${1}${param:-}"
 }
 export -f @dryrun

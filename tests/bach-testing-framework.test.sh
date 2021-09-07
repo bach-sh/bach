@@ -1479,3 +1479,10 @@ test-at_dot-command() {
 test-at_dot-command-assert() {
     do-something
 }
+
+test-show-empty-parameter() {
+    foo "" bar
+}
+test-show-empty-parameter-assert() {
+    @dryrun foo $'\x1b\x5b31m\u2205\x1b\x5b0m' bar 
+}
