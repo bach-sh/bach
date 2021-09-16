@@ -1495,3 +1495,35 @@ test-mock-printf-assert() {
     @echo foo
 }
 
+test-ASSERT-FAIL-cannot-mock-builtin(){
+    @mock builtin
+}
+
+test-ASSERT-FAIL-cannot-mock-declare(){
+    @mock declare
+}
+
+test-ASSERT-FAIL-cannot-mock-eval(){
+    @mock eval
+}
+
+test-ASSERT-FAIL-cannot-mock-set(){
+    @mock set
+}
+
+test-ASSERT-FAIL-cannot-mock-unset(){
+    @mock unset
+}
+
+test-ASSERT-FAIL-cannot-mock-true(){
+    @mock true
+}
+
+test-ASSERT-FAIL-cannot-mock-false(){
+    @mock false
+}
+
+test-ASSERT-FAIL-cannot-mock-read(){
+    @mock read
+}
+
