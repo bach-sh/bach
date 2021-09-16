@@ -126,7 +126,11 @@ But it doesn't allow to mock the following built-in commands in Bach Testing Fra
 - `builtin`
 - `declare`
 - `eval`
-- `printf`
+- `set`
+- `unset`
+- `true`
+- `false`
+- `read`
 
 Test cases will fail if you attempt to mock these built-in commands. If they are needed in the script under test, we can extract a new function which contains the built-in commands in our scripts, and then use Bach to mock this new function.
 
