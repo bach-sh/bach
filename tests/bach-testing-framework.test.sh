@@ -1494,3 +1494,4 @@ test-mock-printf() {
 test-mock-printf-assert() {
     @echo foo
 }
+

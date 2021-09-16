@@ -309,7 +309,7 @@ export -f @generate_mock_function_name
 function @mock() {
     declare -a param name cmd func body desttype
     name="$1"
-    if [[ "$name" == @(builtin|declare|eval|set|unset|true|false|while|read) ]]; then
+    if [[ "$name" == @(builtin|declare|eval|set|unset|true|false|read) ]]; then
         @die "Cannot mock the builtin command: $name"
     fi
     if [[ command == "$name" ]]; then
