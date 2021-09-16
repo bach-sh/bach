@@ -1484,5 +1484,13 @@ test-show-empty-parameter() {
     foo "" bar
 }
 test-show-empty-parameter-assert() {
-    @dryrun foo $'\x1b\x5b31m\u2205\x1b\x5b0m' bar 
+    @dryrun foo $'\x1b\x5b31m\u2205\x1b\x5b0m' bar
+}
+
+test-mock-printf() {
+    @mock printf "something %s" foobar === @stdout foo
+    printf "something %s" foobar
+}
+test-mock-printf-assert() {
+    @echo foo
 }
