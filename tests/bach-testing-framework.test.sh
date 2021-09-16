@@ -1525,6 +1525,34 @@ test-ASSERT-FAIL-cannot-mock-read(){
 
 test-ASSERT-FAIL-cannot-ignore-builtin(){
     cannot not ignore the builtin command
-    @mock builtin
+    @ignore builtin
+}
+
+test-ASSERT-FAIL-cannot-ignore-declare(){
+    @ignore declare
+}
+
+test-ASSERT-FAIL-cannot-ignore-eval(){
+    @ignore eval
+}
+
+test-ASSERT-FAIL-cannot-ignore-set(){
+    @ignore set
+}
+
+test-ASSERT-FAIL-cannot-ignore-unset(){
+    @ignore unset
+}
+
+test-ASSERT-FAIL-cannot-ignore-true(){
+    @ignore true
+}
+
+test-ASSERT-FAIL-cannot-ignore-false(){
+    @ignore false
+}
+
+test-ASSERT-FAIL-cannot-ignore-read(){
+    @ignore read
 }
 

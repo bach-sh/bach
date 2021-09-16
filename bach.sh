@@ -530,13 +530,18 @@ function assert-execution() (
 )
 
 function @ignore() {
-    declare name="$1"
-    eval "function ${name}() {
+    declare name
+    for name; do
+        if [[ "$name" == @(builtin|declare|eval|set|unset|true|false|read) ]]; then
+            @die "Cannot ignore the builtin command: $name"
+        fi
+        eval "function ${name}() {
               declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\";
               if bach--is-function \"\$mockfunc\"; then
                   \"\${mockfunc}\" \"\$@\";
               else [[ -t 0 ]] || @cat; fi
           }; export -f ${name}"
+    done
 }
 export -f @ignore
 
