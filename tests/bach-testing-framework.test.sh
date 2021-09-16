@@ -1337,10 +1337,6 @@ test-bach-framework-@assert-equals-variables() {
 }
 
 
-test-ASSERT-FAIL-bach-framework-each-test-case-does-not-have-an-assertion() {
-    @echo Every test case must have an assertion
-}
-
 test-ASSERT-FAIL-bach-framework-each-test-case-has-a-failed-assertion() {
     @echo Every test case must have an assertion, it is fail
     @assert-equals "Answer to the Ultimate Question of Life, the Universe, and Everything" 42
@@ -1525,5 +1521,10 @@ test-ASSERT-FAIL-cannot-mock-false(){
 
 test-ASSERT-FAIL-cannot-mock-read(){
     @mock read
+}
+
+test-ASSERT-FAIL-cannot-ignore-builtin(){
+    cannot not ignore the builtin command
+    @mock builtin
 }
 

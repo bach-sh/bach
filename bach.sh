@@ -516,7 +516,12 @@ function assert-execution() (
         fi
     else
         __bach__run_test "$bach_test_name" |
-            @tee /dev/stderr | @grep "^${__bach_run_test__ignore_prefix} \\[assert-" >/dev/null
+            @tee /dev/stderr | if [[ "$bach_test_name" = test-ASSERT-FAIL-* ]]; then
+                @cat
+                @echo "${__bach_run_test__ignore_prefix} Should fail"
+            else
+                @grep "^${__bach_run_test__ignore_prefix} \\[assert-" >/dev/null
+            fi
         retval="$?"
     fi
     @popd &>/dev/null
