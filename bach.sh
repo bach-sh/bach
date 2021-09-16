@@ -23,12 +23,12 @@ function @out() {
     if [[ "${1:-}" == "-" || ! -t 0 ]]; then
         [[ "${1:-}" == "-" ]] && shift
         while IFS=$'\n' read -r line; do
-            printf "%s\n" "${*}$line"
+            builtin printf "%s\n" "${*}$line"
         done
     elif [[ "$#" -gt 0 ]]; then
-        printf "%s\n" "$*"
+        builtin printf "%s\n" "$*"
     else
-        printf "\n"
+        builtin printf "\n"
     fi
 } 8>/dev/null
 export -f @out
@@ -168,7 +168,7 @@ function bach-run-tests--get-all-tests() {
         [[ "$name" == test?* ]] || continue
         [[ "$name" == *-assert ]] && continue
         bach--skip-the-test "$name" || continue
-        printf "%s\n" "$name"
+        builtin printf "%s\n" "$name"
     done
 }
 
@@ -211,7 +211,7 @@ function bach-run-tests() {
         while param="${1:-}"; [[ -n "${param:-}" ]]; do
             shift || true
             if [[ "$param" == "--" ]]; then
-                xargs_opts+=("${BASH:-bash}" "-c" "$(printf "'%s' " "$@") \$@" "-s")
+                xargs_opts+=("${BASH:-bash}" "-c" "$(builtin printf "'%s' " "$@") \$@" "-s")
                 break
             else
                 xargs_opts+=("$param")
@@ -264,14 +264,14 @@ function bach-run-tests() {
             test_name_assert_fail=""
         fi
         if [[ "$test_retval" -eq 0 ]]; then
-            printf "${color_ok}ok %d - ${test_name_assert_fail}${color_ok}%s${color_end}\n" "$total" "$friendly_name"
+            builtin printf "${color_ok}ok %d - ${test_name_assert_fail}${color_ok}%s${color_end}\n" "$total" "$friendly_name"
         else
             : $(( ++error ))
-            printf "${color_err}not ok %d - ${test_name_assert_fail}${color_err}%s${color_end}\n" "$total" "$friendly_name"
+            builtin printf "${color_err}not ok %d - ${test_name_assert_fail}${color_err}%s${color_end}\n" "$total" "$friendly_name"
             {
-                printf "\n"
+                builtin printf "\n"
                 @cat "$testresult" >&2
-                printf "\n"
+                builtin printf "\n"
             } >&2
         fi
         @rm "$testresult" &>/dev/null
@@ -281,7 +281,7 @@ function bach-run-tests() {
     if (( error > 0 )); then
         color_result="$color_err"
     fi
-    printf -- "# -----\n#${color_result} All tests: %s, failed: %d, skipped: %d${color_end}\n" \
+    builtin printf -- "# -----\n#${color_result} All tests: %s, failed: %d, skipped: %d${color_end}\n" \
            "${#all_tests[@]}" "$error" "$(( ${#all_tests[@]} - total ))">&2
     [[ "$error" == 0 ]] && [[ "${#all_tests[@]}" -eq "$total" ]]
 }
@@ -294,7 +294,7 @@ function bach-on-exit() {
     if [[ "$?" -eq 0 ]]; then
         [[ "${BACH_DISABLED:-false}" == true ]] || bach-run-tests
     else
-        printf "Bail out! %s\n" "Couldn't initlize tests."
+        builtin printf "Bail out! %s\n" "Couldn't initlize tests."
     fi
 }
 
@@ -536,12 +536,12 @@ function @ignore() {
 export -f @ignore
 
 function @stderr() {
-    printf "%s\n" "$@" >&2
+    builtin printf "%s\n" "$@" >&2
 }
 export -f @stderr
 
 function @stdout() {
-    printf "%s\n" "$@"
+    builtin printf "%s\n" "$@"
 }
 export -f @stdout
 
