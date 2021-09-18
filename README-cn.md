@@ -1,4 +1,4 @@
-# Bach 测试框架
+# Bach 单元测试框架
 
 [![Build Status](https://travis-ci.org/bach-sh/bach.svg)](https://travis-ci.org/bach-sh/bach)
 [![GitHub Actions](https://github.com/bach-sh/bach/workflows/Testing%20Bach/badge.svg)](https://github.com/bach-sh/bach)
@@ -17,7 +17,7 @@ Bach is a [Bash](https://www.gnu.org/software/bash/) testing framework, can be u
 
 ## Bach 入门
 
-Bach 作为一个真正的单元测试框架，意味着任何在 PATH 环境变量中的命令都成为了被测的 Bash 脚本的外部依赖，这些外部命令都不会被真正的执行。换句话说，在 Bach 的测试中，除了部分的内置命令外，所有的命令都是 "Dry Run" 的。所以，在 Bach 中，验证的是命令被执行的时候是否使用了期望的参数，而非验证命令的执行结果。毕竟，我们测试的是 Bash 脚本的行为，而非测试那些命令是否可以正常工作。Bach 也提供了一系列的 API 可以用于模拟命令的执行。
+Bach 单元测试框架作为一个真正的 Bash 脚本的单元测试框架，意味着任何在 PATH 环境变量中的命令都成为了被测的 Bash 脚本的外部依赖，这些外部命令都不会被真正的执行。换句话说，在 Bach 的测试中，除了部分的内置命令外，所有的命令都是 "Dry Run" 的。所以，在 Bach 中，验证的是命令被执行的时候是否使用了期望的参数，而非验证命令的执行结果。毕竟，我们测试的是 Bash 脚本的行为，而非测试那些命令是否可以正常工作。Bach 也提供了一系列的 API 可以用于模拟命令的执行。
 
 ### Bach 的依赖
 
@@ -576,7 +576,7 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
 ## 版本
 
-Bach 当前最新的版本是 0.2.9，查看[Bach 的发布列表](https://github.com/bach-sh/bach/releases)
+Bach 当前最新的版本是 0.4.0，查看[Bach 的发布列表](https://github.com/bach-sh/bach/releases)
 
 ## 作者
 

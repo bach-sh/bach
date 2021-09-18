@@ -1,4 +1,4 @@
-# Bach Testing Framework
+# Bach Unit Testing Framework
 
 [![Build Status](https://travis-ci.org/bach-sh/bach.svg)](https://travis-ci.org/bach-sh/bach)
 [![GitHub Actions](https://github.com/bach-sh/bach/workflows/Testing%20Bach/badge.svg)](https://github.com/bach-sh/bach)
@@ -19,7 +19,7 @@ Bach is a Bash testing framework, can be used to test scripts that contain dange
 
 ## Getting Started
 
-Bach Testing Framework is a **real** unit testing framework. All commands in the `PATH` environment variable become external dependencies of bash scripts being tested. No commands can be actually executed. In other words, all commands in Bach test cases are **dry run**. Because that unit tests should verify the behavior of bash scripts, not test commands. Bach Testing Framework also provides APIs to mock commands.
+Bach Unit Testing Framework is a **real** unit testing framework. All commands in the `PATH` environment variable become external dependencies of bash scripts being tested. No commands can be actually executed. In other words, all commands in Bach test cases are **dry run**. Because that unit tests should verify the behavior of bash scripts, not test commands. Bach Testing Framework also provides APIs to mock commands.
 
 ### Prerequisites
 
@@ -550,7 +550,7 @@ n
 
 ## Versioning
 
-The latest version of Bach is 0.2.9, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
+The latest version of Bach is 0.4.0, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
 
 ## Author
 
