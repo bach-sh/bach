@@ -9,6 +9,7 @@ function release-sh() {
 @setup-test {
     @ignore echo
     @mocktrue sed -Ene '/^## Versioning$/,+2p' README.md
+    @mockfalse hash mmark
 }
 
 
@@ -47,4 +48,23 @@ test-pass-a-non-existed-tag() {
 }
 test-pass-a-non-existed-tag-assert() {
     @false
+}
+
+test-convert-to-html() {
+    @touch README.md README-zh_CN.md
+    @mocktrue hash mmark
+    @mock grep '<h1 ' index.html === @stdout "Bach Unit Testing Framework for Bash"
+    @mock grep '<h1 ' index-zh_CN.html === @stdout "Bash 脚本的 Bach 单元测试框架"
+    @mock sed "s/<[^>]\+>//g"
+
+    test-pass-a-valid-tag
+}
+test-convert-to-html-assert() {
+    test-pass-a-valid-tag-assert
+
+    mmark -html -css //bach.sh/solarized-dark.min.css README-zh_CN.md
+    sed -i "/<title>/s/>/>Bash 脚本的 Bach 单元测试框架/" index-zh_CN.html
+
+    mmark -html -css //bach.sh/solarized-dark.min.css README.md
+    sed -i "/<title>/s/>/>Bach Unit Testing Framework for Bash/" index.html
 }

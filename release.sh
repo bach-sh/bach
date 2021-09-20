@@ -15,3 +15,13 @@ fi
 git push
 git push --tags
 hub release create -m "v${tag}"$'\n'$'\n'"Version ${tag}" "$tag"
+
+if hash mmark &>/dev/null; then
+    for readme in README*.md; do
+        readme_lang="${readme#README}"
+        readme_lang="${readme_lang%.md}"
+        mmark -html -css //bach.sh/solarized-dark.min.css "$readme" > "index${readme_lang}.html"
+        title="$(grep '<h1 ' "index${readme_lang}.html" | sed "s/<[^>]\+>//g")"
+        sed -i "/<title>/s/>/>${title}/" "index${readme_lang}.html"
+    done
+fi
