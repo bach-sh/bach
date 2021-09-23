@@ -129,10 +129,10 @@ function bach_initialize(){
     while read -r name; do
         name="${name%%=*}"
         name="${name##* }"
-        [[ "$name" != BACH_* ]] || continue
-        unset "$envname"
-    done < <(@real export)
-    builtin export LANG=C
+        [[ "${name^^}" != BACH_* ]] || continue
+        unset "$name"
+    done < <(builtin export)
+    builtin export LANG=C TERM=vt100
     @unset name util_path
 
     bach_restore_stdin
