@@ -126,6 +126,13 @@ function bach_initialize(){
         eval "[[ -n \"${util_path}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"${util_path}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
+    while read -r name; do
+        name="${name%%=*}"
+        name="${name##* }"
+        [[ "$name" != BACH_* ]] || continue
+        unset "$envname"
+    done < <(@real export)
+    builtin export LANG=C
     @unset name util_path
 
     bach_restore_stdin
