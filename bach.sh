@@ -129,14 +129,14 @@ function bach_initialize(){
     bach_restore_stdin
     @mockall "${bash_builtin_cmds[@]}" source .
 
-    while read -r name; do
+    eval "$(builtin export | while read -rs name; do
         name="${name%%=*}"
         name="${name##* }"
         [[ "${name^^}" != BACH_* ]] || continue
-        unset "$name" || builtin true
-    done < <(builtin export)
+        builtin echo "unset '$name' || builtin true"
+    done)"
     builtin export LANG=C TERM=vt100
-    @unset name util_path
+    unset name util_path
 }
 
 function @real() {
