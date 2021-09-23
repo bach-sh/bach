@@ -126,17 +126,17 @@ function bach_initialize(){
         eval "[[ -n \"${util_path}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"${util_path}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
+    bach_restore_stdin
+    @mockall "${bash_builtin_cmds[@]}" source .
+
     while read -r name; do
         name="${name%%=*}"
         name="${name##* }"
         [[ "${name^^}" != BACH_* ]] || continue
-        unset "$name"
+        unset "$name" || builtin true
     done < <(builtin export)
     builtin export LANG=C TERM=vt100
     @unset name util_path
-
-    bach_restore_stdin
-    @mockall "${bash_builtin_cmds[@]}" source .
 }
 
 function @real() {
