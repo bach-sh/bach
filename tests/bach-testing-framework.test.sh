@@ -195,6 +195,17 @@ test-run-script-filename-only-with-parameters-assert() {
 }
 
 
+test-mock-builtin-command--v-ls() {
+  @mock command -v ls === @echo /usr/bin/ls
+  
+  command -v ls
+}
+
+test-mock-builtin-command--v-ls-assert() {
+  @echo /usr/bin/ls
+}
+
+
 test-mock-command-which-something() {
     @mock command which something === fake-something
     command which something

@@ -204,7 +204,7 @@ function bach-run-tests() {
     done
 
     function command() {
-        if bach--is-function "$1"; then
+        if [[ "$1" != -* ]] && bach--is-function "$1"; then
             "$@"
         else
             command_not_found_handle command "$@"
@@ -319,7 +319,7 @@ function @mock() {
     if [[ "$name" == @(builtin|declare|eval|set|unset|true|false|read) ]]; then
         @die "Cannot mock the builtin command: $name"
     fi
-    if [[ command == "$name" ]]; then
+    if [[ command == "$name" && "$2" != -* ]]; then
         shift
         name="$1"
     fi
