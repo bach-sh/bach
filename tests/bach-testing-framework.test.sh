@@ -197,12 +197,25 @@ test-run-script-filename-only-with-parameters-assert() {
 
 test-mock-builtin-command--v-ls() {
   @mock command -v ls === @echo /usr/bin/ls
-  
+
   command -v ls
 }
 
 test-mock-builtin-command--v-ls-assert() {
   @echo /usr/bin/ls
+}
+
+
+test-mock-builtin-command--v-foo-stdout() {
+  @mock command -v foo === @echo /bin/foo
+
+  if [[ "$(command -v foo)" = /bin/foo ]]; then
+      works
+  fi
+}
+
+test-mock-builtin-command--v-foo-stdout-assert() {
+  @dryrun works
 }
 
 

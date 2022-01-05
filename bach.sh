@@ -207,7 +207,13 @@ function bach-run-tests() {
         if [[ "$1" != -* ]] && bach--is-function "$1"; then
             "$@"
         else
-            command_not_found_handle command "$@"
+            mockfunc="$(@generate_mock_function_name command "$@")"
+            if bach--is-function "${mockfunc}"; then
+                @debug "[BC-func]" "${mockfunc}" "$@"
+                "${mockfunc}" "$@"
+            else
+                command_not_found_handle command "$@"
+            fi
         fi
     }
     export -f command
