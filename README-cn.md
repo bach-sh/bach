@@ -38,7 +38,6 @@ Bach 的安装很简单，只需要下载 [bach.sh](https://github.com/bach-sh/b
 #### 一个简单的测试示例
 
     #!/usr/bin/env bash
-    set -euo pipefail
     source bach.sh
 
     test-rm-rf() {

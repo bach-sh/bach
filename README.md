@@ -38,7 +38,6 @@ For example:
 #### A complete example
 
     #!/usr/bin/env bash
-    set -euo pipefail
     source bach.sh
 
     test-rm-rf() {
