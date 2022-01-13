@@ -47,12 +47,12 @@ Bach 的安装很简单，只需要下载 [bach.sh](https://github.com/bach-sh/b
         # 这个方法 `test-rm-rf` 是测试用例的执行
 
         project_log_path=/tmp/project/logs
-        sudo rm -rf "$project_log_ptah/" # 注意，这里有个笔误！
+        rm -rf "$project_log_ptah/" # 注意，这里有个笔误！
     }
     test-rm-rf-assert() {
         # 这个方法 `test-rm-rf-assert` 是测试用例的验证
-        sudo rm -rf /   # 这就是真实的将会执行的命令
-                        # 不要慌！使用 Bach 测试框架不会让这个命令真的执行！
+        rm -rf /   # 这就是真实的将会执行的命令
+                   # 不要慌！使用 Bach 测试框架不会让这个命令真的执行！
     }
 
     test-rm-your-dot-git() {

@@ -13,12 +13,12 @@ test-rm--rf() {
     set +u
     @do-not-panic
     project_log_path=/tmp/project/logs
-    sudo rm -rf "$project_log_ptah/" # Typo here!
+    rm -rf "$project_log_ptah/" # Typo here!
 }
 test-rm--rf-assert() {
     @do-not-panic
-    sudo rm -rf /   # This is the actual command to run on your host!
-                    # DO NOT PANIC! By using Bach Testing Framework it won't actually run.
+    rm -rf /   # This is the actual command to run on your host!
+               # DO NOT PANIC! By using Bach Testing Framework it won't actually run.
 }
 
 test-rm-your-dot-git() {
@@ -396,7 +396,7 @@ test-bach-framework-mock-commands-assert() {
 test-bach-framework-error-output() {
     project_path=/src/project
     cd "${project_path%/*}"
-    sudo rm -rf $project_path
+    rm -rf $project_path
 
     @err no error 2>/dev/null
     @err error 2>&1 1>/dev/null
@@ -406,7 +406,7 @@ test-bach-framework-error-output() {
 }
 test-bach-framework-error-output-assert() {
     cd /src
-    sudo rm -rf /src/project
+    rm -rf /src/project
 
     @echo error
     @echo "ls /foo: No such file or directory"

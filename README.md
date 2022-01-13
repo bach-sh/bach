@@ -44,12 +44,12 @@ For example:
         # Write your test case
 
         project_log_path=/tmp/project/logs
-        sudo rm -rf "$project_log_ptah/" # Typo here!
+        rm -rf "$project_log_ptah/" # Typo here!
     }
     test-rm-rf-assert() {
         # Verify your test case
-        sudo rm -rf /   # This is the actual command to run on your host!
-                        # DO NOT PANIC! By using Bach Testing Framework it won't actually run.
+        rm -rf /   # This is the actual command to run on your host!
+                   # DO NOT PANIC! By using Bach Testing Framework it won't actually run.
     }
 
     test-rm-your-dot-git() {
