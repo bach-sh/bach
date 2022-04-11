@@ -3,7 +3,6 @@ set -ue
 [ -z "${DEBUG:-}" ] || set -x
 
 unset BACH_ASSERT_DIFF BACH_ASSERT_DIFF_OPTS
-PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
 
 OS_NAME="$(uname)"
 if [ -e /etc/os-release ]; then
@@ -52,6 +51,7 @@ err() {
 
 set +e
 retval=0
+PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
 cd "$(dirname "$0")"
 for file in tests/*.test.sh examples/learn*; do
     echo "Running $file"
