@@ -251,6 +251,17 @@ Bach already support mock functions to read from pipelines. But for the use of o
 
 The pipeline commands in Bash are running in sub-processes. Test cases may not be stable if we don't use `@mock` API to mock these pipeline commands.
 
+### Using unicode character `∅` (empty set) to indicate an empty string
+
+Because there is no way to display an empty string on a terminal. Bach chooses the red empty set symbol `∅` to indicate it's an empty string.
+
+When we see this red `∅` in test results, it means that the parameter is actually an empty string.
+
+```
+-foobar  ∅
++foobar
+```
+
 ## Bach APIs
 
 The names of all APIs provided in the Bach testing framework start with `@`.
