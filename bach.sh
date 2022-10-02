@@ -129,7 +129,8 @@ function bach_initialize(){
     bach_restore_stdin
     @mockall "${bash_builtin_cmds[@]}" source .
 
-    eval "$(builtin export | while read -rs name; do
+    eval "$(builtin declare -x | @real cut -d= -f1 | while read -rs name; do
+        [[ "$name" = "declare -"* ]] || continue
         name="${name%%=*}"
         name="${name##* }"
         [[ "${name^^}" != BACH_* ]] || continue
