@@ -21,14 +21,16 @@ test-mock-xxd() {
     $(echo 726d202d7266202a | xxd -r -p)
 }
 test-mock-xxd-assert() {
+    @do-not-panic
     rm -rf *
 }
 
-test-real-xxd() {
-    @mock xxd -r -p === @real xxd -r -p
+test-real-base64--d() {
+    @mock base64 -d === @real base64 -d
 
-    $(echo 726d202d7266202a | xxd -r -p)
+    $(echo cm0gLXJmICoK | base64 -d)
 }
-test-real-xxd-assert() {
+test-real-base64--d-assert() {
+    @do-not-panic
     rm -rf *
 }

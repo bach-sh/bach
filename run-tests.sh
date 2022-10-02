@@ -19,7 +19,7 @@ case "$OS_NAME" in
     FreeBSD)
         export PATH="/usr/local/sbin:$PATH"
         export ASSUME_ALWAYS_YES=yes
-        pkg_install_pkgs="pkg -vv; pkg update -f; pkg install -y bash vim" # vim provides xxd command
+        pkg_install_pkgs="pkg -vv; pkg update -f; pkg install -y bash" # vim provides xxd command
         if ! hash bash || ! hash xxd; then
             if [ "$(id -u)" -gt 0 ] && hash sudo; then
                 sudo /bin/sh -c "$pkg_install_pkgs"
@@ -32,7 +32,6 @@ case "$OS_NAME" in
         apk update
         hash bash &>/dev/null || apk add bash
         apk add coreutils diffutils
-        apk add xxd # for running `@real xxd` in ./tests/demo-xxd.test.sh
         ;;
 esac
 
