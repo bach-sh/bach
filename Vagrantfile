@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "chaifeng/ubuntu-18.04-docker-18.09"
+  config.vm.box = "chaifeng/ubuntu-20.04-docker-20.10.17#{(`uname -m`.strip == "arm64")?"-arm64":""}"
 
   for bash_version in ["4.3", "4.4", "5.0", "devel"] do
     config.vm.provision "Test on Ubuntu", type: "shell", inline: <<-SHELL
