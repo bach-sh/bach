@@ -1580,3 +1580,9 @@ test-ASSERT-FAIL-cannot-ignore-read(){
     @ignore read
 }
 
+test-left-square-bracket-is-a-function() {
+    @type -t '['
+}
+test-left-square-bracket-is-a-function-assert() {
+    @echo function
+}

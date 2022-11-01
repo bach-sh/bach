@@ -241,6 +241,11 @@ function bach-run-tests() {
     }
     export -f xargs
 
+    function [() {
+        builtin '[' "$@"
+    }
+    export -f '['
+
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
         BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
     fi
