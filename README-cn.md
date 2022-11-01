@@ -184,6 +184,78 @@ Bach 也提供了一些常用命令的 API，这些 API 对应的真实命令都
 
 而 `@xargs` 中，则真的会调用系统中的 `xargs` 命令，但默认也不会真的执行命令。
 
+例如：
+
+    test-xargs-no-dash-dash() {
+        @mock ls === @stdout foo bar
+
+        ls | xargs -n1 rm -v
+    }
+    test-xargs-no-dash-dash-assert() {
+        xargs -n1 rm -v
+    }
+
+
+    test-xargs() {
+        @mock ls === @stdout foo bar
+
+        ls | xargs -n1 -- rm -v
+    }
+    test-xargs-assert() {
+        rm -v foo
+        rm -v bar
+    }
+
+
+    test-xargs-0() {
+        @mock ls === @stdout foo bar
+
+        ls | xargs -- rm -v
+    }
+    test-xargs-0-assert() {
+        rm -v foo bar
+    }
+
+我们还可以模拟测试命令 `[ ... ]`。但如果没有模拟的话，测试将会保持原有的行为。
+
+例如:
+
+    test-if-string-is-empty() {
+        if [ -n "original behavior" ] # 没有模拟这个测试，将保持默认行为
+        then
+            It keeps the original behavior by default # 应该看到这一行
+        else
+            It should not be empty
+        fi
+
+        @mockfalse [ -n "Non-empty string" ] # 我们可以通过模拟一个测试来反转其结果
+
+        if [ -n "Non-empty string" ]
+        then
+            Non-empty string is not empty # 不，我们看不到这个
+        else
+            Non-empty string should not be empty but we reverse its result
+        fi
+    }
+    test-if-string-is-empty-assert() {
+        It keeps the original behavior by default
+
+        Non-empty string should not be empty but we reverse its result
+    }
+
+    # 模拟测试命令 `[ ... ]` 是很有用的，比如当我们想去检查一个有绝对路径的文件是否存在的时候
+    test-a-file-exists() {
+        @mocktrue [ -f /etc/an-awesome-config.conf ]
+        if [ -f /etc/an-awesome-config.conf ]; then
+            Found this awesome config file
+        else
+            Even though this config file does not exist
+        fi
+    }
+    test-a-file-exists-assert() {
+        Found this awesome config file
+    }
+
 ### 配置 Bach
 
 有一系列的以 `BACH_` 开头的环境变量用于配置 Bach 测试框架，有

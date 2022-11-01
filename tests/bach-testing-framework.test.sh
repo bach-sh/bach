@@ -1590,7 +1590,7 @@ test-left-square-bracket-is-a-function-assert() {
 test-left-square-bracket-if-string-is-empty() {
     if [ -z "" ]
     then empty
-    else not-empty
+    else non-empty
     fi
 }
 test-left-square-bracket-if-string-is-empty-assert() {
@@ -1624,4 +1624,41 @@ test-left-square-bracket-returns-false-if-string-is-not-empty() {
 test-left-square-bracket-returns-false-if-string-is-not-empty-assert() {
     abc is not empty
     XYZ is empty
+}
+
+test-if-string-is-empty() {
+    if [ -n "original behavior" ] # We did not mock it, so this test keeps the original behavior
+    then
+        It keeps the original behavior by default # We should see this
+    else
+        It should not be empty
+    fi
+
+    @mockfalse [ -n "Non-empty string" ] # We can reverse the test result by mocking it
+
+    if [ -n "Non-empty string" ]
+    then
+        Non-empty string is not empty # No, we cannot see this
+    else
+        Non-empty string should not be empty but we reverse its result
+    fi
+}
+test-if-string-is-empty-assert() {
+    It keeps the original behavior by default
+
+    Non-empty string should not be empty but we reverse its result
+}
+
+# Mocking the test command `[ ... ]` is useful
+# when we want to check whether a file with absolute path exists or not
+test-a-file-exists() {
+    @mocktrue [ -f /etc/an-awesome-config.conf ]
+    if [ -f /etc/an-awesome-config.conf ]; then
+        Found this awesome config file
+    else
+        Even though this config file does not exist
+    fi
+}
+test-a-file-exists-assert() {
+    Found this awesome config file
 }
