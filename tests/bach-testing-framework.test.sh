@@ -1586,3 +1586,42 @@ test-left-square-bracket-is-a-function() {
 test-left-square-bracket-is-a-function-assert() {
     @echo function
 }
+
+test-left-square-bracket-if-string-is-empty() {
+    if [ -z "" ]
+    then empty
+    else not-empty
+    fi
+}
+test-left-square-bracket-if-string-is-empty-assert() {
+    empty
+}
+
+test-left-square-bracket-returns-false-if-string-is-empty() {
+    @mock [ -z "" ] === @false
+    if [ -z "" ]
+    then empty string should be empty but we reverse the result by mocking it incorrectly
+    else an empty string which is not empty
+    fi
+}
+test-left-square-bracket-returns-false-if-string-is-empty-assert() {
+    an empty string which is not empty
+}
+
+test-left-square-bracket-returns-false-if-string-is-not-empty() {
+    @mock [ -n XYZ ] === @false
+
+    if [ -n "abc" ]
+    then abc is not empty
+    else abc should not be empty
+    fi
+
+    if [ -n "XYZ" ]
+    then XYZ should not be empty but we reverse the result by mocking it incorrectly
+    else XYZ is empty
+    fi
+}
+test-left-square-bracket-returns-false-if-string-is-not-empty-assert() {
+    abc is not empty
+    XYZ is empty
+}

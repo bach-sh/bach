@@ -208,7 +208,7 @@ function bach-run-tests() {
         if [[ "$1" != -* ]] && bach--is-function "$1"; then
             "$@"
         else
-            mockfunc="$(@generate_mock_function_name command "$@")"
+            declare mockfunc="$(@generate_mock_function_name command "$@")"
             if bach--is-function "${mockfunc}"; then
                 @debug "[BC-func]" "${mockfunc}" "$@"
                 "${mockfunc}" "$@"
@@ -242,7 +242,13 @@ function bach-run-tests() {
     export -f xargs
 
     function [() {
-        builtin '[' "$@"
+        declare mockfunc="$(@generate_mock_function_name '[' "$@")"
+        if bach--is-function "${mockfunc}"; then
+            @debug "[LSB-func]" "${mockfunc}" "$@"
+            "${mockfunc}" "$@"
+        else
+            builtin '[' "$@"
+        fi
     }
     export -f '['
 
@@ -400,7 +406,7 @@ SCRIPT
         for (( mockfunc__SEQ=1; mockfunc__SEQ <= ${BACH_MOCK_FUNCTION_MAX_COUNT:-0}; ++mockfunc__SEQ )); do
             bach--is-function "${mockfunc}_${mockfunc__SEQ}" || break
         done
-        body="${mockfunc}_${mockfunc__SEQ}() {
+        body="function ${mockfunc}_${mockfunc__SEQ}() {
             # @mock ${name} ${cmd[@]} ===
             $func
         }; export -f ${mockfunc}_${mockfunc__SEQ}"
