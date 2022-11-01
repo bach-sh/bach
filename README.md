@@ -602,7 +602,7 @@ n
 
 ## Versioning
 
-The latest version of Bach is 0.4.2, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
+The latest version of Bach is 0.5.0, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
 
 ## Author
 
