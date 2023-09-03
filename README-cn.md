@@ -72,6 +72,18 @@ Bach 的安装很简单，只需要下载 [bach.sh](https://github.com/bach-sh/b
 
 更多的测试示例请看 [tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh)
 
+#### Windows
+shebang 得是
+```
+#!/bin/bash
+```
+而非
+```
+#!/bin/sh
+```
+
+若以 Cygwin 而非 Git Bash 运行，要将 `bach.sh` 的行尾序列改为 `LF`.
+
 ### 用 Bach 来写脚本测试
 
 与我们所熟悉的测试框架不同的是，Bach 的标准测试用例是由两个方法组成，这样做的目的是为了让测试用例的验证变得简单。测试用例的执行部分是写在以 `test-` 开头的方法中，然后 Bach 会寻找与这个测试方法名称对应的以 `-assert` 结尾的测试验证方法。所以，每一个 Bach 的测试执行方法都必须不能以 `-assert` 作为后缀。比如，一个名为 `test-rm-rf` 的测试执行方法，对应的测试验证方法是 `test-rm-rf-assert`。

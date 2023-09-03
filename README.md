@@ -69,6 +69,18 @@ For example:
 
 See [tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh) for more examples.
 
+#### On Windows
+Make sure to use for shebang
+```
+#!/bin/bash
+```
+and not
+```
+#!/bin/sh
+```
+
+If on Cygwin (as opposed to Git Bash), the end of line sequence of `bach.sh` should be `LF`.
+
 ### Write test cases
 
 Unlike the other testing frameworks, A standard test case of Bach is composed of two Bash functions. One is for running tests, the other is for asserting. Bach will run the two functions separately and then compare whether the same sequence of commands will be executed in both functions. The name of a testing function must start with `test-`, the name of the corresponding asserting function ends with `-assert`.
