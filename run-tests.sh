@@ -58,7 +58,7 @@ for file in tests/*.test.sh examples/learn*; do
         err "Found defination of BACH_TESTS in $file"
         retval=1
     fi
-    if [ "$file" = */failed-* ]; then
+    if [ "${file##*/failed-}" != "${file}" ]; then
         ! "$bash_bin" -euo pipefail "$file"
     else
         "$bash_bin" -euo pipefail "$file"
