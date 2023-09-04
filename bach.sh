@@ -151,7 +151,7 @@ function @real() {
         cmd=(builtin "$name")
         [[ "$name" != declare ]] || cmd+=(-g)
     else
-        real_cmd="$(bach-real-path "$1" 7>&1)"
+        real_cmd="$(bach-real-path "$1" 7>&1 || true)"
         if [[ -z "${real_cmd}" ]]; then
             real_cmd="${name}_not_found"
         fi
