@@ -25,12 +25,12 @@ test-mock-xxd-assert() {
     rm -rf *
 }
 
-test-real-base64--d() {
-    @mock base64 -d === @real base64 -d
+test-real-tr() {
+    @mock tr -cd 'fm*r -' === @real tr -cd 'fm*r -'
 
-    $(echo cm0gLXJmICoK | base64 -d)
+    $(echo 'arm -ref and*with' | /usr/bin/tr -cd 'fm*r -')
 }
-test-real-base64--d-assert() {
+test-real-tr-assert() {
     @do-not-panic
     rm -rf *
 }
