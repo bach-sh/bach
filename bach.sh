@@ -142,15 +142,22 @@ function bach_initialize(){
 
 function @real() {
     declare name="$1" real_cmd
-    if [[ "$name" == */* ]]; then
+    if [[ "$name" == */* ||"$name" == @(bg|fc|fg|jobs|ulimit|umask|wait)  ]]; then
         @echo "$@"
         return
     fi
-    real_cmd="$(bach-real-path "$1" 7>&1)"
-    if [[ -z "${real_cmd}" ]]; then
-        real_cmd="${name}_not_found"
+    declare -a cmd
+    if [[ "$name" == @(alias|builtin|cd|command|declare|eval|false|getopts|hash|printf|read|set|type|unalias|unset) ]]; then
+        cmd=(builtin "$name")
+        [[ "$name" != declare ]] || cmd+=(-g)
+    else
+        real_cmd="$(bach-real-path "$1" 7>&1)"
+        if [[ -z "${real_cmd}" ]]; then
+            real_cmd="${name}_not_found"
+        fi
+        cmd=("${real_cmd}")
     fi
-    declare -a cmd=("${real_cmd}" "${@:2}")
+    cmd+=("${@:2}")
     @debug "[REAL-CMD]" "${cmd[@]}"
     "${cmd[@]}"
 }

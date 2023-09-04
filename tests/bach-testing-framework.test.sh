@@ -342,6 +342,75 @@ test-@real-function-command-not-found-assert() {
     @dryrun md5sum_not_found file.txt
 }
 
+
+test-@real-builtin-command() {
+    @real command -v builtin
+}
+test-@real-builtin-command-assert() {
+    @echo builtin
+}
+
+
+test-@real-builtin-declare() {
+    @real declare answer=42
+    @echo "answer is $answer"
+}
+test-@real-builtin-declare-assert() {
+    @echo answer is 42
+}
+
+
+test-@real-builtin-builtin() {
+    @real builtin type -t @command
+}
+test-@real-builtin-builtin-assert() {
+    @echo function
+}
+
+
+test-@real-builtin-type() {
+    @real type -t @command
+}
+test-@real-builtin-type-assert() {
+    @echo function
+}
+
+
+test-@real-builtin-printf() {
+    @real printf "Hello, %s" world
+}
+test-@real-builtin-printf-assert() {
+    @echo -n "Hello, world"
+}
+
+
+test-@real-should-not-invoke-these-builtin-commands() {
+    # bg|fc|fg|jobs|read|ulimit|umask|wait
+    @real bg 42
+    @real fc -l
+    @real fg 42
+    @real jobs -l
+    @real ulimit -a
+    @real umask 022
+    @real wait 42
+}
+test-@real-should-not-invoke-these-builtin-commands-assert() {
+    @echo bg 42
+    @echo fc -l
+    @echo fg 42
+    @echo jobs -l
+    @echo ulimit -a
+    @echo umask 022
+    @echo wait 42
+}
+
+
+test-@real-should-not-invoke-bach-api-@command() {
+    @real @command -v builtin
+}
+test-@real-should-not-invoke-bach-api-@command-assert() {
+    @command_not_found -v builtin
+}
 this_variable_exists=""
 this_variable_exists_in_test=""
 this_variable_exists_in_assert=""
