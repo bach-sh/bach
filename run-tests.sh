@@ -11,7 +11,7 @@ if [ -e /etc/os-release ]; then
 fi
 case "$OS_NAME" in
     Darwin)
-        if ! brew list --full-name --versions bash &>/dev/null; then
+        if ! brew list --full-name --versions bash >/dev/null 2>&1; then
             brew install bash
         fi
         bash_bin="$(brew --prefix)"/bin/bash
@@ -30,7 +30,7 @@ case "$OS_NAME" in
         ;;
     Linux-alpine-*)
         apk update
-        hash bash &>/dev/null || apk add bash
+        hash bash >/dev/null 2>&1 || apk add bash
         apk add coreutils diffutils
         ;;
 esac
