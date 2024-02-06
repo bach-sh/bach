@@ -16,7 +16,7 @@ case "$OS_NAME" in
         fi
         bash_bin="$(brew --prefix)"/bin/bash
         ;;
-    FreeBSD)
+    FreeBSD*)
         export PATH="/usr/local/sbin:$PATH"
         export ASSUME_ALWAYS_YES=yes
         pkg_install_pkgs="pkg -vv; pkg update -f; pkg install -y bash base64"
