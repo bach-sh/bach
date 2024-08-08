@@ -290,7 +290,7 @@ test-bach-real-path-typical() {
     @echo '#!/bin/bash' > bin/shasum
     @chmod +x bin/shasum
 
-    bach-real-path 'shasum|sha1sum'
+    .bach.real-path 'shasum|sha1sum'
 }
 test-bach-real-path-typical-assert() {
     @out bin/shasum
@@ -300,8 +300,8 @@ test-bach-real-path-typical-assert() {
 test-bach-real-path-fallback() {
     setup-bach-real-path
 
-    bach-real-path sha1sum
-    bach-real-path 'shasum|sha1sum'
+    .bach.real-path sha1sum
+    .bach.real-path 'shasum|sha1sum'
 }
 test-bach-real-path-fallback-assert() {
     @out usr/bin/sha1sum
@@ -312,7 +312,7 @@ test-bach-real-path-fallback-assert() {
 test-bach-real-path-not-found() {
     setup-bach-real-path
 
-    bach-real-path foobar
+    .bach.real-path foobar
 }
 
 test-bach-real-path-not-found-assert() {
@@ -321,8 +321,8 @@ test-bach-real-path-not-found-assert() {
 
 
 test-@real-function() {
-    @unset -f bach-real-path
-    @mock bach-real-path md5sum === fake-md5sum
+    @unset -f .bach.real-path
+    @mock .bach.real-path md5sum === fake-md5sum
 
     @real md5sum
     @real md5sum --version
@@ -333,8 +333,8 @@ test-@real-function-assert() {
 }
 
 test-@real-function-command-not-found() {
-    @unset -f bach-real-path
-    @mock bach-real-path md5sum === @stdout ""
+    @unset -f .bach.real-path
+    @mock .bach.real-path md5sum === @stdout ""
 
     @real md5sum file.txt
 }
@@ -686,9 +686,9 @@ test-mock-script-with-custom-complex-action-assert() {
 }
 
 test-bach-framework-can-get-all-tests() {
-    @unset -f bach-get-all-functions @sort
+    @unset -f .bach.get-all-functions @sort
     @mock @sort -R === @real sort
-    @mock bach-get-all-functions <<EOF
+    @mock .bach.get-all-functions <<EOF
 @echo declare -f gp
 @echo declare -f test-bach-run-tests--get-all-tests-foo
 @echo declare -f test-bach-run-tests--get-all-tests-bar
@@ -697,7 +697,7 @@ test-bach-framework-can-get-all-tests() {
 @echo declare -f test-bach-run-tests--get-all-tests-bar-assert
 EOF
 
-    bach-run-tests--get-all-tests
+    .bach.run-tests--get-all-tests
 }
 test-bach-framework-can-get-all-tests-assert() {
     test-bach-run-tests--get-all-tests-bar
@@ -1012,7 +1012,7 @@ test-bach-framework-@fail-function-with-error-message-assert() {
 
 
 function mock-bach-get-all-functions() {
-    @mock bach-get-all-functions <<EOF
+    @mock .bach.get-all-functions <<EOF
 @echo declare -f gp
 @echo declare -f test-bach-run-tests--get-all-tests-foo
 @echo declare -f test-bach-run-tests--get-all-tests-bar
@@ -1027,10 +1027,10 @@ EOF
 test-bach-framework-only-run-a-certain-test() {
     export BACH_TESTS=bach-run-this
 
-    @unset -f bach-get-all-functions @sort
+    @unset -f .bach.get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
-    bach-run-tests--get-all-tests
+    .bach.run-tests--get-all-tests
 }
 test-bach-framework-only-run-a-certain-test-assert() {
     @cat <<TESTS
@@ -1041,10 +1041,10 @@ TESTS
 test-bach-framework-uses-multi-tests-filters() {
     export BACH_TESTS='bach-run-this,bach-run-this-too'
 
-    @unset -f bach-get-all-functions @sort
+    @unset -f .bach.get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
-    bach-run-tests--get-all-tests
+    .bach.run-tests--get-all-tests
 }
 test-bach-framework-uses-multi-tests-filters-assert() {
     @cat <<TESTS
@@ -1057,10 +1057,10 @@ TESTS
 test-bach-framework-uses-multi-tests-filters-supports-glob() {
     export BACH_TESTS='bach-run-this*,*bar*'
 
-    @unset -f bach-get-all-functions @sort
+    @unset -f .bach.get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
-    bach-run-tests--get-all-tests
+    .bach.run-tests--get-all-tests
 }
 test-bach-framework-uses-multi-tests-filters-supports-glob-assert() {
     @cat <<TESTS
@@ -1074,10 +1074,10 @@ TESTS
 test-bach-framework-filter-tests-no-matches() {
     export BACH_TESTS="you-can-not-find-me"
 
-    @unset -f bach-get-all-functions @sort
+    @unset -f .bach.get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
-    bach-run-tests--get-all-tests
+    .bach.run-tests--get-all-tests
 }
 test-bach-framework-filter-tests-no-matches-assert() {
     @comment nothing here
@@ -1086,10 +1086,10 @@ test-bach-framework-filter-tests-no-matches-assert() {
 test-bach-framework-filter-tests-by-glob() {
     export BACH_TESTS="bach-run-this*"
 
-    @unset -f bach-get-all-functions @sort
+    @unset -f .bach.get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
-    bach-run-tests--get-all-tests
+    .bach.run-tests--get-all-tests
 }
 test-bach-framework-filter-tests-by-glob-assert() {
     @cat <<TESTS
@@ -1101,10 +1101,10 @@ TESTS
 test-bach-framework-filter-tests-by-glob-two-stars() {
     export BACH_TESTS="*run-this*"
 
-    @unset -f bach-get-all-functions @sort
+    @unset -f .bach.get-all-functions @sort
     @mock @sort -R === @real sort
     mock-bach-get-all-functions
-    bach-run-tests--get-all-tests
+    .bach.run-tests--get-all-tests
 }
 test-bach-framework-filter-tests-by-glob-two-stars-assert() {
     @cat <<TESTS
@@ -1382,7 +1382,7 @@ test-bach-framework-is_function() {
         : do nothing
     }
 
-    bach--is-function this_is_a_function
+    .bach.is-function this_is_a_function
     @assert-success
 }
 
@@ -1390,7 +1390,7 @@ test-bach-framework-is_function() {
 test-bach-framework-is_function-2() {
     this_is_a_variable=some_value
 
-    bach--is-function this_is_a_variable
+    .bach.is-function this_is_a_variable
 }
 test-bach-framework-is_function-2-assert() {
     @fail

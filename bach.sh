@@ -60,7 +60,7 @@ else
 fi
 export -f @debug
 
-function bach-real-path() {
+function .bach.real-path() {
     declare folder name="$1"
     declare altname="${name#*|}"
     name="${name%|*}"
@@ -75,11 +75,11 @@ function bach-real-path() {
     done
     return 1
 }
-export -f bach-real-path
+export -f .bach.real-path
 
 export BACH_DEV_STDIN=""
 
-function bach_restore_stdin() {
+function .bach.restore-stdin() {
     if [[ ! -t 0 ]]; then
         declare name
         [[ -n "$BACH_DEV_STDIN" ]] || for name in /dev/ptmx /dev/pts/ptmx /dev/ttyv[0-9a-f]; do
@@ -94,7 +94,7 @@ function bach_restore_stdin() {
     fi
 }
 
-function bach_initialize(){
+function .bach.initialize(){
     enable -n alias bg bind dirs disown fc fg hash help history jobs kill suspend times ulimit umask unalias wait
 
     declare util name util_path
@@ -122,11 +122,11 @@ function bach_initialize(){
             util="shasum|sha1"
         fi
         name="${util%|*}"
-        util_path="$(bach-real-path "$util")"
+        util_path="$(.bach.real-path "$util")"
         eval "[[ -n \"${util_path}\" ]] || @die \"Fatal, CAN NOT find '$name' in \\\$PATH\"; function @${name}() { \"${util_path}\" \"\$@\"; } 8>/dev/null; export -f @${name}"
     done
 
-    bach_restore_stdin
+    .bach.restore-stdin
     @mockall "${bash_builtin_cmds[@]}" source .
 
     eval "$(builtin declare -x | @real cut -d= -f1 | while read -rs name; do
@@ -151,7 +151,7 @@ function @real() {
         cmd=(builtin "$name")
         [[ "$name" != declare ]] || cmd+=(-g)
     else
-        real_cmd="$(bach-real-path "$1" 7>&1 || true)"
+        real_cmd="$(.bach.real-path "$1" 7>&1 || true)"
         if [[ -z "${real_cmd}" ]]; then
             real_cmd="${name}_not_found"
         fi
@@ -163,12 +163,12 @@ function @real() {
 }
 export -f @real
 
-function bach-get-all-functions() {
+function .bach.get-all-functions() {
     declare -F
 }
-export -f bach-get-all-functions
+export -f .bach.get-all-functions
 
-function bach--skip-the-test() {
+function .bach.skip-the-test() {
     declare test="$1" test_filter
     while read -d, test_filter; do
         [[ -n "$test_filter" ]] || continue
@@ -176,13 +176,13 @@ function bach--skip-the-test() {
         [[ "$test" == test-$test_filter ]] && return 0
     done <<< "${BACH_TESTS:-},"
 }
-export -f bach--skip-the-test
+export -f .bach.skip-the-test
 
-function bach-run-tests--get-all-tests() {
-    bach-get-all-functions | @sort -R | while read -r _ _ name; do
+function .bach.run-tests--get-all-tests() {
+    .bach.get-all-functions | @sort -R | while read -r _ _ name; do
         [[ "$name" == test?* ]] || continue
         [[ "$name" == *-assert ]] && continue
-        bach--skip-the-test "$name" || continue
+        .bach.skip-the-test "$name" || continue
         builtin printf "%s\n" "$name"
     done
 }
@@ -191,10 +191,10 @@ for donotpanic in donotpanic dontpanic do-not-panic dont-panic do_not_panic dont
     eval "function @${donotpanic}() { builtin printf '\n%s\n  line number: %s\n  script stack: %s\n\n' 'DO NOT PANIC!' \"\${BASH_LINENO}\" \"\${BASH_SOURCE[*]}\"; builtin exit 1; } >&2; export -f @${donotpanic};"
 done
 
-function bach--is-function() {
+function .bach.is-function() {
     [[ "$(@type -t "$1")" == function ]]
 }
-export -f bach--is-function
+export -f .bach.is-function
 
 declare -gr __bach_run_test__ignore_prefix="## BACH:"
 function @comment() {
@@ -202,21 +202,21 @@ function @comment() {
 }
 export -f @comment
 
-function bach-run-tests() {
+function .bach.run-tests() {
     set -euo pipefail
 
-    bach_initialize
+    .bach.initialize
 
     for donotpanic in donotpanic dontpanic do-not-panic dont-panic do_not_panic dont_panic; do
         eval "function @${donotpanic}() { builtin true; }; export -f @${donotpanic}"
     done
 
     function command() {
-        if [[ "$1" != -* ]] && bach--is-function "$1"; then
+        if [[ "$1" != -* ]] && .bach.is-function "$1"; then
             "$@"
         else
-            declare mockfunc="$(@generate_mock_function_name command "$@")"
-            if bach--is-function "${mockfunc}"; then
+            declare mockfunc="$(.bach.gen_function_name command "$@")"
+            if .bach.is-function "${mockfunc}"; then
                 @debug "[BC-func]" "${mockfunc}" "$@"
                 "${mockfunc}" "$@"
             else
@@ -249,8 +249,8 @@ function bach-run-tests() {
     export -f xargs
 
     function [() {
-        declare mockfunc="$(@generate_mock_function_name '[' "$@")"
-        if bach--is-function "${mockfunc}"; then
+        declare mockfunc="$(.bach.gen_function_name '[' "$@")"
+        if .bach.is-function "${mockfunc}"; then
             @debug "[LSB-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
         else
@@ -276,7 +276,7 @@ function bach-run-tests() {
     declare name friendly_name testresult test_name_assert_fail
     declare -i total=0 error=0
     declare -a all_tests
-    mapfile -t all_tests < <(bach-run-tests--get-all-tests)
+    mapfile -t all_tests < <(.bach.run-tests--get-all-tests)
     @echo "1..${#all_tests[@]}"
     for name in "${all_tests[@]}"; do
         # @debug "Running test: $name"
@@ -286,7 +286,7 @@ function bach-run-tests() {
         : $(( ++total ))
         testresult="$(@mktemp)"
         @set +e
-        assert-execution "$name" &>"$testresult"; test_retval="$?"
+        .bach.assert-execution "$name" &>"$testresult"; test_retval="$?"
         @set -e
         if [[ "$name" == test-ASSERT-FAIL-* ]]; then
             test_retval="$(( test_retval == 0?1:0 ))"
@@ -318,25 +318,25 @@ function bach-run-tests() {
     [[ "$error" == 0 ]] && [[ "${#all_tests[@]}" -eq "$total" ]]
 }
 
-function bach-on-exit() {
+function .bach.on-exit() {
     if [[ -o xtrace ]]; then
         exec 8>&2
         BASH_XTRACEFD=8
     fi
     if [[ "$?" -eq 0 ]]; then
-        [[ "${BACH_DISABLED:-false}" == true ]] || bach-run-tests
+        [[ "${BACH_DISABLED:-false}" == true ]] || .bach.run-tests
     else
         builtin printf "Bail out! %s\n" "Couldn't initlize tests."
     fi
 }
 
-trap bach-on-exit EXIT
+trap .bach.on-exit EXIT
 
-function @generate_mock_function_name() {
+function .bach.gen_function_name() {
     declare name="$1"
     @echo "mock_exec_${name}_$(@dryrun "${@}" | @shasum | @cut -b1-7)"
 }
-export -f @generate_mock_function_name
+export -f .bach.gen_function_name
 
 function @mock() {
     declare -a param name cmd func body desttype
@@ -386,8 +386,8 @@ SCRIPT
     else
         if [[ -z "$desttype" || "$desttype" == builtin ]]; then
             eval "function ${name}() {
-                      declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\"
-                      if bach--is-function \"\$mockfunc\"; then
+                      declare mockfunc=\"\$(.bach.gen_function_name ${name} \"\${@}\")\"
+                      if .bach.is-function \"\$mockfunc\"; then
                            \"\${mockfunc}\" \"\$@\"
                       else
                            [[ -t 0 ]] || @cat
@@ -396,14 +396,14 @@ SCRIPT
                   }; export -f ${name}"
         fi
         declare mockfunc
-        mockfunc="$(@generate_mock_function_name "${cmd[@]}")"
+        mockfunc="$(.bach.gen_function_name "${cmd[@]}")"
         #stderr name="$name"
         #body="function ${mockfunc}() { @debug Running mock : '${cmd[*]}' :; $func; }"
         declare mockfunc_seq="${mockfunc//_/__}_SEQ"
         mockfunc_seq="${mockfunc_seq//[-\!+.@\[\]\{\}~]/_}"
         body="function ${mockfunc}() {
             declare -gxi ${mockfunc_seq}=\"\${${mockfunc_seq}:-0}\";
-            if bach--is-function \"${mockfunc}_\$(( ${mockfunc_seq} + 1))\"; then
+            if .bach.is-function \"${mockfunc}_\$(( ${mockfunc_seq} + 1))\"; then
                 let ++${mockfunc_seq};
             fi;
             \"${mockfunc}_\${${mockfunc_seq}}\" \"\$@\";
@@ -411,7 +411,7 @@ SCRIPT
         @debug "$body"
         eval "$body"
         for (( mockfunc__SEQ=1; mockfunc__SEQ <= ${BACH_MOCK_FUNCTION_MAX_COUNT:-0}; ++mockfunc__SEQ )); do
-            bach--is-function "${mockfunc}_${mockfunc__SEQ}" || break
+            .bach.is-function "${mockfunc}_${mockfunc__SEQ}" || break
         done
         body="function ${mockfunc}_${mockfunc__SEQ}() {
             # @mock ${name} ${cmd[@]} ===
@@ -456,13 +456,13 @@ alias @setup-test="function $BACH_FRAMEWORK__PRE_TEST_FUNCNAME"
 BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME='_bach_framework_pre_assert_'
 alias @setup-assert="function $BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME"
 
-function _bach_framework__run_function() {
+function .bach.run_function() {
     declare name="$1"
-    if bach--is-function "$name"; then
+    if .bach.is-function "$name"; then
         "$name"
     fi
 }
-export -f _bach_framework__run_function
+export -f .bach.run_function
 
 function @dryrun() {
     builtin declare param
@@ -481,7 +481,7 @@ declare -gxa BACH_ASSERT_DIFF_OPTS=(-u)
 declare -gx BACH_ASSERT_IGNORE_COMMENT="${BACH_ASSERT_IGNORE_COMMENT:-true}"
 declare -gx BACH_ASSERT_DIFF="${BACH_ASSERT_DIFF:-diff}"
 
-function assert-execution() (
+function .bach.assert-execution() (
     @unset BACH_TESTS
     declare bach_test_name="$1" bach_tmpdir bach_actual_output bach_expected_output
     bach_tmpdir="$(@mktemp -d)"
@@ -495,9 +495,9 @@ function assert-execution() (
     function command_not_found_handle() {
         declare mockfunc bach_cmd_name="$1"
         [[ -n "$bach_cmd_name" ]] || @out "Error: Bach found an empty command at line ${BASH_LINENO}." >&7
-        mockfunc="$(@generate_mock_function_name "$@")"
+        mockfunc="$(.bach.gen_function_name "$@")"
         # @debug "mockid=$mockid" >&2
-        if bach--is-function "${mockfunc}"; then
+        if .bach.is-function "${mockfunc}"; then
             @debug "[CNFH-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
         elif [[ "${bach_cmd_name}" == @(cd|command|echo|eval|exec|false|popd|pushd|pwd|source|true|type) ]]; then
@@ -510,34 +510,34 @@ function assert-execution() (
     } >&7 #8>/dev/null
     export -f command_not_found_handle
 
-    function __bach__pre_run_test_and_assert() {
+    function .bach.pre_run_test_and_assert() {
         @trap - EXIT RETURN
         @set +euo pipefail
         declare -gxr PATH=bach-fake-path
-        bach_restore_stdin
-        _bach_framework__run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
+        .bach.restore-stdin
+        .bach.run_function "$BACH_FRAMEWORK__SETUP_FUNCNAME"
     }
-    function __bach__run_test() (
-        __bach__pre_run_test_and_assert
-        _bach_framework__run_function "${BACH_FRAMEWORK__PRE_TEST_FUNCNAME}"
+    function .bach.run_test() (
+        .bach.pre_run_test_and_assert
+        .bach.run_function "${BACH_FRAMEWORK__PRE_TEST_FUNCNAME}"
         "${1}"
     ) 7>&1
 
-    function __bach__run_assert() (
+    function .bach.run_assert() (
         @unset -f @mock @mockall @ignore @setup-test
-        __bach__pre_run_test_and_assert
-        _bach_framework__run_function "${BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME}"
+        .bach.pre_run_test_and_assert
+        .bach.run_function "${BACH_FRAMEWORK__PRE_ASSERT_FUNCNAME}"
         "${1}-assert"
     ) 7>&1
     bach_actual_stdout="${bach_tmpdir}/actual-stdout.txt"
     bach_expected_stdout="${bach_tmpdir}/expected-stdout.txt"
-    if bach--is-function "${bach_test_name}-assert"; then
+    if .bach.is-function "${bach_test_name}-assert"; then
         @cat <(
-            __bach__run_test "$bach_test_name"
+            .bach.run_test "$bach_test_name"
             @echo "# Exit code: $?"
         ) > "${bach_actual_stdout}"
         @cat <(
-            __bach__run_assert "$bach_test_name"
+            .bach.run_assert "$bach_test_name"
             @echo "# Exit code: $?"
         ) > "${bach_expected_stdout}"
         @cd ..
@@ -547,7 +547,7 @@ function assert-execution() (
             retval=0
         fi
     else
-        __bach__run_test "$bach_test_name" |
+        .bach.run_test "$bach_test_name" |
             @tee /dev/stderr | if [[ "$bach_test_name" = test-ASSERT-FAIL-* ]]; then
                 @cat
                 @echo "${__bach_run_test__ignore_prefix} Should fail"
@@ -568,8 +568,8 @@ function @ignore() {
             @die "Cannot ignore the builtin command: $name"
         fi
         eval "function ${name}() {
-              declare mockfunc=\"\$(@generate_mock_function_name ${name} \"\${@}\")\";
-              if bach--is-function \"\$mockfunc\"; then
+              declare mockfunc=\"\$(.bach.gen_function_name ${name} \"\${@}\")\";
+              if .bach.is-function \"\$mockfunc\"; then
                   \"\${mockfunc}\" \"\$@\";
               else [[ -t 0 ]] || @cat; fi
           }; export -f ${name}"
@@ -654,7 +654,7 @@ export -f @do-nothing
 
 function @unmock() {
     declare name="${1:?missing command name}"
-    if bach--is-function "$name"; then
+    if .bach.is-function "$name"; then
         unset -f "$name"
     fi
 }
