@@ -99,9 +99,9 @@ function .bach.initialize(){
 
     declare util name util_path
 
-    declare -a bash_builtin_cmds=(cd echo enable export popd pushd pwd shopt test trap type)
+    declare -a bash_builtin_cmds=(cd echo enable popd pushd pwd shopt test trap type)
 
-    for name in . command exec false set true unset "${bash_builtin_cmds[@]}"; do
+    for name in . command exec export false set true unset "${bash_builtin_cmds[@]}"; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; builtin export -f @${name}"
     done
 
@@ -128,6 +128,7 @@ function .bach.initialize(){
 
     .bach.restore-stdin
     @mockall "${bash_builtin_cmds[@]}" source .
+    function export() { builtin export "$@"; @dryrun export "$@"; }
 
     eval "$(builtin declare -x | @real cut -d= -f1 | while read -rs name; do
         [[ "$name" = "declare -"* ]] || continue
