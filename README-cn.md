@@ -670,7 +670,7 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
 ## 版本
 
-Bach 当前最新的版本是 0.5.0，查看[Bach 的发布列表](https://github.com/bach-sh/bach/releases)
+Bach 当前最新的版本是 0.6.0，查看[Bach 的发布列表](https://github.com/bach-sh/bach/releases)
 
 ## 作者
 
