@@ -342,7 +342,7 @@ builtin export -f .bach.gen_function_name
 function @mock() {
     declare -a param name cmd func body desttype
     name="$1"
-    if [[ "$name" == @(builtin|declare|eval|set|unset|true|false|read) ]]; then
+    if [[ "$name" == @(builtin|declare|export|eval|set|unset|true|false|read) ]]; then
         @die "Cannot mock the builtin command: $name"
     fi
     if [[ command == "$name" && "$2" != -* ]]; then

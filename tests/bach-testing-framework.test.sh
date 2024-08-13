@@ -1216,6 +1216,16 @@ test-ignore-export-assert() {
     say "Hello, tom"
 }
 
+test-cannot-mock-export() {
+    @mock export NAME=tom === @stdout cannot do this
+    export NAME=tom
+    export MSG="Hello, $NAME"
+    say "$MSG"
+}
+test-cannot-mock-export-assert() {
+    @fail
+}
+
 
 test-bach-framework-could-not-declare-PATH() {
     declare new_path=/bin:/usr/bin
