@@ -1194,6 +1194,29 @@ test-bach-framework-could-not-export-PATH-assert() {
 }
 
 
+test-builtin-export() {
+    export NAME=tom
+    export MSG="Hello, $NAME"
+    say "$MSG"
+}
+test-builtin-export-assert() {
+    export NAME=tom
+    export MSG="Hello, tom"
+    say "Hello, tom"
+}
+
+
+test-ignore-export() {
+    @ignore export
+    export NAME=tom
+    export MSG="Hello, $NAME"
+    say "$MSG"
+}
+test-ignore-export-assert() {
+    say "Hello, tom"
+}
+
+
 test-bach-framework-could-not-declare-PATH() {
     declare new_path=/bin:/usr/bin
     declare FOOBAR=foobar

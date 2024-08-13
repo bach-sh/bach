@@ -567,13 +567,16 @@ function @ignore() {
     for name; do
         if [[ "$name" == @(builtin|declare|eval|set|unset|true|false|read) ]]; then
             @die "Cannot ignore the builtin command: $name"
-        fi
-        eval "function ${name}() {
+        elif [[ "$name" == export ]]; then
+          function export() { builtin export "$@"; }
+        else
+          eval "function ${name}() {
               declare mockfunc=\"\$(.bach.gen_function_name ${name} \"\${@}\")\";
               if .bach.is-function \"\$mockfunc\"; then
                   \"\${mockfunc}\" \"\$@\";
               else [[ -t 0 ]] || @cat; fi
           }; builtin export -f ${name}"
+        fi
     done
 }
 builtin export -f @ignore

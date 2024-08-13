@@ -66,6 +66,8 @@ for file in tests/*.test.sh examples/learn*; do
 done
 
 if [ "$retval" -ne 0 ]; then
+    err ""
+    err ":----------:"
     err "Test failed!"
 fi
 
