@@ -1,11 +1,16 @@
 # -*- mode: sh -*-
-# Bach Testing Framework, https://bach.sh
+# Bach Unit Testing Framework, https://bach.sh
 # Copyright (C) 2019  Chai Feng <chaifeng@chaifeng.com>
 #
-# Bach Testing Framework is dual licensed under:
+# Bach Unit Testing Framework is dual licensed under:
 # - GNU General Public License v3.0
 # - Mozilla Public License 2.0
 set -euo pipefail
+IFS='.' read -r __major __minor _ <<< "${BASH_VERSION:-0.0.0}"
+if [ "$__major" -lt 4 ] || { [ "$__major" -eq 4 ] && [ "$__minor" -lt 3 ]; }; then
+    echo "Error: Bach Unit Testing Framework requires Bash version 4.3 or higher. Your current version is ${BASH_VERSION:-unknown}." >&2
+    exit 1
+fi
 shopt -s expand_aliases
 
 builtin export BACH_COLOR="${BACH_COLOR:-auto}"
