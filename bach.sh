@@ -11,6 +11,10 @@ if [ "$__major" -lt 4 ] || { [ "$__major" -eq 4 ] && [ "$__minor" -lt 3 ]; }; th
     echo "Error: Bach Unit Testing Framework requires Bash version 4.3 or higher. Your current version is ${BASH_VERSION:-unknown}." >&2
     exit 1
 fi
+if [ -z "${BASH_VERSION:-}" ] || [ -z "${BASH_SOURCE:-}" ]; then
+  echo "Error: Bach Unit Testing Framework must be run in Bash. Please switch to Bash and try again."
+  exit 1
+fi
 shopt -s expand_aliases
 
 builtin export BACH_COLOR="${BACH_COLOR:-auto}"
