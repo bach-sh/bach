@@ -384,7 +384,7 @@ function @mock() {
     fi
     if [[ -z "${func:-}" ]]; then
         @debug "@mock default $name"
-        func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\" >&7; else @cat; fi"
+        func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\" >&7; fi"
     fi
     if [[ "$name" == */* ]]; then
         [[ -d "${name%/*}" ]] || @mkdir -p "${name%/*}"
@@ -400,7 +400,6 @@ SCRIPT
                       if .bach.is-function \"\$mockfunc\"; then
                            \"\${mockfunc}\" \"\$@\"
                       else
-                           [[ -t 0 ]] || @cat
                            @dryrun ${name} \"\$@\" >&7
                       fi
                   }; builtin export -f ${name}"
@@ -437,6 +436,11 @@ function @@mock() {
     BACH_MOCK_FUNCTION_MAX_COUNT=15 @mock "$@"
 }
 builtin export -f @@mock
+
+function @mockpipe() {
+    @mock "$@" === @cat
+}
+builtin export -f @mockpipe
 
 function @mocktrue() {
     @mock "$@" === @true
@@ -611,8 +615,9 @@ builtin export BACH_STARTUP_PWD="${PWD:-$(pwd)}"
 function @run() {
     declare script="${1:?missing script name}"
     shift
-    [[ "$script" == /* ]] || script="${BACH_STARTUP_PWD}/${script}"
+    builtin pushd "${BACH_STARTUP_PWD}" &>/dev/null
     @source "$script" "$@"
+    builtin popd &>/dev/null
 }
 builtin export -f @run
 

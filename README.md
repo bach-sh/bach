@@ -423,31 +423,35 @@ Loading a function definition from a script.
 
 ### @mock
 
-Mock commands or scripts.
+Mocks the execution of commands or scripts. If the command requires different parameters when executed, multiple mock APIs `@@mock` are needed.
+
+Usage: After `@mock`, specify the complete command to be mocked, and after `===`, define the mock behavior or output. For example: `@mock your-command param1 param2 === @stdout out1 out2`
+
+If `===` is omitted, the default behavior is to invoke the `@dryrun` API to output the command. This method is commonly used to mock pipeline commands to prevent random order assertions. If you need to pass the input from the pipeline to the output, use the `@mockpipe` API.
 
 Note:
+- To mock the execution of a script, the script's path must be a relative path, as you cannot mock scripts with absolute paths.
+- If a command is mocked multiple times, only the last mock will take effect.
 
-- cannot mock commands that have absolute paths.
-- If a command is mocked multiple times, only the last mock takes effect
+Example:
 
-Use `===` to split commands and output
+#### Mocking a command
 
-For example:
+    @mock ls file1 === @stdout file2
 
-#### Mock a command that followed by parameters
+    ls file1 # This will output file2 in the console. It lists the file `file1`, but displays `file2`. Weird, right?
 
-    test-mock-ls() {
-        @mock ls file1 === @stdout file2
+    ls foo bar # Since the `ls` command with these specific parameters hasn't been mocked, `ls foo bar` needs to be asserted.
 
-        ls file1
+#### Mocking without specifying behavior or output
 
-        ls foo bar
-    }
-    test-mock-ls-assert() {
-        @out file2 # To list file1, but got file2, It's strange, right?
+    # Mocking all commands in the pipeline ensures that during assertion, the execution order of commands is consistent with the pipeline order.
 
-        ls foo bar
-    }
+    @mock foo param1 param2
+    @mock bar param1
+    @mock foobar
+
+    foo param1 param2 | bar param1 | foobar
 
 #### Mock commands with complex implementations
 
@@ -511,6 +515,20 @@ Mock the return code of a command as successful.
 ### @mockfalse
 
 Mock the return code of a command as non-zero value.
+
+### @mockpipe
+
+Mock the command in a pipeline: When a mocked command is called within the pipeline, the input will be output unchanged. Commands mocked with `@mock` by default will discard the data in the pipeline.
+
+Example:
+
+    @mock say hello === @echo hello
+
+    @mockpipe a_command_in_a_pipeline some parameters
+    say hello | a_command_in_a_pipeline some parameters # This pipeline command will output "hello"
+
+    @mock foobar foo bar
+    say hello | foobar foo bar # This pipeline command will have no output because the default mocked command `foobar foo bar` will discard the data in the pipeline
 
 ### @out
 

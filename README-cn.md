@@ -461,13 +461,15 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
 ### @mock
 
-模拟命令或脚本的执行，如果命令执行的时候需要指定不同的参数，那就需要多次模拟。
+模拟命令或脚本的执行，如果命令执行的时候需要指定不同的参数，那就需要多次模拟 API `@@mock`。
+
+使用方法，在 `@mock` 后面是要模拟的完整命令，然后 `===` 后面是模拟的行为或输出。 例如： `@mock your-command param1 param2 === @stdout out1 out2`
+
+如果省略了 `===`，默认的行为是调用 `@dryrun` API 输出命令，这种方式常见于模拟管道命令来防止随机顺序的验证。如果需要将管道中的输入传递到输出，请使用 API `@mockpipe`。
 
 注意：
 - 如果要模拟一个脚本的执行，该脚本的路径必须是相对路径，不能模拟绝对路径的脚本。
 - 多次模拟一个命令，只有最后一次的模拟生效
-
-使用 `===` 来分割命令和输出
 
 例子：
 
@@ -478,6 +480,16 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
     ls file1 # 会在控制台输出 file2，列出文件 `file1`，但显示的是 `file2`，很怪，对不对？
 
     ls foo bar # 因为没有模拟 `ls` 命令和特定的参数，所以 `ls foo bar` 需要被验证
+
+#### 不指定行为或者输出的模拟
+
+    # 模拟了管道中的所有命令可以确保验证的时候命令的执行顺序如同管道中的顺序一致
+
+    @mock foo param1 param2
+    @mock bar param1
+    @mock foobar
+
+    foo param1 param2 | bar parm1 | foobar
 
 #### 模拟命令，但希望使用复杂的实现
 
@@ -543,6 +555,20 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 例子：
 
     @mocktrue false
+
+### @mockpipe
+
+模拟管道，被模拟的命令在管道中被调用时，将会把输入原封不变的输出。用 `@mock` 默认模拟的命令会丢弃管道中的数据。
+
+例子：
+
+    @mock say hello === @echo hello
+
+    @mockpipe a_command_in_a_pipeline some parameters
+    say hello | a_command_in_a_pipeline some parameters # 这个管道命令将会输出 hello
+
+    @mock foobar foo bar
+    say hello | foobar foo bar # 这个管道命令不会有任何输出，因为默认模拟的命令 `foobar foo bar` 会丢弃管道中的数据
 
 ### @out
 

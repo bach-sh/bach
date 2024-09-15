@@ -51,12 +51,12 @@ test-pass-a-non-existed-tag-assert() {
 }
 
 test-convert-to-html() {
-    @touch README.md README-zh_CN.md
+    @mock find . -maxdepth 1 -type f -name "README*.md" === @stdout ./README-zh_CN.md ./README.md
 
     @mocktrue hash mmark
     @mock grep '<h1 ' index.html === @stdout "Bach Unit Testing Framework for Bash"
     @mock grep '<h1 ' index-zh_CN.html === @stdout "Bash 脚本的 Bach 单元测试框架"
-    @mock sed "s/<[^>]\+>//g"
+    @mockpipe sed "s/<[^>]\+>//g"
     @mock tee index-zh_CN.html
     @mock tee index.html
 

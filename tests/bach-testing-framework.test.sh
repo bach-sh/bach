@@ -177,21 +177,21 @@ test-run-with-no-filename-assert() {
 
 test-run-script-filename-only() {
     @unset -f @source
-    BACH_STARTUP_PWD=/path/to/testing/folder
+
     @run foo.sh
 }
 test-run-script-filename-only-assert() {
-    @dryrun @source /path/to/testing/folder/foo.sh
+    @dryrun @source foo.sh
 }
 
 
 test-run-script-filename-only-with-parameters() {
     @unset -f @source
-    BACH_STARTUP_PWD=/path/to/testing/folder
+
     @run foo.sh bar baz
 }
 test-run-script-filename-only-with-parameters-assert() {
-    @dryrun @source /path/to/testing/folder/foo.sh bar baz
+    @dryrun @source foo.sh bar baz
 }
 
 
@@ -525,7 +525,7 @@ function load-gpr() {
 
 test-gpr-typical() {
     @mock git log -1 --pretty=%B === @out "This is the latest commit message"
-    @mock hub pull-request -F-
+    @mockpipe hub pull-request -F-
     load-gpr
 
     gpr -f
@@ -538,7 +538,7 @@ test-gpr-typical-assert() {
 
 test-gpw-typical() {
     @mock git log -1 --pretty="WIP %B" === @out "WIP This is the latest commit message"
-    @mock hub pull-request -F-
+    @mockpipe hub pull-request -F-
     load-gpr
 
     gpw -u
@@ -1129,19 +1129,15 @@ test-bach-framework-run-script-with-relative-path() {
     @unset -f @source
     @mock @source
 
-    BACH_STARTUP_PWD=/foo/bar/bach
-
     @run ../script.sh
 }
 test-bach-framework-run-script-with-relative-path-assert() {
-    @dryrun @source /foo/bar/bach/../script.sh
+    @dryrun @source ../script.sh
 }
 
 test-bach-framework-run-script-with-absolute-path() {
     @unset -f @source
     @mock @source
-
-    BACH_STARTUP_PWD=/foo/bar/bach
 
     @run /awesome-bach/script.sh
 }
@@ -1267,7 +1263,7 @@ test-bach-framework-COULD-set-PATH-by-full-path-of-env-command-assert() {
 
 test-bach-framework-one-pipeline-dryrun-if-no-mocking() {
     @mock receive-something
-    @echo hello | receive-something done | @grep -q '^hello$'
+    @echo hello | receive-something done
 }
 test-bach-framework-one-pipeline-dryrun-if-no-mocking-assert() {
     receive-something done
@@ -1276,10 +1272,10 @@ test-bach-framework-one-pipeline-dryrun-if-no-mocking-assert() {
 
 test-bach-framework-one-pipeline-data-directly-if-default-mocking-behavior() {
     @mock receive-something done
-    @echo hello | receive-something done
+    @echo It will by default ignore all data coming through the pipeline | receive-something done
 }
 test-bach-framework-one-pipeline-data-directly-if-default-mocking-behavior-assert() {
-    @stdout hello
+    @do-nothing
 }
 
 
@@ -1293,22 +1289,22 @@ test-bach-framework-one-pipeline-data-directly-if-customize-action-assert() {
 
 
 test-bach-framework-two-pipelines-when-both-non-mocking-commands() {
-    @mock first-cmd
-    @mock second-cmd
+    @mockpipe first-cmd done
+    @mockpipe second-cmd too
 
-    @echo something | first-cmd done | second-cmd too | @grep -q '^something$'
+    @echo something | first-cmd done | second-cmd too | @grep '^something$'
 }
 test-bach-framework-two-pipelines-when-both-non-mocking-commands-assert() {
-    first-cmd done
-    second-cmd too
+    @echo something
 }
 
 
 test-bach-framework-two-pipelines-when-mock-the-first() {
     @mock this-is-a-mock command
     @mock this-non-mock
+    @mock the-last-command
 
-    @echo hello | this-is-a-mock command | this-non-mock command | @grep -q '^hello$'
+    @echo hello | this-is-a-mock command | this-non-mock command | the-last-command
 }
 test-bach-framework-two-pipelines-when-mock-the-first-assert() {
     this-non-mock command
@@ -1316,30 +1312,30 @@ test-bach-framework-two-pipelines-when-mock-the-first-assert() {
 
 
 test-bach-framework-two-pipelines-when-mock-the-second() {
-    @mock this-is-a-mock command
+    @mockpipe this-is-a-mock command
     @mock this-non-mock
 
-    @echo -n | this-non-mock command | this-is-a-mock command
+    @echo we cannot see this | this-non-mock command | this-is-a-mock command
 }
 test-bach-framework-two-pipelines-when-mock-the-second-assert() {
     this-non-mock command
 }
 
 
-test-bach-framework-two-pipelines-when-mock-the-both() {
-    @mock this-is-a-mock command
-    @mock another-mock command
+test-bach-framework-mockpipe() {
+    @mockpipe this-is-a-mock command
+    @mock another-mock command === @cat # @mockpipe
 
     @echo hello | this-is-a-mock command | another-mock command
 }
-test-bach-framework-two-pipelines-when-mock-the-both-assert() {
+test-bach-framework-mockpipe-assert() {
     @stdout hello
 }
 
 
 test-bach-framework-multi-pipelines() {
     @mock first
-    @mock second === read
+    @mock second
     @mock third 3
 
     {
