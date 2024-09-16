@@ -108,9 +108,9 @@ function .bach.initialize(){
 
     declare util name util_path
 
-    declare -a bash_builtin_cmds=(cd echo enable popd pushd pwd shopt test trap type)
+    declare -a bash_builtin_cmds=(cd enable popd pushd pwd shopt test trap type)
 
-    for name in . command exec export false set true unset "${bash_builtin_cmds[@]}"; do
+    for name in . command echo exec export false set true unset "${bash_builtin_cmds[@]}"; do
         eval "function @${name}() { builtin $name \"\$@\"; } 8>/dev/null; builtin export -f @${name}"
     done
 
@@ -258,6 +258,17 @@ function .bach.run-tests() {
     }
     builtin export -f xargs
 
+    function echo() {
+        declare mockfunc="$(.bach.gen_function_name echo "$@")"
+        if .bach.is-function "${mockfunc}"; then
+            @debug "[LSB-func]" "${mockfunc}" "$@"
+            "${mockfunc}" "$@"
+        else
+            @echo "$@"
+        fi
+    }
+    builtin export -f echo
+
     function [() {
         declare mockfunc="$(.bach.gen_function_name '[' "$@")"
         if .bach.is-function "${mockfunc}"; then
@@ -351,7 +362,7 @@ builtin export -f .bach.gen_function_name
 function @mock() {
     declare -a param name cmd func body desttype
     name="$1"
-    if [[ "$name" == @(builtin|declare|export|eval|set|unset|true|false|read) ]]; then
+    if [[ "$name" == @(builtin|declare|echo|export|eval|set|unset|true|false|read) ]]; then
         @die "Cannot mock the builtin command: $name"
     fi
     if [[ command == "$name" && "$2" != -* ]]; then
@@ -460,6 +471,18 @@ function @mockall() {
 }
 builtin export -f @mockall
 
+function @capture() {
+    @mock "$@" <<_EOS_207_
+@assert-capture "$@"
+_EOS_207_
+}
+
+function @assert-capture() {
+    @echo "## Capture input: " "$@"
+    @echo "$@" "<<_BACH_ASSERT_CAPTURE_"
+    @cat
+    @echo _BACH_ASSERT_CAPTURE_
+}
 
 BACH_FRAMEWORK__SETUP_FUNCNAME="_bach_framework_setup_"
 alias @setup="function $BACH_FRAMEWORK__SETUP_FUNCNAME"
@@ -587,7 +610,7 @@ function @ignore() {
               declare mockfunc=\"\$(.bach.gen_function_name ${name} \"\${@}\")\";
               if .bach.is-function \"\$mockfunc\"; then
                   \"\${mockfunc}\" \"\$@\";
-              else [[ -t 0 ]] || @cat; fi
+              fi
           }; builtin export -f ${name}"
         fi
     done
@@ -672,8 +695,9 @@ builtin export -f @do-nothing
 
 function @unmock() {
     declare name="${1:?missing command name}"
-    if .bach.is-function "$name"; then
-        unset -f "$name"
+    declare mockfunc="$(.bach.gen_function_name "${@}")";
+    if .bach.is-function "$mockfunc"; then
+        unset -f "$mockfunc"
     fi
 }
 builtin export -f @unmock

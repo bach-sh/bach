@@ -320,6 +320,28 @@ When we see this red `∅` in test results, it means that the parameter is actua
 
 The names of all APIs provided in the Bach testing framework start with `@`.
 
+### @assert-capture
+
+This API is designed specifically for validation functions to verify the input read by a command.
+
+To use this API, follow these steps:
+
+1. In the test execution function, use the `@capture` API to record the input of the command.
+2. In the assertion function, use the `@assert-capture` API to validate if the captured data matches the expected input.
+
+Example:
+
+    test-capture() {
+        # Record the data read by the command `foobar foo`
+        @capture foobar foo
+        echo hello | foobar foo  # The command `foobar foo` reads data from the pipeline
+    }
+
+    test-capture-assert() {
+        # Verify that the command `foobar foo` reads the data "hello"
+        @assert-capture foobar foo <<< "hello"
+    }
+
 ### @assert-equals
 
     @assert-equals "hello world" "HELLO WORLD"
@@ -334,6 +356,12 @@ The names of all APIs provided in the Bach testing framework start with `@`.
 
     [[ 0 -eq 0 ]]
     @assert-success
+
+### @capture
+
+This API is used to record the data read by a command, including input received through pipelines, Here Documents, and other I/O redirection methods.
+
+Examples: please refer to the `@assert-capture` API.
 
 ### @comment
 

@@ -422,8 +422,6 @@ this_variable_exists_in_assert=""
 }
 
 @setup-test {
-    @ignore echo
-
     @mock git config --get branch.master.remote === @stdout "remote-master"
     @mock git rev-parse --abbrev-ref HEAD <<-MOCK
 			@stdout branch-name
@@ -487,6 +485,8 @@ function load-gp() {
 }
 
 test-gp-running-inside-a-git-repo-and-the-branch-has-upstream() {
+    @ignore echo
+
     load-gp
 
     @mocktrue git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
@@ -503,6 +503,8 @@ test-gp-running-inside-a-git-repo-and-the-branch-has-upstream-assert() {
 }
 
 test-gp-running-inside-a-git-repo-and-the-branch-does-not-have-upstream() {
+    @ignore echo
+
     load-gp
 
     @mockfalse git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
@@ -672,17 +674,17 @@ test-mock-script-with-custom-action-assert() {
 test-mock-script-with-custom-complex-action() {
     @mock ./path/to/script <<\SCRIPT
 if [[ "$1" == foo ]]; then
-  @echo bar
+  the first param is foo
 else
-  @echo anything
+  other params
 fi
 SCRIPT
     ./path/to/script foo
     ./path/to/script something
 }
 test-mock-script-with-custom-complex-action-assert() {
-    bar
-    anything
+    the first param is foo
+    other params
 }
 
 test-bach-framework-can-get-all-tests() {
@@ -792,12 +794,33 @@ test-builtin-trap-assert() {
 test-mock-echo-builtin-command() {
     @unset -f echo
     @mock echo
-    @type -t echo
-    echo done
 }
 test-mock-echo-builtin-command-assert() {
-    @echo function
-    @dryrun echo done
+    @false
+}
+
+test-ignore-echo-command() {
+    @ignore echo
+
+    (
+        declare -pf echo
+        @real ls -l /dev/fd/
+    ) >&2
+    echo you should not see this
+}
+test-ignore-echo-command-assert() {
+    @do-nothing
+}
+
+test-echo-pipe() {
+    @capture foobar foo bar
+    (
+        declare -pf echo
+    ) >&2
+    echo we should see this | foobar foo bar
+}
+test-echo-pipe-assert() {
+    @assert-capture foobar foo bar <<< "we should see this"
 }
 
 test-mock-function-multiple-times() {
@@ -1546,29 +1569,32 @@ test-ASSERT-FAIL-API-unmock-no-parameters() {
 
 
 test-API-unmock() {
-    @ignore echo
-    echo nothing happened
-    @unmock echo
-    echo show something
+    @mock foobar something === anything
+    foobar something
+
+    @unmock foobar something
+    foobar something
 }
 test-API-unmock-assert() {
-    @out show something
+    anything
+    foobar something
 }
 
 
 test-API-unmock-1() {
-    @mock echo foo === @out bar
-    echo foo
-    @unmock echo
-    echo foobar
+    @mock foobar === @stdout bar
+    foobar
+    @unmock foobar
+    foobar
 }
 test-API-unmock-1-assert() {
-    @stdout bar foobar
+    @stdout bar
+    @dryrun foobar
 }
 
 
 test-builtin-commands() {
-    for cmd in alias bg bind cd dirs disown echo enable fc fg \
+    for cmd in alias bg bind cd dirs disown enable fc fg \
                hash help history jobs kill popd pushd pwd shopt suspend \
                test times trap type ulimit umask unalias wait; do
         @mock "$cmd" foobar
@@ -1576,7 +1602,7 @@ test-builtin-commands() {
     done
 }
 test-builtin-commands-assert() {
-    for cmd in alias bg bind cd dirs disown echo enable fc fg \
+    for cmd in alias bg bind cd dirs disown enable fc fg \
                hash help history jobs kill popd pushd pwd shopt suspend \
                test times trap type ulimit umask unalias wait; do
         @dryrun "$cmd" foobar
@@ -1759,4 +1785,30 @@ test-a-file-exists() {
 }
 test-a-file-exists-assert() {
     Found this awesome config file
+}
+
+
+test-api-capture() {
+    @capture foobar foo bar
+
+    @echo hello | foobar foo bar
+}
+test-api-capture-assert() {
+    @assert-capture foobar foo bar <<< hello
+}
+
+
+test-api-capture-heredoc() {
+    @capture foobar foo bar
+
+    foobar foo bar <<\EOF
+the first line
+the 2nd line
+the 3rd line
+EOF
+}
+test-api-capture-heredoc-assert() {
+    @echo "the first line
+the 2nd line
+the 3rd line" | @assert-capture foobar foo bar
 }

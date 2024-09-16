@@ -324,6 +324,25 @@ Bach 中被模拟的命令，已经支持了从标准输入读取命令和管道
 
 Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
+### @assert-capture
+
+这个 API 仅仅可以用于测试验证函数，用于验证命令读取的输入是否为预期。
+
+使用方法：
+
+1. 在测试执行函数中，使用`@capture` API记录命令的输入。
+2. 在验证函数中，使用`@assert-capture` API验证捕获的数据是否与预期输入匹配。
+
+例子：
+
+    test-capture() {
+        @capture foobar foo # 要记录命令 `foobar foo` 读取的数据
+        echo hello | foobar foo # 命令 `foobar foo` 从管道读取数据
+    }
+    test-capture-assert() {
+        @assert-capture foobar foo <<< "hello" # 验证命令 `foobar foo` 读取的数据是 `hello`
+    }
+
 ### @assert-equals
 
 断言两个值是否相等。
@@ -356,6 +375,12 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
     false # 这个命令的返回值不为 0，则断言会失败
     @assert-fail
+
+### @capture
+
+记录命令读取的数据，包括通过管道、Here Document 等 I/O 重定向的方式。
+
+例子请参考 `@assert-capture` API。
 
 ### @cd
 
