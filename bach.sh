@@ -261,7 +261,7 @@ function .bach.run-tests() {
     function [() {
         declare mockfunc;
         local _mock_regex
-        for _mock_regex in "${_bach_mock_regex_test[@]}"; do
+        [[ -z "${_bach_mock_regex_test-}" ]] || for _mock_regex in "${_bach_mock_regex_test[@]}"; do
             if [[ "$*" =~ $_mock_regex ]]; then
                 mockfunc="$(.bach.gen_function_name "[" "$_mock_regex")";
                 break;
@@ -280,7 +280,7 @@ function .bach.run-tests() {
     function echo() {
         declare mockfunc;
         local _mock_regex
-        for _mock_regex in "${_bach_mock_regex_echo[@]}"; do
+        [[ -z "${_bach_mock_regex_echo-}" ]] || for _mock_regex in "${_bach_mock_regex_echo[@]}"; do
             if [[ "$*" =~ $_mock_regex ]]; then
                 mockfunc="$(.bach.gen_function_name echo "$_mock_regex")";
                 break;
@@ -431,7 +431,7 @@ SCRIPT
             eval "function ${name}() {
                       declare mockfunc;
                       local _mock_regex
-                      for _mock_regex in \"\${_bach_mock_regex_${name//[^a-zA-Z_]/__}[@]}\"; do
+                      [[ -z \"\${_bach_mock_regex_${name//[^a-zA-Z_]/__}-}\" ]] || for _mock_regex in \"\${_bach_mock_regex_${name//[^a-zA-Z_]/__}[@]}\"; do
                           if [[ \"\$*\" =~ \$_mock_regex ]]; then
                               mockfunc=\"\$(.bach.gen_function_name ${name} \"\$_mock_regex\")\";
                               break;
@@ -503,7 +503,7 @@ function @mock-regex() {
         _mock_param+=("$_param")
     done
     shift "${#_mock_param[@]}"
-    eval "[[ -n \"\${_bach_mock_regex_${_name}[@]}\" ]] || declare -gax _bach_mock_regex_${_name}; _bach_mock_regex_${_name}+=(\"${_mock_param[*]:1}\")"
+    eval "[[ -n \"\${_bach_mock_regex_${_name}-}\" ]] || declare -gax _bach_mock_regex_${_name}; _bach_mock_regex_${_name}+=(\"${_mock_param[*]:1}\")"
     @debug mock-regex: @mock "${_mock_param[0]}" "${_mock_param[*]:1}" "$@"
     @mock "${_mock_param[0]}" "${_mock_param[*]:1}" "$@"
 }
