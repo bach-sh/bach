@@ -791,12 +791,27 @@ test-builtin-trap-assert() {
     @dryrun trap - EXIT
 }
 
-test-mock-echo-builtin-command() {
-    @unset -f echo
-    @mock echo
+test-cannot-mock-echo-builtin-default-behavior() {
+    say "$(echo hello)"
 }
-test-mock-echo-builtin-command-assert() {
+test-cannot-mock-echo-builtin-default-behavior-assert() {
+    say hello
+}
+
+test-cannot-mock-echo-builtin-with-custom-behavior-command() {
+    @mock echo with custom behavior === @anything  2>&7
+}
+test-cannot-mock-echo-builtin-with-custom-behavior-command-assert() {
+    echo "Cannot mock the builtin command: echo"
     @false
+}
+
+test-cannot-mock-echo-builtin-without-custom-behavior() {
+    @mock echo hello
+    echo hello
+}
+test-cannot-mock-echo-builtin-without-custom-behavior-assert() {
+    @dryrun echo hello
 }
 
 test-ignore-echo-command() {
@@ -1107,6 +1122,7 @@ test-bach-framework-filter-tests-no-matches-assert() {
 }
 
 test-bach-framework-filter-tests-by-glob() {
+    set -x
     @export BACH_TESTS="bach-run-this*"
 
     @unset -f .bach.get-all-functions @sort
@@ -1811,4 +1827,33 @@ test-api-capture-heredoc-assert() {
     @echo "the first line
 the 2nd line
 the 3rd line" | @assert-capture foobar foo bar
+}
+
+
+test-mock-regex-default() {
+    @mock-regex foobar "^bar.*" === bar-star starts with bar
+    foobar foo
+    foobar bar
+    foobar bar anything
+
+    @mock-regex [ foobar = '[^ ]*' ] === @true
+
+    if [   foobar   =   anything   ] && [ foobar = 1 ]; then
+        say You should see this message
+    else
+        say No, you cannot see this
+    fi
+
+    @mock-regex [ -f [^ ]+ ] === @true
+    if [ -f config ]; then
+        say Found config file.
+    fi
+}
+test-mock-regex-default-assert() {
+    foobar foo
+    bar-star starts with bar
+    bar-star starts with bar
+
+    say You should see this message
+    say Found config file.
 }

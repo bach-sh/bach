@@ -258,19 +258,16 @@ function .bach.run-tests() {
     }
     builtin export -f xargs
 
-    function echo() {
-        declare mockfunc="$(.bach.gen_function_name echo "$@")"
-        if .bach.is-function "${mockfunc}"; then
-            @debug "[LSB-func]" "${mockfunc}" "$@"
-            "${mockfunc}" "$@"
-        else
-            @echo "$@"
-        fi
-    }
-    builtin export -f echo
-
     function [() {
-        declare mockfunc="$(.bach.gen_function_name '[' "$@")"
+        declare mockfunc;
+        local _mock_regex
+        for _mock_regex in "${_bach_mock_regex_test[@]}"; do
+            if [[ "$*" =~ $_mock_regex ]]; then
+                mockfunc="$(.bach.gen_function_name "[" "$_mock_regex")";
+                break;
+            fi
+        done
+        [[ -n "${mockfunc-}" ]] || mockfunc="$(.bach.gen_function_name "[" "$@")";
         if .bach.is-function "${mockfunc}"; then
             @debug "[LSB-func]" "${mockfunc}" "$@"
             "${mockfunc}" "$@"
@@ -279,6 +276,25 @@ function .bach.run-tests() {
         fi
     }
     builtin export -f '['
+
+    function echo() {
+        declare mockfunc;
+        local _mock_regex
+        for _mock_regex in "${_bach_mock_regex_echo[@]}"; do
+            if [[ "$*" =~ $_mock_regex ]]; then
+                mockfunc="$(.bach.gen_function_name echo "$_mock_regex")";
+                break;
+            fi
+        done
+        [[ -n "${mockfunc-}" ]] || mockfunc="$(.bach.gen_function_name echo "$@")";
+        if .bach.is-function "${mockfunc}"; then
+            @debug "[LSB-func]" "${mockfunc}" "$@"
+            "${mockfunc}" "$@"
+        else
+            builtin echo "$@"
+        fi
+    }
+    builtin export -f echo
 
     if [[ "${BACH_ASSERT_IGNORE_COMMENT}" == true ]]; then
         BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
@@ -362,7 +378,7 @@ builtin export -f .bach.gen_function_name
 function @mock() {
     declare -a param name cmd func body desttype
     name="$1"
-    if [[ "$name" == @(builtin|declare|echo|export|eval|set|unset|true|false|read) ]]; then
+    if [[ "$name" == @(builtin|declare|export|eval|set|unset|true|false|read) ]]; then
         @die "Cannot mock the builtin command: $name"
     fi
     if [[ command == "$name" && "$2" != -* ]]; then
@@ -395,7 +411,13 @@ function @mock() {
     fi
     if [[ -z "${func:-}" ]]; then
         @debug "@mock default $name"
-        func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\" >&7; fi"
+        if [[ "$name" == echo ]]; then
+            func="@dryrun ${name} \"\$@\" >&7"
+        else
+            func="if [[ -t 0 ]]; then @dryrun \"${name}\" \"\$@\" >&7; fi"
+        fi
+    elif [[ "$name" == echo ]]; then
+        @die "Cannot mock the builtin command: $name"
     fi
     if [[ "$name" == */* ]]; then
         [[ -d "${name%/*}" ]] || @mkdir -p "${name%/*}"
@@ -407,7 +429,15 @@ SCRIPT
     else
         if [[ -z "$desttype" || "$desttype" == builtin ]]; then
             eval "function ${name}() {
-                      declare mockfunc=\"\$(.bach.gen_function_name ${name} \"\${@}\")\"
+                      declare mockfunc;
+                      local _mock_regex
+                      for _mock_regex in \"\${_bach_mock_regex_${name//[^a-zA-Z_]/__}[@]}\"; do
+                          if [[ \"\$*\" =~ \$_mock_regex ]]; then
+                              mockfunc=\"\$(.bach.gen_function_name ${name} \"\$_mock_regex\")\";
+                              break;
+                          fi
+                      done
+                      [[ -n \"\${mockfunc-}\" ]] || mockfunc=\"\$(.bach.gen_function_name ${name} \"\$@\")\";
                       if .bach.is-function \"\$mockfunc\"; then
                            \"\${mockfunc}\" \"\$@\"
                       else
@@ -462,6 +492,22 @@ function @mockfalse() {
     @mock "$@" === @false
 }
 builtin export -f @mockfalse
+
+function @mock-regex() {
+    declare _param _name="${1:?missing command name}"
+    if [[ "$_name" = "[" ]]; then _name=test; fi
+    _name="${_name//[^a-zA-Z_]/__}"
+    declare -a _mock_param=()
+    for _param; do
+        [[ "$_param" = "===" ]] && break
+        _mock_param+=("$_param")
+    done
+    shift "${#_mock_param[@]}"
+    eval "[[ -n \"\${_bach_mock_regex_${_name}[@]}\" ]] || declare -gax _bach_mock_regex_${_name}; _bach_mock_regex_${_name}+=(\"${_mock_param[*]:1}\")"
+    @debug mock-regex: @mock "${_mock_param[0]}" "${_mock_param[*]:1}" "$@"
+    @mock "${_mock_param[0]}" "${_mock_param[*]:1}" "$@"
+}
+builtin export -f @mock-regex
 
 function @mockall() {
     declare name

@@ -595,6 +595,18 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
     @mock foobar foo bar
     say hello | foobar foo bar # 这个管道命令不会有任何输出，因为默认模拟的命令 `foobar foo bar` 会丢弃管道中的数据
 
+### @mock-regex
+
+模拟命令，类似于 `@mock`，但它支持使用正则表达式来匹配命令的参数。使用 `^` 来表示匹配第一个参数的开头，多个参数会通过空格连接，并整体与正则表达式进行匹配。
+
+例子：
+
+    # 模拟判断 [ -f anyfile ] 都会返回成功
+    @mock-regex [ -f [^ ]* ] === @true
+    if [ -f config ]; then
+      echo Found config file
+    fi
+
 ### @out
 
 在标准输出终端上输出内容。

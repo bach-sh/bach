@@ -558,6 +558,18 @@ Example:
     @mock foobar foo bar
     say hello | foobar foo bar # This pipeline command will have no output because the default mocked command `foobar foo bar` will discard the data in the pipeline
 
+### @mock-regex
+
+Mocks a command, similar to `@mock`, but it supports using regular expressions to match command arguments. The `^` symbol matches the start of the first argument. Multiple arguments are joined by spaces and matched against the regular expression as a whole.
+
+Example:
+
+    # 模拟判断 [ -f anyfile ] 都会返回成功
+    @mock-regex [ -f [^ ]* ] === @true
+    if [ -f config ]; then
+      echo Found config file
+    fi
+
 ### @out
 
 Output to the stdout console.
