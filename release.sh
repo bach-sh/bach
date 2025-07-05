@@ -12,7 +12,7 @@ if ! sed -Ene '/^## Versioning$/,+2p' README.md | grep -F "$tag"; then
     exit 1
 fi
 
-git push
+git push --follow-tags
 git push --tags
 hub release create -m "v${tag}"$'\n'$'\n'"Version ${tag}" "$tag"
 

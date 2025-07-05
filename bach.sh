@@ -124,7 +124,7 @@ function .bach.initialize(){
         builtin source "$script" "$@"
     }
 
-    declare -a bach_core_utils=(cat chmod cut diff find env grep ls "shasum|sha1sum" mkdir mktemp rm rmdir sed sort tee touch which xargs)
+    declare -a bach_core_utils=(cat chmod cut diff find env grep ls "shasum|sha1sum" mkdir mktemp rm rmdir sed sort tee touch uniq which xargs)
 
     for util in "${bach_core_utils[@]}"; do
         if [[ "$util" == "shasum|"* && "$BACH_OS_NAME" == FreeBSD ]]; then
@@ -345,7 +345,7 @@ function .bach.run-tests() {
                 builtin printf "\n"
             } >&2
         fi
-        declare _allow_real="$(@grep "^# \\[ALLOW-REAL\\]" -- "$testresult")" || true
+        declare _allow_real="$(@grep "^# \\[ALLOW-REAL\\]" -- "$testresult" | @sort | @uniq)" || true
         [[ -z "${_allow_real-}" ]] || builtin printf "${color_warn}%s${color_end}\n" "${_allow_real}" >&2
         @rm "$testresult" &>/dev/null
     done
@@ -522,8 +522,10 @@ function @mockall() {
 builtin export -f @mockall
 
 function @allow-real() {
-    @echo "# [ALLOW-REAL]" "$@" >&2
-    @mock "$@" === @real "$@"
+    @mock "$@" <<__ALLOW_REAL
+@echo "# [ALLOW-REAL]" "$*" >&2
+@real "$1" "\$@"
+__ALLOW_REAL
 }
 builtin export -f @allow-real
 

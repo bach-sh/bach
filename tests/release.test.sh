@@ -24,7 +24,7 @@ test-pass-a-valid-tag() {
     release-sh 1.2.3
 }
 test-pass-a-valid-tag-assert() {
-    git push
+    git push --follow-tags
     git push --tags
     hub release create -m "v1.2.3
 
