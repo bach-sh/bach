@@ -91,7 +91,7 @@ For example:
 
     test-rm-rf() {
         project_log_path=/tmp/project/logs
-        sudo rm -rf "$project_log_ptah/" # Typo! 
+        sudo rm -rf "$project_log_ptah/" # Typo!
         # An undefined bash variable is an empty string, which can be a serious problem!
     }
     test-rm-rf-assert() {
@@ -293,13 +293,44 @@ In this case, the OS runs the command directly, and does not interact with Bash(
 
 ### Prohibit resetting the PATH environment variable
 
-Because Bach wants to intercept all command calls, the `PATH` is set to read-only to avoid resetting its value. 
+Because Bach wants to intercept all command calls, the `PATH` is set to read-only to avoid resetting its value.
 
 In the case that PATH needs to be re-assigned, it is recommended to use the `declare` builtin command in our scripts to avoid errors caused by resetting a read-only environment variable.
 
-### Bach is unable to intercept I/O redirection
+### Special Handling of I/O Redirection in Bach
 
-Bach already support mock functions to read from pipelines. But for the use of operators such as `>`, `>>`, the solution is to wrap the redirected command in a function. Another way is to use the `sed` command to put `>`  or `>>` in quotation marks, convert the I/O redirected operation to a normal argument.
+Bach’s mocked commands already support reading from standard input and working with pipelines.
+However, I/O redirection using operators like `>` or `>>` cannot be intercepted by Bach due to the limitation of Bash.
+
+A common workaround is to wrap the redirection in a function or use a different command, such as replacing write-to-file redirection with the `tee` command.
+For example, instead of writing `your-cmd > path/to/file`, you can write `your-cmd | tee path/to/file >/dev/null`.
+
+You can also use the `@capture` API to indicate that a command will receive input data, and then use the `@assert-capture` API in your assertion function to verify that the command received the expected data.
+See the examples below:
+
+    test-api-capture() {
+        @capture foobar foo bar
+
+        @echo hello | foobar foo bar
+    }
+    test-api-capture-assert() {
+        @assert-capture foobar foo bar <<< hello
+    }
+
+    test-api-capture-heredoc() {
+        @capture foobar foo bar
+
+        foobar foo bar <<\EOF
+    the first line
+    the 2nd line
+    the 3rd line
+    EOF
+    }
+    test-api-capture-heredoc-assert() {
+        @echo "the first line
+    the 2nd line
+    the 3rd line" | @assert-capture foobar foo bar
+    }
 
 ### All command in the pipeline must be mocked
 
@@ -319,6 +350,36 @@ When we see this red `∅` in test results, it means that the parameter is actua
 ## Bach APIs
 
 The names of all APIs provided in the Bach testing framework start with `@`.
+
+### @allow-real
+
+Allow a specific command to run for real in the test, instead of being mocked or dry-run.
+When this API is called, the specified command will be executed as a real system command.
+A message will be shown in the test output to indicate which command is allowed to run.
+
+Usage:
+
+    @allow-real [command and arguments...]
+
+Example:
+
+    test-allow-real-grep() {
+        @allow-real grep -i hello
+        grep -i hello <<< "Hello, Bach"
+        grep -i hello <<< "Goodbye"
+    }
+    test-allow-real-grep-assert() {
+        @stdout "Hello, Bach"
+        @fail
+    }
+
+Output:
+
+    ok 1 - allow real grep
+    # [ALLOW-REAL] grep -i hello
+
+When you use `@allow-real grep -i hello`, the command `grep -i hello` will really run during the test.
+Bach will display a message like `# [ALLOW-REAL] grep -i hello` in the test result to make it easy to track which commands were allowed to run.
 
 ### @assert-capture
 

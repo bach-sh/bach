@@ -26,7 +26,7 @@ test-mock-xxd-assert() {
 }
 
 test-real-tr() {
-    @mock tr -cd 'fm*r -' === @real tr -cd 'fm*r -'
+    @allow-real tr -cd 'fm*r -'
 
     $(echo 'arm -ref and*with' | /usr/bin/tr -cd 'fm*r -')
 }

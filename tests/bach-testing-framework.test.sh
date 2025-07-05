@@ -1829,6 +1829,17 @@ the 2nd line
 the 3rd line" | @assert-capture foobar foo bar
 }
 
+test-ASSERT-FAIL-api-capture-heredoc() {
+    @capture foobar foo bar
+
+    foobar foo bar <<\EOF
+tom
+EOF
+}
+test-ASSERT-FAIL-api-capture-heredoc-assert() {
+    @echo "jerry" | @assert-capture foobar foo bar
+}
+
 
 test-mock-regex-default() {
     @mock-regex foobar "^bar.*" === bar-star starts with bar
@@ -1856,4 +1867,34 @@ test-mock-regex-default-assert() {
 
     say You should see this message
     say Found config file.
+}
+
+test-api-allow-real-cut() {
+    @allow-real cut -d/ -f2
+
+    cut -d/ -f2 <<< "prefix/foobar/suffix"
+}
+test-api-allow-real-cut-assert() {
+    @stdout foobar
+}
+
+test-api-allow-real-if-grep() {
+    @allow-real grep -i hello
+
+    if @real echo "Hello, world" | grep -i hello >/dev/null; then
+        hello
+    fi
+}
+test-api-allow-real-if-grep-assert() {
+    @dryrun hello
+}
+
+test-allow-real-grep() {
+    @allow-real grep -i hello
+    grep -i hello <<< "Hello, Bach"
+    grep -i hello <<< "Goodbye"
+}
+test-allow-real-grep-assert() {
+    @stdout "Hello, Bach"
+    @fail
 }

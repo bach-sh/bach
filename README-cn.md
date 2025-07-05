@@ -301,9 +301,37 @@ Bach 也提供了一些常用命令的 API，这些 API 对应的真实命令都
 
 因为 Bach 的测试验证就是通过分别执行测试执行函数和测试验证函数来达到的。我们已经在测试执行函数中模拟了命令的调用，在测试验证函数中，就应该直接写出期待执行的命令及其参数。在测试验证中模拟命令的调用是没有道理的。
 
-### 在 Bach 中无法阻止 I/O 重定向
+### 在 Bach 中对 I/O 重定向的特殊处理
 
-Bach 中被模拟的命令，已经支持了从标准输入读取命令和管道的调用。但对于使用 `>` `>>` 等等操作符的使用，解决办法一个是把重定向的命令用一个方法包装起来，另一个办法是在加载脚本的时候，用 `sed` 等命令把 `>` `>>` 等操作符用引号包含起来，把重定向的操作转换为普通的参数。
+Bach 中被模拟的命令，已经支持了从标准输入读取命令和管道的调用。但对于使用 `>` `>>` 等等操作符的使用由于 Bash 的限制实际是无法拦截的。
+解决办法一个是把重定向的命令用一个方法包装起来，比如写入文件的 I/O 重定向，改用 `tee` 命令来实现。
+例如：把原始命令 `your-cmd > path/to/file` 改写为 `your-cmd | tee path/to/file >/dev/null`。
+
+I/O 重定向的数据也可以用 API `@capture` 指示命令将会接受数据，然后在验证方法中使用 API `@assert-capture` 来验证指定的命令是否收到了期望的数据，比如下面的两个例子：
+
+    test-api-capture() {
+        @capture foobar foo bar
+
+        @echo hello | foobar foo bar
+    }
+    test-api-capture-assert() {
+        @assert-capture foobar foo bar <<< hello
+    }
+
+    test-api-capture-heredoc() {
+        @capture foobar foo bar
+
+        foobar foo bar <<\EOF
+    the first line
+    the 2nd line
+    the 3rd line
+    EOF
+    }
+    test-api-capture-heredoc-assert() {
+        @echo "the first line
+    the 2nd line
+    the 3rd line" | @assert-capture foobar foo bar
+    }
 
 ### 必须模拟管道中的每一个命令
 
@@ -323,6 +351,33 @@ Bach 中被模拟的命令，已经支持了从标准输入读取命令和管道
 ## Bach API 列表
 
 Bach 测试框架中提供的 API 都是以 `@` 开头的。
+
+### @allow-real
+
+允许指定命令在测试中真实运行，而不进行 mock 或 dryrun。调用此 API 后，指定命令会直接调用系统命令执行，并在测试结果中显示允许真实执行的提示。
+
+用法：
+
+    @allow-real [command and arguments...]
+
+例子：
+
+    test-allow-real-grep() {
+        @allow-real grep -i hello
+        grep -i hello <<< "Hello, Bach"
+        grep -i hello <<< "Goodbye"
+    }
+    test-allow-real-grep-assert() {
+        @stdout "Hello, Bach"
+        @fail
+    }
+
+输出：
+
+    ok 1 - allow real grep
+    # [ALLOW-REAL] grep -i hello
+
+当调用 `@allow-real grep -i hello` 后，`grep -i hello` 这一条命令将在测试时真实执行，并且在测试结果中用 `# [ALLOW-REAL] grep -i hello` 进行标记，方便追踪和调试。
 
 ### @assert-capture
 

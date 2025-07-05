@@ -300,14 +300,16 @@ function .bach.run-tests() {
         BACH_ASSERT_DIFF_OPTS+=(-I "^${__bach_run_test__ignore_prefix}")
     fi
 
-    declare color_ok color_err color_end
+    declare color_ok color_err color_warn color_end
     if [[ "$BACH_COLOR" == "always" ]] || [[ "$BACH_COLOR" != "no" && -t 1 && -t 2 ]]; then
         color_ok="\e[1;32m"
         color_err="\e[1;31m"
+        color_warn="\e[1;33m"
         color_end="\e[0;m"
     else
         color_ok=""
         color_err=""
+        color_warn=""
         color_end=""
     fi
     declare name friendly_name testresult test_name_assert_fail
@@ -343,6 +345,8 @@ function .bach.run-tests() {
                 builtin printf "\n"
             } >&2
         fi
+        declare _allow_real="$(@grep "^# \\[ALLOW-REAL\\]" -- "$testresult")" || true
+        [[ -z "${_allow_real-}" ]] || builtin printf "${color_warn}%s${color_end}\n" "${_allow_real}" >&2
         @rm "$testresult" &>/dev/null
     done
 
@@ -516,6 +520,12 @@ function @mockall() {
     done
 }
 builtin export -f @mockall
+
+function @allow-real() {
+    @echo "# [ALLOW-REAL]" "$@" >&2
+    @mock "$@" === @real "$@"
+}
+builtin export -f @allow-real
 
 function @capture() {
     @mock "$@" <<_EOS_207_
