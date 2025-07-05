@@ -733,7 +733,7 @@ n
 
 ## Versioning
 
-The latest version of Bach is 0.6.2, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
+The latest version of Bach is 0.7.0, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
 
 ## Author
 
