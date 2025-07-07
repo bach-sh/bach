@@ -533,14 +533,14 @@ function @capture() {
     @mock "$@" <<_EOS_207_
 @assert-capture "$@"
 _EOS_207_
-}
+} >&7
 
 function @assert-capture() {
     @echo "## Capture input: " "$@"
     @echo "$@" "<<_BACH_ASSERT_CAPTURE_"
     @cat
     @echo _BACH_ASSERT_CAPTURE_
-}
+} >&7
 
 BACH_FRAMEWORK__SETUP_FUNCNAME="_bach_framework_setup_"
 alias @setup="function $BACH_FRAMEWORK__SETUP_FUNCNAME"

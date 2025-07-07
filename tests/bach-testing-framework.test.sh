@@ -1814,6 +1814,38 @@ test-api-capture-assert() {
 }
 
 
+test-api-capture-redirect-dev-null() {
+    @capture tee filename
+    @allow-real cat
+    {
+        cat <<< alpha
+        cat <<< beta
+    } | tee filename >/dev/null 2>&1
+}
+test-api-capture-redirect-dev-null-assert() {
+    @assert-capture tee filename <<EOF
+alpha
+beta
+EOF
+}
+
+
+test-allow-real-cat-and-capture-tee() {
+    @allow-real cat
+    @capture tee filename
+    {
+        cat <<< hello
+        cat <<< world
+    } | tee filename >/dev/null
+}
+test-allow-real-cat-and-capture-tee-assert() {
+    @assert-capture tee filename <<EOF
+hello
+world
+EOF
+}
+
+
 test-api-capture-heredoc() {
     @capture foobar foo bar
 
@@ -1897,4 +1929,12 @@ test-allow-real-grep() {
 test-allow-real-grep-assert() {
     @stdout "Hello, Bach"
     @fail
+}
+
+test-allow-real-cat-here-doc() {
+    @allow-real cat
+    cat <<< hello
+}
+test-allow-real-cat-here-doc-assert() {
+    @stdout hello
 }
