@@ -54,7 +54,7 @@ err() {
 
 set +e
 retval=0
-PATH=/usr/bin:/bin
+PATH=/usr/bin:/bin:/sbin
 cd "$(dirname "$0")"
 for file in tests/*.test.sh examples/learn*; do
     echo "Running $file"
