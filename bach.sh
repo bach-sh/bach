@@ -139,14 +139,11 @@ function .bach.initialize(){
     @mockall "${bash_builtin_cmds[@]}" source .
     function export() { builtin export "$@"; @dryrun export "$@"; }
 
-    eval "$(builtin declare -x | @real cut -d= -f1 | while read -rs name; do
-        [[ "$name" = "declare -"* ]] || continue
-        name="${name%%=*}"
-        name="${name##* }"
-        [[ "${name^^}" != BACH_* ]] || continue
-        builtin echo "unset '$name' || builtin true"
-    done)"
-    builtin export LANG=C TERM=vt100
+    while read -r name; do
+        [[ "${name^^}" == BACH_* ]] && continue
+        unset "$name" 2>/dev/null || true
+    done < <(builtin export -p | @sed -nE 's/^declare -x ([^=]+)(=.*)?$/\1/p')
+    builtin export LC_ALL=C LANG=C TERM=vt100 PS4='+ '
     unset name util_path
 }
 
