@@ -11,10 +11,14 @@ if [ -e /etc/os-release ]; then
 fi
 case "$OS_NAME" in
     Darwin)
-        if ! brew list --full-name --versions bash >/dev/null 2>&1; then
-            brew install bash
+        if command -v brew >/dev/null 2>&2; then
+            if ! brew list --full-name --versions bash >/dev/null 2>&1; then
+                brew install bash
+            fi
+            bash_bin="$(brew --prefix)"/bin/bash
+        else
+            bash_bin="$(command -v bash)"
         fi
-        bash_bin="$(brew --prefix)"/bin/bash
         ;;
     FreeBSD*)
         export PATH="/usr/local/sbin:$PATH"
@@ -50,7 +54,7 @@ err() {
 
 set +e
 retval=0
-PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin
+PATH=/usr/bin:/bin
 cd "$(dirname "$0")"
 for file in tests/*.test.sh examples/learn*; do
     echo "Running $file"
