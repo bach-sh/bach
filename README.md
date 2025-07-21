@@ -69,6 +69,31 @@ For example:
 
 See [tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh) for more examples.
 
+#### How to run tests?
+
+It's recommended to use a shebang at the top of your test file:
+
+```bash
+#!/usr/bin/env bash
+```
+
+Using `#!/usr/bin/env bash` is preferable to `#!/bin/bash` because it looks for the `bash` executable in the user's `PATH`. This is particularly important on operating systems like macOS, where the default `/bin/bash` is an outdated version 3.x, while Bach requires Bash v4.3 or newer. A newer version of Bash installed via Homebrew (`brew install bash`) is typically located in a path like `/usr/local/bin/bash`, and `#!/usr/bin/env bash` will ensure this correct, newer version is used.
+
+After setting the shebang, make the test file executable and run it directly (recommended):
+
+```bash
+chmod +x your-test-file.test.sh
+./your-test-file.test.sh
+```
+
+Alternatively, you can run the test script directly with the `bash` command:
+
+```bash
+bash your-test-file.test.sh
+```
+
+**Important:** Do not use the `source` command to run your test files (e.g., `source your-test-file.test.sh`). Sourcing the script runs it within your current shell session, which can pollute your environment and lead to unexpected side effects. Test files should be executed in a separate subshell process to ensure a clean, isolated testing environment.
+
 #### On Windows
 Make sure to use for shebang
 ```

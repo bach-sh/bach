@@ -72,6 +72,31 @@ Bach 的安装很简单，只需要下载 [bach.sh](https://github.com/bach-sh/b
 
 更多的测试示例请看 [tests/bach-testing-framework.test.sh](tests/bach-testing-framework.test.sh)
 
+#### 如何运行测试？
+
+推荐在测试用例文件的第一行使用 Shebang:
+
+```bash
+#!/usr/bin/env bash
+```
+
+使用 `#!/usr/bin/env bash` 而不是 `#!/bin/bash` 的好处是，它会从用户的 `PATH` 环境变量中查找 `bash` 可执行文件。这尤其重要，因为在某些操作系统（如 macOS）上，默认的 `/bin/bash` 是一个非常陈旧的 3.x 版本，而 Bach 框架需要 Bash v4.3 或更高版本。通过 Homebrew (`brew install bash`) 安装的较新版本的 Bash 通常位于 `/usr/local/bin/bash` 或类似路径下，`#!/usr/bin/env bash` 可以确保调用到这个正确的、较新的版本。
+
+设置好 Shebang 后，给测试用例文件添加可执行权限后便可直接运行（推荐方式）：
+
+```bash
+chmod +x your-test-file.test.sh
+./your-test-file.test.sh
+```
+
+或者，你也可以直接用 `bash` 命令来执行测试脚本：
+
+```bash
+bash your-test-file.test.sh
+```
+
+**重要提示：** 请不要使用 `source` 命令来执行测试用例（例如 `source your-test-file.test.sh`）。`source` 会在当前的 Shell 环境中执行脚本，这会污染你当前的会话，并可能导致预料之外的副作用。测试用例应当在一个独立的子 Shell 进程中执行，以保证测试环境的纯净和隔离。
+
 #### Windows
 shebang 得是
 ```
