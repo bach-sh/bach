@@ -17,7 +17,7 @@ case "$OS_NAME" in
             fi
             bash_bin="$(brew --prefix)"/bin/bash
         else
-            bash_bin="$(command -v bash)"
+            bash_bin="${BASH:-$(command -v bash)}"
         fi
         ;;
     FreeBSD*)
@@ -40,7 +40,7 @@ case "$OS_NAME" in
 esac
 
 if [ -z "${bash_bin:-}" ]; then
-    bash_bin="$(which bash)"
+    bash_bin="${BASH:-$(command -v bash)}"
 fi
 
 uname -a
