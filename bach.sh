@@ -682,6 +682,11 @@ function @stdout() {
 }
 builtin export -f @stdout
 
+function @quote() {
+    builtin printf '%q\n' "$@"
+}
+builtin export -f @quote
+
 function @load_function() {
     local file="${1:?script filename}"
     local func="${2:?function name}"

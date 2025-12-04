@@ -753,6 +753,20 @@ Bach 测试框架中提供的 API 都是以 `@` 开头的。
 
 用于在标准控制台输出内容，每个参数输出一行。
 
+### @quote
+
+用于在标准控制台输出经过 shell 转义的内容，每个参数输出一行。当需要将包含空格或特殊字符的参数传递给 `xargs` 等命令时非常有用。
+
+例子：
+
+    @quote "hello world" "foo bar"
+    # 输出：
+    # hello\ world
+    # foo\ bar
+
+    # 与 xargs 配合使用
+    @quote "file with spaces.txt" "another file.txt" | xargs -I{} -- rm {}
+
 ### @trap
 
 执行真正的内置 `trap` 命令。

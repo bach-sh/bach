@@ -154,6 +154,34 @@ test-mock-@stdout-include-space-assert() {
 }
 
 
+test-@quote-typical() {
+    @quote abc 123
+}
+test-@quote-typical-assert() {
+    @echo abc
+    @echo 123
+}
+
+
+test-@quote-include-space() {
+    @quote "abc 123" "def 456"
+}
+test-@quote-include-space-assert() {
+    @echo 'abc\ 123'
+    @echo 'def\ 456'
+}
+
+
+test-@quote-with-special-characters() {
+    @quote "it's" 'say "hello"' '$HOME'
+}
+test-@quote-with-special-characters-assert() {
+    @echo "it\\'s"
+    @echo 'say\ \"hello\"'
+    @echo '\$HOME'
+}
+
+
 test-run-a-script() {
     @mock load-script === @echo "for param; do @echo \"script.sh - \$param\"; done"
 

@@ -714,6 +714,20 @@ Output content to the stderr console, one line per parameter.
 
 Output content to the stdout console, one line per parameter.
 
+### @quote
+
+Output shell-quoted content to the stdout console, one line per parameter. This is useful when passing arguments that may contain spaces or special characters to commands like `xargs`.
+
+Example:
+
+    @quote "hello world" "foo bar"
+    # Output:
+    # hello\ world
+    # foo\ bar
+
+    # Using with xargs
+    @quote "file with spaces.txt" "another file.txt" | xargs -I{} -- rm {}
+
 ## Learn Bash Programming with Bach
 
     test-learn-bash-no-double-quote-star() {
