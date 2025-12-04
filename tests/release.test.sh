@@ -56,7 +56,7 @@ test-convert-to-html() {
     @mocktrue hash mmark
     @mock grep '<h1 ' index.1.html === @stdout "<h1 id=\"title\">Bach Unit Testing Framework for Bash</h1>"
     @mock grep '<h1 ' index-zh_CN.1.html === @stdout "<h1 id=\"title\">Bash 脚本的 Bach 单元测试框架</h1>"
-    @allow-real sed -e "s/<[^>]\+>//g" -e 's|/|\\/|g'
+    @allow-real sed -e "s/<[^>]*>//g"
     @mock cat index-zh_CN.1.html
     @mock cat index.1.html
     @mock tee index-zh_CN.1.html
@@ -70,10 +70,10 @@ test-convert-to-html-assert() {
     test-pass-a-valid-tag-assert
 
     mmark -html -css //bach.sh/solarized-dark.min.css README-zh_CN.md
-    sed "/<title>/s/>/><h1 id=\"title\">Bash 脚本的 Bach 单元测试框架<\\/h1>/"
+    sed "/<title>/s/>/>Bash 脚本的 Bach 单元测试框架/"
     rm index-zh_CN.1.html
 
     mmark -html -css //bach.sh/solarized-dark.min.css README.md
-    sed "/<title>/s/>/><h1 id=\"title\">Bach Unit Testing Framework for Bash<\\/h1>/"
+    sed "/<title>/s/>/>Bach Unit Testing Framework for Bash/"
     rm index.1.html
 }
