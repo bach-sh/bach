@@ -56,19 +56,19 @@ set +e
 retval=0
 PATH=/usr/bin:/bin:/sbin
 cd "$(dirname "$0")"
-declare -a failed_tests=()
+failed_tests=""
 for file in tests/*.test.sh examples/learn*; do
     echo "Running $file"
     if grep -E "^[[:blank:]]*BACH_TESTS=.+" "$file"; then
         err "Found defination of BACH_TESTS in $file"
         retval=1
-        failed_tests+=("$file")
+        failed_tests="$failed_tests:$file"
     fi
     if [ "${file##*/failed-}" != "${file}" ]; then
         ! "$bash_bin" -euo pipefail "$file"
     else
         "$bash_bin" -euo pipefail "$file"
-    fi || { retval=1; failed_tests+=("$file"); }
+    fi || { retval=1; failed_tests="$failed_tests:$file"; }
 done
 
 err ""
@@ -76,9 +76,13 @@ err ":----------:"
 if [ "$retval" -ne 0 ]; then
     err "NOT OK: Some tests failed."
     err "Failed tests:"
-    for file in "${failed_tests[@]}"; do
+    OLD_IFS="$IFS"
+    IFS=":"
+    for file in $failed_tests; do
+        [ -n "$file" ] || continue
         err "    $file"
     done
+    IFS="$OLD_IFS"
 else
     err "OK: All tests passed"
 fi
