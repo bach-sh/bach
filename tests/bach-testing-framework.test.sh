@@ -952,12 +952,36 @@ test-xargs-complicated-command-curly-brackets-expressions-assert() {
 
 
 test-xargs-complicated-command-without-dash-dash() {
-    @mock ls === @stdout foo bar foobar
+    @mock ls === @quote foo bar foobar
 
     ls | xargs -n2 bash -c 'do-something ${@//aaa/xxx}' -s
 }
 test-xargs-complicated-command-without-dash-dash-assert() {
     xargs -n2 bash -c 'do-something ${@//aaa/xxx}' -s
+}
+
+
+test-xargs-with-mock-commands() {
+    @mock ls === @quote foo bar
+    @mock do-something foo === @stdout "Hello-FOO"
+
+    ls | xargs -n1 -- do-something
+}
+test-xargs-with-mock-commands-assert() {
+    @echo "Hello-FOO"
+    do-something bar
+}
+
+
+test-xargs-with-spaces-in-params() {
+    @mock ls === @quote "a b" "c d"
+    @mock "foo-bar" "a b" === @stdout "FOO-BAR A-B"
+
+    ls | xargs -n1 -- foo-bar
+}
+test-xargs-with-spaces-in-params-assert() {
+    @echo "FOO-BAR A-B"
+    @dryrun "foo-bar" "c d"
 }
 
 

@@ -239,7 +239,7 @@ function .bach.run-tests() {
         while param="${1:-}"; [[ -n "${param:-}" ]]; do
             shift || true
             if [[ "$param" == "--" ]]; then
-                xargs_opts+=("${BASH:-bash}" "-c" "$(builtin printf "'%s' " "$@") \$@" "-s")
+                xargs_opts+=("${BASH:-bash}" "-c" "builtin printf \" '%s'\" $(builtin printf "'%s' " "$@") \"\$@\"; builtin printf '\\n'" "-s")
                 break
             else
                 xargs_opts+=("$param")
@@ -247,7 +247,7 @@ function .bach.run-tests() {
         done
         @debug "@mock-xargs" "${xargs_opts[@]}"
         if [[ "$#" -gt 0 ]]; then
-            @xargs "${xargs_opts[@]}"
+            eval "$(@xargs "${xargs_opts[@]}")"
         else
             [[ -t 0 ]] || @cat &>/dev/null
             @dryrun xargs "${xargs_opts[@]}"
