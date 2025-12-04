@@ -764,7 +764,7 @@ Example:
 
 - a command line tool
 - run inside docker containers
-n
+
 ## Clients
 
 * BMW Group
@@ -772,7 +772,7 @@ n
 
 ## Versioning
 
-The latest version of Bach is 0.7.1, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
+The latest version of Bach is 0.7.2, See [Bach Releases](https://github.com/bach-sh/bach/releases) for more.
 
 ## Author
 
