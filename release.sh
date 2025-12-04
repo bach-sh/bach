@@ -21,8 +21,9 @@ if hash mmark &>/dev/null; then
         readme="${readme##*/}"
         readme_lang="${readme#README}"
         readme_lang="${readme_lang%.md}"
-        mmark -html -css //bach.sh/solarized-dark.min.css "$readme" | tee "index${readme_lang}.html"
-        title="$(grep '<h1 ' "index${readme_lang}.html" | sed "s/<[^>]\+>//g")"
-        sed -i "/<title>/s/>/>${title}/" "index${readme_lang}.html"
+        mmark -html -css //bach.sh/solarized-dark.min.css "$readme" | tee "index${readme_lang}.1.html"
+        title="$(grep '<h1 ' "index${readme_lang}.1.html" | sed -e "s/<[^>]\+>//g" -e 's|/|\\/|g')"
+        cat "index${readme_lang}.1.html" | sed "/<title>/s/>/>${title}/" | tee "index${readme_lang}.html" >/dev/null
+        rm "index${readme_lang}.1.html"
     done
 fi

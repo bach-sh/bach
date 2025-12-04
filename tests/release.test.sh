@@ -54,10 +54,14 @@ test-convert-to-html() {
     @mock find . -maxdepth 1 -type f -name "README*.md" === @stdout ./README-zh_CN.md ./README.md
 
     @mocktrue hash mmark
-    @mock grep '<h1 ' index.html === @stdout "Bach Unit Testing Framework for Bash"
-    @mock grep '<h1 ' index-zh_CN.html === @stdout "Bash 脚本的 Bach 单元测试框架"
-    @mockpipe sed "s/<[^>]\+>//g"
+    @mock grep '<h1 ' index.1.html === @stdout "<h1 id=\"title\">Bach Unit Testing Framework for Bash</h1>"
+    @mock grep '<h1 ' index-zh_CN.1.html === @stdout "<h1 id=\"title\">Bash 脚本的 Bach 单元测试框架</h1>"
+    @allow-real sed -e "s/<[^>]\+>//g" -e 's|/|\\/|g'
+    @mock cat index-zh_CN.1.html
+    @mock cat index.1.html
+    @mock tee index-zh_CN.1.html
     @mock tee index-zh_CN.html
+    @mock tee index.1.html
     @mock tee index.html
 
     test-pass-a-valid-tag
@@ -66,8 +70,10 @@ test-convert-to-html-assert() {
     test-pass-a-valid-tag-assert
 
     mmark -html -css //bach.sh/solarized-dark.min.css README-zh_CN.md
-    sed -i "/<title>/s/>/>Bash 脚本的 Bach 单元测试框架/" index-zh_CN.html
+    sed "/<title>/s/>/><h1 id=\"title\">Bash 脚本的 Bach 单元测试框架<\\/h1>/"
+    rm index-zh_CN.1.html
 
     mmark -html -css //bach.sh/solarized-dark.min.css README.md
-    sed -i "/<title>/s/>/>Bach Unit Testing Framework for Bash/" index.html
+    sed "/<title>/s/>/><h1 id=\"title\">Bach Unit Testing Framework for Bash<\\/h1>/"
+    rm index.1.html
 }
